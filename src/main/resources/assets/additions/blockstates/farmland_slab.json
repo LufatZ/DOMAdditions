@@ -1,0 +1,11 @@
+{
+  "multipart": [
+    { "when": { "type": "bottom", "moisture": "0|1|2|3|4|5|6" }, "apply": { "model": "additions:block/farmland_slab" }},
+    { "when": { "type": "top", "moisture": "0|1|2|3|4|5|6" }, "apply": { "model": "additions:block/farmland_slab_top" }},
+    { "when": { "type": "double", "moisture": "0|1|2|3|4|5|6" }, "apply": { "model": "block/farmland" }},
+
+    { "when": { "type": "bottom", "moisture": "7" }, "apply": { "model": "additions:block/farmland_slab_moist" }},
+    { "when": { "type": "top", "moisture": "7" }, "apply": { "model": "additions:block/farmland_slab_top_moist" }},
+    { "when": { "type": "double", "moisture": "7" }, "apply": { "model": "block/farmland_moist" }}
+  ]
+}

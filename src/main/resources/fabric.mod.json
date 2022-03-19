@@ -1,28 +1,33 @@
 {
   "schemaVersion": 1,
-  "id": "blocks",
+  "id": "additions",
   "version": "${version}",
-  "name": "DayOfMind Blocks",
-  "description": "The official DayOfMind blocks mod. This is a mod for my modpack. DayOfMind Blocks adds additional blocks to the game",
-  "authors": ["LufatZ"],
-  "contact": {"homepage": "https://discord.com/invite/9EuPx2fJ4F"},
+  "name": "DayOfMind Additions",
+  "description": "DayOfMind Additions adds things that matches the vanilla gameplay",
+  "authors": [
+    "LufatZ",
+    "MysticBanana"
+  ],
+  "contact": {
+    "website": "https://discord.com/invite/9EuPx2fJ4F"
+  },
   "license": "All-Rights-Reserved",
-  "icon": "assets/blocks/icon.png",
+  "icon": "assets/additions/icon.png",
   "environment": "*",
   "entrypoints": {
     "client": [
-      "de.lufatz.blocks.client.DOM_BlocksClient"
+      "de.dayofmind.additions.client.AdditionsClient"
     ],
     "main": [
-      "de.lufatz.blocks.DOM_Blocks"
+      "de.dayofmind.additions.Additions"
     ]
   },
   "mixins": [
-    "blocks.mixins.json"
+    "additions.mixins.json"
   ],
   "depends": {
-    "fabricloader": ">=0.13.2",
+    "fabricloader": ">=0.13.3",
     "fabric": "*",
-    "minecraft": "*"
+    "minecraft": "1.18.2"
   }
 }
