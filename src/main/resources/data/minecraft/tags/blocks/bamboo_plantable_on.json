@@ -1,0 +1,7 @@
+{
+  "replace": false,
+  "values": [
+    "blocks:dirt_slab",
+    "blocks:grass_slab"
+  ]
+}

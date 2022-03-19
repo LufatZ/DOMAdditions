@@ -1,0 +1,10 @@
+{
+  "replace": false,
+  "values": [
+    "blocks:dirt_slab",
+    "blocks:farmland_slab",
+    "blocks:dirt_path_slab",
+    "blocks:grass_slab",
+    "blocks:dripstone_slab"
+  ]
+}
