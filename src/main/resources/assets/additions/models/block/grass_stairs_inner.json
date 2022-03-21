@@ -1,5 +1,5 @@
 {
-  "parent": "minecraft:block/inner_stairs",
+  "parent": "additions:block/template_overgrown_inner_stairs",
   "textures": {
     "bottom": "minecraft:block/dirt",
     "top": "minecraft:block/grass_block_top",
