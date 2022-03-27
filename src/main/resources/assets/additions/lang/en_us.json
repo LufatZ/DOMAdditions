@@ -1,5 +1,5 @@
 {
-  "ItemsGroup.additions.general": "DayOfMind",
+  "itemGroup.additions.general": "DayOfMind",
 
   "block.additions.dirt_slab": "Dirt Slab",
   "block.additions.dirt_path_slab": "Dirt Path Slab",

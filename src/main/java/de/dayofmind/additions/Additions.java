@@ -35,6 +35,6 @@ public class Additions implements ModInitializer {
 
     }
         //System.out.println("loading DayOfMind ItemGroup"); TODO Mystic fragen
-        public static final ItemGroup DayOfMind = FabricItemGroupBuilder.build(new Identifier(MOD_ID, "general"), () -> new ItemStack(DOMBlocks.DIRT_SLAB));
+        public static final ItemGroup DayOfMind = FabricItemGroupBuilder.build(new Identifier(MOD_ID, "general"), () -> new ItemStack(DOMBlocks.GRASS_STAIR));
 
 }
