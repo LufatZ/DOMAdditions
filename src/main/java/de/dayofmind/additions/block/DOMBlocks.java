@@ -18,16 +18,16 @@ public class DOMBlocks {
         public static final Block DIRT_SLAB = new SlabBlock(FabricBlockSettings.copyOf(Blocks.DIRT));
         public static final Block GRASS_SLAB = new DOMGrassSlab(FabricBlockSettings.copyOf(Blocks.GRASS_BLOCK));
         public static final Block FARMLAND_SLAB = new DOMFarmlandSlab(FabricBlockSettings.copyOf(Blocks.FARMLAND));
-        public static final Block DIRT_PATH_SLAB = new SlabBlock(FabricBlockSettings.copyOf(Blocks.DIRT_PATH));
+        public static final Block DIRT_PATH_SLAB = new DOMShortSlab(FabricBlockSettings.copyOf(Blocks.DIRT_PATH));
         public static final Block GOLD_SLAB = new SlabBlock(FabricBlockSettings.copyOf(Blocks.GOLD_BLOCK));
         public static final Block IRON_SLAB = new SlabBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK));
     //stairs
-        public static final Block DIRT_STAIR = new DOMStairsBlock(Blocks.DIRT.getDefaultState(),FabricBlockSettings.copyOf(Blocks.DIRT));
-        public static final Block GRASS_STAIR = new DOMStairsBlock(Blocks.GRASS_BLOCK.getDefaultState(),FabricBlockSettings.copyOf(Blocks.GRASS_BLOCK));
-        //public static final Block FARMLAND_STAIR = new DOMStairsBlock(Blocks.FARMLAND.getDefaultState(),FabricBlockSettings.copyOf(Blocks.FARMLAND));
-        public static final Block DIRT_PATH_STAIR = new DOMStairsBlock(Blocks.DIRT_PATH.getDefaultState(),FabricBlockSettings.copyOf(Blocks.DIRT_PATH));
-        public static final Block GOLD_STAIR = new DOMStairsBlock(Blocks.GOLD_BLOCK.getDefaultState(),FabricBlockSettings.copyOf(Blocks.GOLD_BLOCK));
-        public static final Block IRON_STAIR = new DOMStairsBlock(Blocks.IRON_BLOCK.getDefaultState(),FabricBlockSettings.copyOf(Blocks.IRON_BLOCK));
+        public static final Block DIRT_STAIR = new DOMStairs(Blocks.DIRT.getDefaultState(),FabricBlockSettings.copyOf(Blocks.DIRT));
+        public static final Block GRASS_STAIR = new DOMStairs(Blocks.GRASS_BLOCK.getDefaultState(),FabricBlockSettings.copyOf(Blocks.GRASS_BLOCK));
+        //public static final Block FARMLAND_STAIR = new DOMShortStairs(Blocks.FARMLAND.getDefaultState(),FabricBlockSettings.copyOf(Blocks.FARMLAND));
+        public static final Block DIRT_PATH_STAIR = new DOMShortStairs(Blocks.DIRT_PATH.getDefaultState(),FabricBlockSettings.copyOf(Blocks.DIRT_PATH));
+        public static final Block GOLD_STAIR = new DOMStairs(Blocks.GOLD_BLOCK.getDefaultState(),FabricBlockSettings.copyOf(Blocks.GOLD_BLOCK));
+        public static final Block IRON_STAIR = new DOMStairs(Blocks.IRON_BLOCK.getDefaultState(),FabricBlockSettings.copyOf(Blocks.IRON_BLOCK));
 
     public static void registerBlocks(){
         //slabs
