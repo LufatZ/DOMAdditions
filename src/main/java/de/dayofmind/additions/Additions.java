@@ -11,13 +11,14 @@ import net.minecraft.util.registry.Registry;
 
 /*
 TODO:
- -add all blocks                |CHECK
+ -add all blocks                |COMPLETE BUT MORE IN FUTURE
  -add all BlockItems            |Automatic
- -give all Blocks Visual        |Work in progress
+ -give all Blocks Visual        |COMPLETE BUT PARTICLE LOOK STRANGE (GRASS_SLAB)
  -Block mineable
  -give all Blocks LootTable
  -look for tags
- -Block functions
+ -Block functions               |WORKING (SNOWY; )
+ -add connected Textures
 */
 public class Additions implements ModInitializer {
 
