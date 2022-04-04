@@ -17,6 +17,11 @@ TODO:
  -look for tags
  -Block functions               |WORKING (SNOWY; )
  -add connected Textures
+
+IDEAS:
+ -Glass Slabs
+ -snowy for grass stairs and slabs
+ -stony path layer (decoration)
 */
 public class Additions implements ModInitializer {
 
