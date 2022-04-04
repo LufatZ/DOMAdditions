@@ -38,7 +38,7 @@ public class DOMGrassSlab extends SlabBlock implements Waterloggable {
     @Override
     public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState neighborState, WorldAccess world, BlockPos pos, BlockPos neighborPos) {
         if (direction == Direction.UP) {
-            return (BlockState)state.with(SNOWY, DOMGrassSlab.isSnow(neighborState));
+            return state.with(SNOWY, DOMGrassSlab.isSnow(neighborState));
         }
         return super.getStateForNeighborUpdate(state, direction, neighborState, world, pos, neighborPos);
     }
