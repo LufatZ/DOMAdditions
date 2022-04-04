@@ -23,7 +23,7 @@ public class DOMBlocks {
         public static final Block IRON_SLAB = new SlabBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK));
     //stairs
         public static final Block DIRT_STAIR = new DOMStairs(Blocks.DIRT.getDefaultState(),FabricBlockSettings.copyOf(Blocks.DIRT));
-        public static final Block GRASS_STAIR = new DOMStairs(Blocks.GRASS_BLOCK.getDefaultState(),FabricBlockSettings.copyOf(Blocks.GRASS_BLOCK));
+        public static final Block GRASS_STAIR = new DOMGrassStair(Blocks.ACACIA_STAIRS.getDefaultState(),FabricBlockSettings.copyOf(Blocks.GRASS_BLOCK)); //TODO Temporary Default state as acacia stair, better fix later
         //public static final Block FARMLAND_STAIR = new DOMShortStairs(Blocks.FARMLAND.getDefaultState(),FabricBlockSettings.copyOf(Blocks.FARMLAND));
         public static final Block DIRT_PATH_STAIR = new DOMShortStairs(Blocks.DIRT_PATH.getDefaultState(),FabricBlockSettings.copyOf(Blocks.DIRT_PATH));
         public static final Block GOLD_STAIR = new DOMStairs(Blocks.GOLD_BLOCK.getDefaultState(),FabricBlockSettings.copyOf(Blocks.GOLD_BLOCK));
