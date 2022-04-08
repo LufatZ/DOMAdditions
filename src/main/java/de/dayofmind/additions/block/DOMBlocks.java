@@ -17,23 +17,23 @@ public class DOMBlocks {
     //slabs
         public static final Block DIRT_SLAB = new SlabBlock(FabricBlockSettings.copyOf(Blocks.DIRT));
         public static final Block GRASS_SLAB = new DOMGrassSlab(FabricBlockSettings.copyOf(Blocks.GRASS_BLOCK));
-        public static final Block FARMLAND_SLAB = new DOMFarmlandSlab(FabricBlockSettings.copyOf(Blocks.FARMLAND));
         public static final Block DIRT_PATH_SLAB = new DOMShortSlab(FabricBlockSettings.copyOf(Blocks.DIRT_PATH));
         public static final Block GOLD_SLAB = new SlabBlock(FabricBlockSettings.copyOf(Blocks.GOLD_BLOCK));
         public static final Block IRON_SLAB = new SlabBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK));
     //stairs
         public static final Block DIRT_STAIR = new DOMStairs(Blocks.DIRT.getDefaultState(),FabricBlockSettings.copyOf(Blocks.DIRT));
         public static final Block GRASS_STAIR = new DOMGrassStair(Blocks.ACACIA_STAIRS.getDefaultState(),FabricBlockSettings.copyOf(Blocks.GRASS_BLOCK)); //TODO Temporary Default state as acacia stair, better fix later
-        //public static final Block FARMLAND_STAIR = new DOMShortStairs(Blocks.FARMLAND.getDefaultState(),FabricBlockSettings.copyOf(Blocks.FARMLAND));
         public static final Block DIRT_PATH_STAIR = new DOMShortStairs(Blocks.DIRT_PATH.getDefaultState(),FabricBlockSettings.copyOf(Blocks.DIRT_PATH));
         public static final Block GOLD_STAIR = new DOMStairs(Blocks.GOLD_BLOCK.getDefaultState(),FabricBlockSettings.copyOf(Blocks.GOLD_BLOCK));
         public static final Block IRON_STAIR = new DOMStairs(Blocks.IRON_BLOCK.getDefaultState(),FabricBlockSettings.copyOf(Blocks.IRON_BLOCK));
+    //blocks
+    //items
+
 
     public static void registerBlocks(){
         //slabs
             registerBlock("dirt_slab", DIRT_SLAB);
             registerBlock("grass_slab", GRASS_SLAB);
-            registerBlock("farmland_slab", FARMLAND_SLAB);
             registerBlock("dirt_path_slab", DIRT_PATH_SLAB);
             registerBlock("gold_slab", GOLD_SLAB);
             registerBlock("iron_slab", IRON_SLAB);
@@ -44,12 +44,11 @@ public class DOMBlocks {
             registerBlock("dirt_path_stair", DIRT_PATH_STAIR);
             registerBlock("gold_stair", GOLD_STAIR);
             registerBlock("iron_stair", IRON_STAIR);
+        //blocks
     }
 
 
-
-
-    //for Block registration
+    //for BlockItem registration
     private static void registerBlock(String name, Block block) {
         registerBlock(name, block, null);
     }

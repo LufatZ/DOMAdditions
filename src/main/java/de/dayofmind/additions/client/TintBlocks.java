@@ -6,8 +6,7 @@ import net.minecraft.client.color.world.BiomeColors;
 import net.minecraft.client.color.world.GrassColors;
 import net.minecraft.client.render.RenderLayer;
 
-import static de.dayofmind.additions.block.DOMBlocks.GRASS_SLAB;
-import static de.dayofmind.additions.block.DOMBlocks.GRASS_STAIR;
+import static de.dayofmind.additions.block.DOMBlocks.*;
 
 public class TintBlocks {
     public static void TintGrassBlocks() {

@@ -1,5 +1,5 @@
 {
-  "parent": "additions:block/template_farmland_slab_top",
+  "parent": "additions:block/short_slab_top",
   "textures": {
     "bottom": "minecraft:block/dirt",
     "top": "minecraft:block/dirt_path_top",

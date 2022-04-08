@@ -15,7 +15,7 @@ TODO:
  -Block mineable
  -give all Blocks LootTable
  -look for tags
- -Block functions               |WORKING (SNOWY; )
+ -Block functions               |WORKING (SNOWY_Grass_Slab; ...))
  -add connected Textures
 
 IDEAS:
