@@ -4,6 +4,7 @@
   "package": "de.dayofmind.additions.mixins",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
+    "DOMShovelMixin"
   ],
   "client": [
   ],

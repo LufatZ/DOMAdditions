@@ -31,6 +31,9 @@ public class DOMBlocks {
 
 
     public static void registerBlocks(){
+
+        System.out.println("DayOfMind is just adding blocks to minecraft");
+
         //slabs
             registerBlock("dirt_slab", DIRT_SLAB);
             registerBlock("grass_slab", GRASS_SLAB);
@@ -40,7 +43,6 @@ public class DOMBlocks {
         //stairs
             registerBlock("dirt_stair", DIRT_STAIR);
             registerBlock("grass_stair", GRASS_STAIR);
-            //registerBlock("farmland_stair", FARMLAND_STAIR);
             registerBlock("dirt_path_stair", DIRT_PATH_STAIR);
             registerBlock("gold_stair", GOLD_STAIR);
             registerBlock("iron_stair", IRON_STAIR);
