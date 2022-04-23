@@ -22,8 +22,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.Map;
 
-import static net.minecraft.block.StairsBlock.FACING;
-import static net.minecraft.block.StairsBlock.HALF;
+import static net.minecraft.block.StairsBlock.*;
 
 @Mixin(ShovelItem.class)
 public class DOMShovelMixin {
@@ -62,7 +61,7 @@ public class DOMShovelMixin {
             }
         }
         if (context.getSide() != Direction.DOWN && blockState.getBlock() instanceof StairsBlock && world.getBlockState(blockPos).isIn(BlockTags.DIRT)) {
-            BlockState blockState4 = PATH_STATES3.get(blockState.getBlock()).with(FACING, blockState.get(FACING)).with(HALF, blockState.get(HALF));
+            BlockState blockState4 = PATH_STATES3.get(blockState.getBlock()).with(FACING, blockState.get(FACING)).with(HALF, blockState.get(StairsBlock.HALF)).with(StairsBlock.WATERLOGGED, blockState.get(StairsBlock.WATERLOGGED)).with(SHAPE, blockState.get(SHAPE));
             BlockState blockState5 = null;
             PlayerEntity playerEntity = context.getPlayer();
 
@@ -80,7 +79,7 @@ public class DOMShovelMixin {
             }
         }
         if (context.getSide() != Direction.DOWN && blockState.getBlock() instanceof SlabBlock && world.getBlockState(blockPos).isIn(BlockTags.DIRT)) {
-            BlockState blockState4 = PATH_STATES2.get(blockState.getBlock()).with(SlabBlock.TYPE, blockState.get(SlabBlock.TYPE));
+            BlockState blockState4 = PATH_STATES2.get(blockState.getBlock()).with(SlabBlock.TYPE, blockState.get(SlabBlock.TYPE)).with(SlabBlock.WATERLOGGED, blockState.get(SlabBlock.WATERLOGGED));
             BlockState blockState5 = null;
             PlayerEntity playerEntity = context.getPlayer();
 
