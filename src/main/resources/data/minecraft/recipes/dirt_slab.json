@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "dirt_slab",
+  "pattern": [
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "minecraft:dirt"
+    }
+  },
+  "result": {
+    "item": "additions:dirt_slab",
+    "count": 6
+  }
+}

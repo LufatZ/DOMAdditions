@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "additions:gold_slab",
+    "additions:gold_stair",
+    "additions:iron_slab",
+    "additions:iron_stair"
+  ]
+}

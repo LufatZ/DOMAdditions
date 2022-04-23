@@ -30,7 +30,8 @@ public class DOMShovelMixin {
     private static final Map<Block, BlockState> PATH_STATES = Maps.newHashMap(new ImmutableMap.Builder<Block, BlockState>().put(Blocks.GRASS_BLOCK, Blocks.DIRT_PATH.getDefaultState()).put(Blocks.DIRT, Blocks.DIRT_PATH.getDefaultState()).put(Blocks.PODZOL, Blocks.DIRT_PATH.getDefaultState()).put(Blocks.COARSE_DIRT, Blocks.DIRT_PATH.getDefaultState()).put(Blocks.MYCELIUM, Blocks.DIRT_PATH.getDefaultState()).put(Blocks.ROOTED_DIRT, Blocks.DIRT_PATH.getDefaultState()).build());
     private static final Map<Block, BlockState>  PATH_STATES2 = Maps.newHashMap(new ImmutableMap.Builder<Block, BlockState>().put(DOMBlocks.DIRT_SLAB, DOMBlocks.DIRT_PATH_SLAB.getDefaultState()).put(DOMBlocks.GRASS_SLAB, DOMBlocks.DIRT_PATH_SLAB.getDefaultState()).build());
     private static final Map<Block, BlockState>  PATH_STATES3 = Maps.newHashMap(new ImmutableMap.Builder<Block, BlockState>().put(DOMBlocks.DIRT_STAIR, DOMBlocks.DIRT_PATH_STAIR.getDefaultState()).put(DOMBlocks.GRASS_STAIR, DOMBlocks.DIRT_PATH_STAIR.getDefaultState()).build());
-    //TODO achte auf slabtyp und stair orientation
+
+    //TODO optimieren
 
     @Inject(at = @At("HEAD"), method = "useOnBlock", cancellable = true)
     public void useOnBlock(ItemUsageContext context, CallbackInfoReturnable<ActionResult> cir) {
