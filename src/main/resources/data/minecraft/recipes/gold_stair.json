@@ -8,11 +8,11 @@
   ],
   "key": {
     "#": {
-      "item": "minecraft:dirt_path"
+      "item": "minecraft:gold_block"
     }
   },
   "result": {
-    "item": "additions:dirt_path_stair",
+    "item": "additions:gold_stair",
     "count": 4
   }
 }

@@ -8,11 +8,11 @@
   ],
   "key": {
     "#": {
-      "item": "minecraft:dirt_path"
+      "item": "minecraft:iron_block"
     }
   },
   "result": {
-    "item": "additions:dirt_path_stair",
+    "item": "additions:iron_stair",
     "count": 4
   }
 }

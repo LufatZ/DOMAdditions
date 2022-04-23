@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "dirt_slab",
+  "pattern": [
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "minecraft:gold_block"
+    }
+  },
+  "result": {
+    "item": "additions:gold_slab",
+    "count": 6
+  }
+}
