@@ -1,6 +1,7 @@
 package de.dayofmind.additions;
 
 import de.dayofmind.additions.block.DOMBlocks;
+import de.dayofmind.additions.block.TraverseBlocks;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
 import net.minecraft.item.ItemGroup;
@@ -34,9 +35,9 @@ public class Additions implements ModInitializer {
         System.out.println("Please take a look on my Discord: https://discord.com/invite/9EuPx2fJ4F");
         System.out.println("Please report bugs to LufatZ or MysticBanana");
         DOMBlocks.registerBlocks();
+        TraverseBlocks.registerBlocks();
 
     }
         //System.out.println("loading DayOfMind ItemGroup"); TODO Mystic fragen
         public static final ItemGroup DayOfMind = FabricItemGroupBuilder.build(new Identifier(MOD_ID, "general"), () -> new ItemStack(DOMBlocks.GRASS_STAIR));
-
 }

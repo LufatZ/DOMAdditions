@@ -29,7 +29,6 @@ public class DOMBlocks {
     //blocks
     //items
 
-
     public static void registerBlocks(){
 
         System.out.println("DayOfMind is just adding blocks to minecraft");
