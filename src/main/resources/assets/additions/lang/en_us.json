@@ -6,11 +6,12 @@
   "block.additions.grass_slab": "Grass Slab",
   "block.additions.gold_slab": "Gold Slab",
   "block.additions.iron_slab": "Iron Slab",
+  "block.additions.diamond_slab": "Diamond Slab",
 
   "block.additions.dirt_stair": "Dirt Stair",
   "block.additions.dirt_path_stair": "Dirt Path Stair",
   "block.additions.grass_stair": "Grass Stair",
-  "block.additions.farmland_stair": "Farmland Stair",
   "block.additions.gold_stair": "Gold Stair",
-  "block.additions.iron_stair": "Iron Stair"
+  "block.additions.iron_stair": "Iron Stair",
+  "block.additions.diamond_stair": "Diamond Stair"
 }

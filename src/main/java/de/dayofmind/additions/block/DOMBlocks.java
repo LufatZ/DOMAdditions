@@ -25,12 +25,14 @@ public class DOMBlocks {
         public static final Block DIRT_PATH_SLAB = new DOMShortSlab(FabricBlockSettings.copyOf(Blocks.DIRT_PATH));
         public static final Block GOLD_SLAB = new SlabBlock(FabricBlockSettings.copyOf(Blocks.GOLD_BLOCK));
         public static final Block IRON_SLAB = new SlabBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK));
+        public static final Block DIAMOND_SLAB = new SlabBlock(FabricBlockSettings.copyOf(Blocks.DIAMOND_BLOCK));
     //stairs
         public static final Block DIRT_STAIR = new DOMStairs(Blocks.DIRT.getDefaultState(),FabricBlockSettings.copyOf(Blocks.DIRT));
         public static final Block GRASS_STAIR = new DOMGrassStair(Blocks.ACACIA_STAIRS.getDefaultState(),FabricBlockSettings.copyOf(Blocks.GRASS_BLOCK)); //TODO Temporary Default state as acacia stair, better fix later
         public static final Block DIRT_PATH_STAIR = new DOMShortStairs(Blocks.DIRT_PATH.getDefaultState(),FabricBlockSettings.copyOf(Blocks.DIRT_PATH));
         public static final Block GOLD_STAIR = new DOMStairs(Blocks.GOLD_BLOCK.getDefaultState(),FabricBlockSettings.copyOf(Blocks.GOLD_BLOCK));
         public static final Block IRON_STAIR = new DOMStairs(Blocks.IRON_BLOCK.getDefaultState(),FabricBlockSettings.copyOf(Blocks.IRON_BLOCK));
+        public static final Block DIAMOND_STAIR = new DOMStairs(Blocks.DIAMOND_BLOCK.getDefaultState(),FabricBlockSettings.copyOf(Blocks.DIAMOND_BLOCK));
     //blocks
     //items
 
@@ -44,12 +46,14 @@ public class DOMBlocks {
             registerBlock("dirt_path_slab", DIRT_PATH_SLAB);
             registerBlock("gold_slab", GOLD_SLAB);
             registerBlock("iron_slab", IRON_SLAB);
+            registerBlock("diamond_slab", DIAMOND_SLAB);
         //stairs
             registerBlock("dirt_stair", DIRT_STAIR);
             registerBlock("grass_stair", GRASS_STAIR);
             registerBlock("dirt_path_stair", DIRT_PATH_STAIR);
             registerBlock("gold_stair", GOLD_STAIR);
             registerBlock("iron_stair", IRON_STAIR);
+            registerBlock("diamond_stair", DIAMOND_STAIR);
         //blocks
     }
 

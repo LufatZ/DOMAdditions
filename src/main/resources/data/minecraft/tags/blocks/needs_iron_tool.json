@@ -2,6 +2,8 @@
   "replace": false,
   "values": [
     "additions:gold_slab",
-    "additions:gold_stair"
+    "additions:gold_stair",
+    "additions:diamond_slab",
+    "additions:diamond_stair"
   ]
 }

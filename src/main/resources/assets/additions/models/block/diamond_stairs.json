@@ -1,0 +1,9 @@
+{
+  "parent": "minecraft:block/stairs",
+  "textures": {
+    "particle": "block/diamond_block",
+    "bottom": "block/diamond_block",
+    "top": "block/diamond_block",
+    "side": "block/diamond_block"
+  }
+}
