@@ -12,9 +12,14 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.registry.Registry;
 
+//traverse Blocks
 //IMPORTANT this is only temporary, because traverse hasn´t updated yet.
+//Using block-names and assets of the original traverse mod, with the permission of TerraformersMC
 public class TraverseBlocks {
-    //traverse Blocks
+
+    //adding Traverse Item Group
+    public static final ItemGroup Traverse = FabricItemGroupBuilder.build(new Identifier("traverse", "items"), () -> new ItemStack(TraverseBlocks.RED_AUTUMNAL_LEAVES));
+
     //leaves
     public static final Block RED_AUTUMNAL_LEAVES = new LeavesBlock(FabricBlockSettings.copyOf(Blocks.OAK_LEAVES));
     public static final Block BROWN_AUTUMNAL_LEAVES = new LeavesBlock(FabricBlockSettings.copyOf(Blocks.OAK_LEAVES));
@@ -77,8 +82,6 @@ public class TraverseBlocks {
         registerTraverseBlock("fir_trapdoor", FIR_TRAPDOOR);
     }
     //for BlockItem registration
-
-    public static final ItemGroup Traverse = FabricItemGroupBuilder.build(new Identifier("traverse", "items"), () -> new ItemStack(TraverseBlocks.RED_AUTUMNAL_LEAVES));
 
     private static void registerTraverseBlock(String name, Block block) {
         registerTraverseBlock(name, block, null);
