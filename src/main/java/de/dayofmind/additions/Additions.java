@@ -12,7 +12,7 @@ TODO:
  -Block mineable
  -give all Blocks LootTable
  -look for tags
- -Block functions               |WORKING (SNOWY_Grass_Slab; ...))
+ -Block functions               |Missing (dirt slab or stair after time to grass slab or stair)
  -add connected Textures
 
 IDEAS:

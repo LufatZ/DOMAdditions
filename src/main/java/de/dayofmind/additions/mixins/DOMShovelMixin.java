@@ -30,7 +30,7 @@ public class DOMShovelMixin {
     private static final Map<Block, BlockState>  PATH_STATES2 = Maps.newHashMap(new ImmutableMap.Builder<Block, BlockState>().put(DOMBlocks.DIRT_SLAB, DOMBlocks.DIRT_PATH_SLAB.getDefaultState()).put(DOMBlocks.GRASS_SLAB, DOMBlocks.DIRT_PATH_SLAB.getDefaultState()).build());
     private static final Map<Block, BlockState>  PATH_STATES3 = Maps.newHashMap(new ImmutableMap.Builder<Block, BlockState>().put(DOMBlocks.DIRT_STAIR, DOMBlocks.DIRT_PATH_STAIR.getDefaultState()).put(DOMBlocks.GRASS_STAIR, DOMBlocks.DIRT_PATH_STAIR.getDefaultState()).build());
 
-    //TODO optimieren
+    //TODO scramble and optimize (possibly register or change new tags)
 
     @Inject(at = @At("HEAD"), method = "useOnBlock", cancellable = true)
     public void useOnBlock(ItemUsageContext context, CallbackInfoReturnable<ActionResult> cir) {
