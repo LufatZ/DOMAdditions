@@ -1,2 +1,15 @@
-# DOMAdditions
-DayOfMind Additions adds things that matches the vanilla gameplay and complete the DayOfMind-Modpack. Thanks to TerraformersMC for using blocks from their mod Traverse (https://github.com/TerraformersMC/Traverse)
+# **DOMAdditions**
+___
+![img.png](https://bisecthosting.com/images/CF/DayOfMind/BH_DM_Header.png)
+### About DayOfMind Additions
+DayOfMind Additions adds things that matches the vanilla gameplay and complete the DayOfMind-Modpack.
+### Special Thanks
+Thanks to TerraformersMC for the permission to using blocks from their mod Traverse (https://github.com/TerraformersMC/Traverse)
+### Mod Authors
+LufatZ <br>
+MysticBanana
+### Contact Us
+Discord (Modpack-Discord): https://discord.com/invite/9EuPx2fJ4F <br>
+CurseForge (Modpack-Site): https://www.curseforge.com/minecraft/modpacks/day-of-mind
+### Download
+CurseForge: https://www.curseforge.com/minecraft/mc-mods/dayofmind
