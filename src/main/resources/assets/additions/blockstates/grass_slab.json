@@ -4,10 +4,10 @@
       "model": "additions:block/grass_slab"
     },
     "type=double,snowy=false": {
-      "model": "minecraft:block/grass_block"
+      "model": "additions:block/grass_block"
     },
     "type=double,snowy=true": {
-      "model": "minecraft:block/grass_block_snow"
+      "model": "additions:block/grass_block_snow"
     },
     "type=top": {
       "model": "additions:block/grass_slab_top"
