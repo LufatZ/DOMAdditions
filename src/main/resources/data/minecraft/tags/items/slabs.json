@@ -1,0 +1,11 @@
+{
+  "replace": false,
+  "values": [
+    "additions:dirt_slab",
+    "additions:grass_slab",
+    "additions:dirt_path_slab",
+    "additions:gold_slab",
+    "additions:iron_slab",
+    "additions:diamond_slab"
+  ]
+}
