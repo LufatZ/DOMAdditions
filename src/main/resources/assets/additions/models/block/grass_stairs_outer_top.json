@@ -1,6 +1,7 @@
 {
   "parent": "additions:block/template_overgrown_outer_stairs_top",
   "textures": {
+    "particle": "#top",
     "bottom": "minecraft:block/dirt",
     "top": "minecraft:block/grass_block_top",
     "side": "minecraft:block/grass_block_side",

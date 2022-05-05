@@ -3,7 +3,7 @@
   "id": "additions",
   "version": "${version}",
   "name": "DayOfMind Additions",
-  "description": "DayOfMind Additions adds things that matches the vanilla gameplay",
+  "description": "DayOfMind Additions adds things that matches the vanilla gameplay and complete the DayOfMind-Modpack. Thanks to TerraformersMC for using blocks from their mod Traverse (https://github.com/TerraformersMC/Traverse)",
   "authors": [
     "LufatZ",
     "MysticBanana"
@@ -11,7 +11,7 @@
   "contact": {
     "website": "https://discord.com/invite/9EuPx2fJ4F"
   },
-  "license": "All-Rights-Reserved",
+  "license": "LGPL-3.0-only",
   "icon": "assets/additions/icon.png",
   "environment": "*",
   "entrypoints": {
@@ -28,6 +28,6 @@
   "depends": {
     "fabricloader": ">=0.13.3",
     "fabric": "*",
-    "minecraft": "1.18.2"
+    "minecraft": "*"
   }
 }
