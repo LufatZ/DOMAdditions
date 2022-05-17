@@ -4,6 +4,7 @@ import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.LanternBlock;
 import net.minecraft.block.SlabBlock;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
@@ -33,6 +34,12 @@ public class DOMBlocks {
         public static final Block GOLD_STAIR = new DOMStairs(Blocks.GOLD_BLOCK.getDefaultState(),FabricBlockSettings.copyOf(Blocks.GOLD_BLOCK));
         public static final Block IRON_STAIR = new DOMStairs(Blocks.IRON_BLOCK.getDefaultState(),FabricBlockSettings.copyOf(Blocks.IRON_BLOCK));
         public static final Block DIAMOND_STAIR = new DOMStairs(Blocks.DIAMOND_BLOCK.getDefaultState(),FabricBlockSettings.copyOf(Blocks.DIAMOND_BLOCK));
+
+    //lanterns
+        public static final Block NETHERITE_LANTERN = new LanternBlock(FabricBlockSettings.copyOf(Blocks.LANTERN));
+        public static final Block DIAMOND_LANTERN = new LanternBlock(FabricBlockSettings.copyOf(Blocks.LANTERN));
+        public static final Block COPPER_LANTERN = new LanternBlock(FabricBlockSettings.copyOf(Blocks.LANTERN));
+
     //blocks
     //items
 
@@ -54,6 +61,10 @@ public class DOMBlocks {
             registerBlock("gold_stair", GOLD_STAIR);
             registerBlock("iron_stair", IRON_STAIR);
             registerBlock("diamond_stair", DIAMOND_STAIR);
+        //lanterns
+            registerBlock("netherite_lantern", NETHERITE_LANTERN);
+            registerBlock("diamond_lantern", DIAMOND_LANTERN);
+            registerBlock("copper_lantern", COPPER_LANTERN);
         //blocks
     }
 

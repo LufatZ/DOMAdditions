@@ -1,6 +1,6 @@
 package de.dayofmind.additions.client;
 
-import de.dayofmind.additions.block.TraverseBlocks;
+import de.dayofmind.additions.block.DOMBlocks;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.minecraft.client.render.RenderLayer;
 
@@ -13,8 +13,7 @@ public class TextureCutOut {
         BlockRenderLayerMap.INSTANCE.putBlock(GRASS_SLAB, RenderLayer.getCutoutMipped());
         //stair
         BlockRenderLayerMap.INSTANCE.putBlock(GRASS_STAIR, RenderLayer.getCutoutMipped());
-
-        //TRAVERSE BLOCKS (TEMPORARY)
-        BlockRenderLayerMap.INSTANCE.putBlocks(RenderLayer.getCutout(), TraverseBlocks.FIR_DOOR, TraverseBlocks.FIR_TRAPDOOR);
+        //lanterns
+        BlockRenderLayerMap.INSTANCE.putBlocks(RenderLayer.getCutout(), DOMBlocks.COPPER_LANTERN, DOMBlocks.NETHERITE_LANTERN, DOMBlocks.DIAMOND_LANTERN);
     }
 }

@@ -1,7 +1,6 @@
 package de.dayofmind.additions;
 
 import de.dayofmind.additions.block.DOMBlocks;
-import de.dayofmind.additions.block.TraverseBlocks;
 import net.fabricmc.api.ModInitializer;
 
 /*
@@ -32,9 +31,6 @@ public class Additions implements ModInitializer {
         System.out.println("Please report bugs to LufatZ or MysticBanana");
         //Register DoM blocks
         DOMBlocks.registerBlocks();
-        //Register Blocks from Traverse (unofficial port of a few Traverse blocks with the use of some original assets and names of the blocks). No biomes are added and blocks are only used to keep old worlds alive.
-        System.out.println("Thanks to TerraformersMC for the permission to port some Blocks to 1.18.2");
-        TraverseBlocks.registerBlocks();
 
     }
 }

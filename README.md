@@ -4,7 +4,7 @@ ___
 ### About DayOfMind Additions
 DayOfMind Additions adds things that matches the vanilla gameplay and complete the DayOfMind-Modpack.
 ### Special Thanks
-Thanks to TerraformersMC for the permission to using blocks from their mod Traverse (https://github.com/TerraformersMC/Traverse)
+To the community
 ### Mod Authors
 LufatZ <br>
 MysticBanana

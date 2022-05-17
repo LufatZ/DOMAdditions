@@ -6,12 +6,16 @@
   "block.additions.grass_slab": "Gras Stufe",
   "block.additions.gold_slab": "Gold Stufe",
   "block.additions.iron_slab": "Eisen Stufe",
-  "block.additions.diamond_slab": "Diamand Stufe",
+  "block.additions.diamond_slab": "Diamant Stufe",
 
   "block.additions.dirt_stair": "Erd Treppe",
   "block.additions.dirt_path_stair": "Trampelpfad Treppe",
   "block.additions.grass_stair": "Gras Treppe",
   "block.additions.gold_stair": "Gold Treppe",
   "block.additions.iron_stair": "Eisen Treppe",
-  "block.additions.diamond_stair": "Diamand Treppe"
+  "block.additions.diamond_stair": "Diamant Treppe",
+
+  "block.additions.netherite_lantern": "Netherite Laterne",
+  "block.additions.copper_lantern": "Kupfer Laterne",
+  "block.additions.diamond_lantern": "Diamant Laterne"
 }
