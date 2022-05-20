@@ -3,8 +3,9 @@ ___
 ![img.png](https://bisecthosting.com/images/CF/DayOfMind/BH_DM_Header.png)
 ### About DayOfMind Additions
 DayOfMind Additions adds things that matches the vanilla gameplay and complete the DayOfMind-Modpack.
+I have many things planned for this mod, but, for now, this mod just adds block variants.
 ### Special Thanks
-To the community
+To our community :)
 ### Mod Authors
 LufatZ <br>
 MysticBanana
