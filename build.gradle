@@ -12,12 +12,18 @@ repositories {
     // Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
     // See https://docs.gradle.org/current/userguide/declaring_repositories.html
     // for more information about repositories.
+
+    //added Mods
+    //modMenu
     maven{
         url("https://maven.terraformersmc.com/releases/")
     }
+    //REI
     maven{
         url "https://maven.shedaniel.me"
     }
+    //WTHIT
+    maven { url "https://maven.bai.lol" }
 }
 
 dependencies {
@@ -34,6 +40,9 @@ dependencies {
     modImplementation "com.terraformersmc:modmenu:4.0.0-beta.4"
     //REI
     modRuntimeOnly "me.shedaniel:RoughlyEnoughItems-fabric:9.0.462"
+    //WTHIT
+    modRuntimeOnly "mcp.mobius.waila:wthit:fabric-5.1.1"
+    modRuntimeOnly "lol.bai:badpackets:fabric-0.1.2"
 }
 
 processResources {
