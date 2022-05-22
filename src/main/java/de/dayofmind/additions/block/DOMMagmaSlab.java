@@ -13,28 +13,26 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.tag.FluidTags;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 
-import java.util.Random;
-
 public class DOMMagmaSlab extends SlabBlock implements Waterloggable {
-
-    private static final int SCHEDULED_TICK_DELAY = 20;
 
     public DOMMagmaSlab(Settings settings) {
         super(settings);
     }
+    private static final int SCHEDULED_TICK_DELAY = 20;
 
     public void onSteppedOn(World world, BlockPos pos, BlockState state, Entity entity) {
-        if (!entity.isFireImmune() && entity instanceof LivingEntity && !EnchantmentHelper.hasFrostWalker((LivingEntity)entity)) {
+        if (!entity.bypassesSteppingEffects() && entity instanceof LivingEntity && !EnchantmentHelper.hasFrostWalker((LivingEntity)entity)) {
             entity.damage(DamageSource.HOT_FLOOR, 1.0F);
         }
 
         super.onSteppedOn(world, pos, state, entity);
     }
 
-    public void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
+    public void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, net.minecraft.util.math.random.Random random) {
         BubbleColumnBlock.update(world, pos.up(), state);
     }
 
