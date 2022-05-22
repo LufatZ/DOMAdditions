@@ -4,6 +4,18 @@
     "additions:gold_slab",
     "additions:gold_stair",
     "additions:iron_slab",
-    "additions:iron_stair"
+    "additions:iron_stair",
+    "additions:diamond_slab",
+    "additions:diamond_stair",
+    "additions:smooth_basalt_slab",
+    "additions:smooth_basalt_stair",
+    "additions:polished_basalt_slab",
+    "additions:polished_basalt_stair",
+    "additions:magma_slab",
+    "additions:magma_stair",
+    "additions:obsidian_slab",
+    "additions:obsidian_stair",
+    "additions:crying_obsidian_slab",
+    "additions:crying_obsidian_stair"
   ]
 }

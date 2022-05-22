@@ -6,6 +6,11 @@
     "additions:dirt_path_slab",
     "additions:gold_slab",
     "additions:iron_slab",
-    "additions:diamond_slab"
+    "additions:diamond_slab",
+    "additions:smooth_basalt_slab",
+    "additions:polished_basalt_slab",
+    "additions:magma_slab",
+    "additions:crying_obsidian_slab",
+    "additions:obsidian_slab"
   ]
 }
