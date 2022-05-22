@@ -14,6 +14,6 @@ public class TextureCutOut {
         //stair
         BlockRenderLayerMap.INSTANCE.putBlock(GRASS_STAIR, RenderLayer.getCutoutMipped());
         //lanterns
-        BlockRenderLayerMap.INSTANCE.putBlocks(RenderLayer.getCutout(), DOMBlocks.COPPER_LANTERN, DOMBlocks.NETHERITE_LANTERN, DOMBlocks.DIAMOND_LANTERN);
+        BlockRenderLayerMap.INSTANCE.putBlocks(RenderLayer.getCutout(), DOMBlocks.COPPER_LANTERN, DOMBlocks.NETHERITE_LANTERN);
     }
 }

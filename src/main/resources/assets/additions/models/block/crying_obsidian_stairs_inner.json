@@ -1,0 +1,9 @@
+{
+  "parent": "minecraft:block/inner_stairs",
+  "textures": {
+    "particle": "block/crying_obsidian",
+    "bottom": "block/crying_obsidian",
+    "top": "block/crying_obsidian",
+    "side": "block/crying_obsidian"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "parent": "block/slab",
+  "textures": {
+    "particle": "block/obsidian",
+    "bottom": "block/obsidian",
+    "top": "block/obsidian",
+    "side": "block/obsidian"
+  }
+}

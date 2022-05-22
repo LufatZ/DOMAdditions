@@ -65,12 +65,15 @@ public class DOMLanterns extends LanternBlock implements Waterloggable {
             Block.createCuboidShape(7.5, 8, 7.5, 8.5, 9, 8.5)
     );
     public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
-        if(state.isOf(DOMBlocks.NETHERITE_LANTERN)){
-            return (Boolean)state.get(HANGING) ? NETHERITE_HANGING_SHAPE : NETHERITE_STANDING_SHAPE;
+        Boolean hanging = state.get(HANGING);
+        if(state.isOf(DOMBlocks.NETHERITE_LANTERN)) {
+            return hanging ? NETHERITE_HANGING_SHAPE : NETHERITE_STANDING_SHAPE;
         }
-        if(state.isOf(DOMBlocks.COPPER_LANTERN)){
-            return (Boolean)state.get(HANGING) ? COPPER_HANGING_SHAPE : COPPER_STANDING_SHAPE;
+        else if(state.isOf(DOMBlocks.COPPER_LANTERN)) {
+            return hanging ? COPPER_HANGING_SHAPE : COPPER_STANDING_SHAPE;
         }
-        else return (Boolean)state.get(HANGING) ? HANGING_SHAPE : STANDING_SHAPE;
+        else {
+            return hanging ? HANGING_SHAPE : STANDING_SHAPE;
+        }
     }
 }
