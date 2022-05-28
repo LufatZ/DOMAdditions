@@ -31,6 +31,5 @@ public class Additions implements ModInitializer {
         System.out.println("Please report bugs to LufatZ or MysticBanana");
         //Register DoM blocks
         DOMBlocks.registerBlocks();
-
     }
-}
+    }

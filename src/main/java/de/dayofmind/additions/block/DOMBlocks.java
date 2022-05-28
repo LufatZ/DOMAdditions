@@ -1,14 +1,14 @@
 package de.dayofmind.additions.block;
 
+import de.dayofmind.additions.item.DOMGuitar;
 import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.SlabBlock;
+import net.minecraft.block.*;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
+import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
@@ -49,7 +49,12 @@ public class DOMBlocks {
         public static final Block COPPER_LANTERN = new DOMLanterns(FabricBlockSettings.copyOf(Blocks.LANTERN));
 
     //blocks
+    //instruments
+        public static final Block GUITAR = new DOMInstrumentBlock(FabricBlockSettings.of(Material.WOOD, MapColor.BROWN).strength(2.0F, 3.0F).sounds(BlockSoundGroup.WOOD));
+
     //items
+        public static final Item GUITAR_ITEM = new DOMGuitar(DOMBlocks.GUITAR,(new Item.Settings().group(DayOfMind)));
+
 
     public static void registerBlocks(){
 
@@ -83,6 +88,9 @@ public class DOMBlocks {
             registerBlock("netherite_lantern", NETHERITE_LANTERN);
             registerBlock("copper_lantern", COPPER_LANTERN);
         //blocks
+        //instruments
+
+        registerBlock("guitar", GUITAR, (BlockItem) GUITAR_ITEM);
     }
 
 
