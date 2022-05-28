@@ -39,7 +39,7 @@ dependencies {
     //modmenu
     modImplementation "com.terraformersmc:modmenu:4.0.0-beta.4"
     //REI
-    modRuntimeOnly "me.shedaniel:RoughlyEnoughItems-fabric:9.0.462"
+    //modRuntimeOnly "me.shedaniel:RoughlyEnoughItems-fabric:9.0.466"
     //WTHIT
     modRuntimeOnly "mcp.mobius.waila:wthit:fabric-5.1.1"
     modRuntimeOnly "lol.bai:badpackets:fabric-0.1.2"

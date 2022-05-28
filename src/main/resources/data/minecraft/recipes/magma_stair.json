@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "stairs",
+  "pattern": [
+    "#  ",
+    "## ",
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "minecraft:magma_block"
+    }
+  },
+  "result": {
+    "item": "additions:magma_stair",
+    "count": 4
+  }
+}

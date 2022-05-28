@@ -12,20 +12,20 @@ import org.spongepowered.asm.mixin.Overwrite;
 import static net.minecraft.block.BubbleColumnBlock.DRAG;
 
 @Mixin(BubbleColumnBlock.class)
-public class MagmaSlabMixin {
+public class DOMBubbleColumnBlockMixin {
 
     //TODO temporär überschreiben... später bessere lösung
 
     /**
-     * @author Mojang
+     * @author original: Mojang, modified by LufatZ
      */
     @Overwrite
         public boolean canPlaceAt(BlockState state, WorldView world, BlockPos pos) {
             BlockState blockState = world.getBlockState(pos.down());
-            return blockState.isOf(Blocks.BUBBLE_COLUMN) || blockState.isOf(DOMBlocks.MAGMA_SLAB) || blockState.isOf(Blocks.MAGMA_BLOCK) || blockState.isOf(Blocks.SOUL_SAND);
+            return blockState.isOf(Blocks.BUBBLE_COLUMN) || blockState.isOf(DOMBlocks.MAGMA_SLAB) || blockState.isOf(DOMBlocks.MAGMA_STAIR) || blockState.isOf(Blocks.MAGMA_BLOCK) || blockState.isOf(Blocks.SOUL_SAND);
         }
     /**
-     * @author Mojang
+     * @author original: Mojang, modified by LufatZ
      */
     @Overwrite
     private static BlockState getBubbleState(BlockState state) {
@@ -34,7 +34,7 @@ public class MagmaSlabMixin {
         } else if (state.isOf(Blocks.SOUL_SAND)) {
             return (BlockState) Blocks.BUBBLE_COLUMN.getDefaultState().with(DRAG, false);
         }else {
-            return state.isOf(Blocks.MAGMA_BLOCK) || state.isOf(DOMBlocks.MAGMA_SLAB) ? (BlockState)Blocks.BUBBLE_COLUMN.getDefaultState().with(DRAG, true) : Blocks.WATER.getDefaultState();
+            return state.isOf(Blocks.MAGMA_BLOCK) || state.isOf(DOMBlocks.MAGMA_STAIR) || state.isOf(DOMBlocks.MAGMA_SLAB) ? (BlockState)Blocks.BUBBLE_COLUMN.getDefaultState().with(DRAG, true) : Blocks.WATER.getDefaultState();
         }
     }
 }

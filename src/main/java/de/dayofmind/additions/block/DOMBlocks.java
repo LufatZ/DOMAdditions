@@ -40,7 +40,7 @@ public class DOMBlocks {
         public static final Block DIAMOND_STAIR = new DOMStairs(Blocks.DIAMOND_BLOCK.getDefaultState(),FabricBlockSettings.copyOf(Blocks.DIAMOND_BLOCK));
         public static final Block SMOOTH_BASALT_STAIR = new DOMStairs(Blocks.BASALT.getDefaultState(),FabricBlockSettings.copyOf(Blocks.BASALT));
         public static final Block POLISHED_BASALT_STAIR = new DOMStairs(Blocks.POLISHED_BASALT.getDefaultState(),FabricBlockSettings.copyOf(Blocks.POLISHED_BASALT));
-        public static final Block MAGMA_STAIR = new DOMStairs(Blocks.MAGMA_BLOCK.getDefaultState(),FabricBlockSettings.copyOf(Blocks.MAGMA_BLOCK));
+        public static final Block MAGMA_STAIR = new DOMMagmaStair(Blocks.MAGMA_BLOCK.getDefaultState(),FabricBlockSettings.copyOf(Blocks.MAGMA_BLOCK));
         public static final Block OBSIDIAN_STAIR = new DOMStairs(Blocks.OBSIDIAN.getDefaultState(),FabricBlockSettings.copyOf(Blocks.OBSIDIAN));
         public static final Block CRYING_OBSIDIAN_STAIR = new DOMStairs(Blocks.CRYING_OBSIDIAN.getDefaultState(),FabricBlockSettings.copyOf(Blocks.CRYING_OBSIDIAN));
 
