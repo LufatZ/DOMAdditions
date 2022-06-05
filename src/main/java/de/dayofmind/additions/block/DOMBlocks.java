@@ -50,7 +50,7 @@ public class DOMBlocks {
 
     //blocks
     //instruments
-        public static final Block GUITAR = new DOMInstrumentBlock(FabricBlockSettings.of(Material.WOOD, MapColor.BROWN).strength(2.0F, 3.0F).sounds(BlockSoundGroup.WOOD));
+        public static final Block GUITAR = new DOMGuitarBlock(FabricBlockSettings.of(Material.WOOD, MapColor.BROWN).strength(2.0F, 3.0F).sounds(BlockSoundGroup.WOOD));
 
     //items
         public static final Item GUITAR_ITEM = new DOMGuitar(DOMBlocks.GUITAR,(new Item.Settings().group(DayOfMind)));
@@ -89,8 +89,7 @@ public class DOMBlocks {
             registerBlock("copper_lantern", COPPER_LANTERN);
         //blocks
         //instruments
-
-        registerBlock("guitar", GUITAR, (BlockItem) GUITAR_ITEM);
+            registerBlock("guitar", GUITAR, (BlockItem) GUITAR_ITEM);
     }
 
 

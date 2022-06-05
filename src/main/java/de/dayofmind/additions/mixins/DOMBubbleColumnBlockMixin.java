@@ -14,19 +14,11 @@ import static net.minecraft.block.BubbleColumnBlock.DRAG;
 @Mixin(BubbleColumnBlock.class)
 public class DOMBubbleColumnBlockMixin {
 
-    //TODO temporär überschreiben... später bessere lösung
-
-    /**
-     * @author original: Mojang, modified by LufatZ
-     */
     @Overwrite
         public boolean canPlaceAt(BlockState state, WorldView world, BlockPos pos) {
             BlockState blockState = world.getBlockState(pos.down());
             return blockState.isOf(Blocks.BUBBLE_COLUMN) || blockState.isOf(DOMBlocks.MAGMA_SLAB) || blockState.isOf(DOMBlocks.MAGMA_STAIR) || blockState.isOf(Blocks.MAGMA_BLOCK) || blockState.isOf(Blocks.SOUL_SAND);
         }
-    /**
-     * @author original: Mojang, modified by LufatZ
-     */
     @Overwrite
     private static BlockState getBubbleState(BlockState state) {
         if (state.isOf(Blocks.BUBBLE_COLUMN)) {
