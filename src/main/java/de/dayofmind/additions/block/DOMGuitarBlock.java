@@ -1,6 +1,5 @@
 package de.dayofmind.additions.block;
 
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.block.enums.Instrument;
@@ -153,6 +152,7 @@ public class DOMGuitarBlock extends DOMInstrumentBlock{
         return STANDING_NORTH_SHAPE();
     }
 
+    //TODO don´t know why, but maybe it is the lightning on the top sided textures that looks wierd (if direction isn´t north)
     @Override
     public VoxelShape getOutlineShape(BlockState state, BlockView view, BlockPos pos, ShapeContext ctx) {
         Direction dir = state.get(FACING);
