@@ -18,13 +18,10 @@ public class DOMShortSlab extends SlabBlock implements Waterloggable {
     public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
         SlabType slabType = state.get(TYPE);
         switch (slabType) {
-            case DOUBLE -> {
-                return DOUBLE_SHAPE;
-            }
-            case TOP -> {
-                return TOP_SHAPE;
-            }
+            case DOUBLE -> {return DOUBLE_SHAPE;}
+            case TOP -> {return TOP_SHAPE;}
+            case BOTTOM -> {return BOTTOM_SHAPE;}
+            default -> {return BOTTOM_SHAPE;}
         }
-        return BOTTOM_SHAPE;
     }
 }

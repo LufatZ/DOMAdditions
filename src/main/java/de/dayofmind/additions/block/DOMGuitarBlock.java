@@ -1,25 +1,17 @@
 package de.dayofmind.additions.block;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.ShapeContext;
 import net.minecraft.block.enums.Instrument;
-import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.state.property.Properties;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.util.shape.VoxelShapes;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.WorldAccess;
-
-import static net.minecraft.block.HorizontalFacingBlock.FACING;
 
 public class DOMGuitarBlock extends DOMInstrumentBlock{
 
     public DOMGuitarBlock(Settings settings) {
         super(settings);
-    }
+        this.setDefaultState(this.stateManager.getDefaultState().with(INSTRUMENT, Instrument.GUITAR).with(NOTE, 0).with(POWERED, false).with(Properties.HORIZONTAL_FACING, Direction.NORTH).with(WATERLOGGED, false));
 
+    }
+    /*
     public VoxelShape STANDING_NORTH_SHAPE(){
         VoxelShape shape = VoxelShapes.empty();
         shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0.5, 0.125, 0.40625, 0.5, 1.1875, 0.4375));
@@ -152,7 +144,9 @@ public class DOMGuitarBlock extends DOMInstrumentBlock{
         return STANDING_NORTH_SHAPE();
     }
 
+
     //TODO don´t know why, but maybe it is the lightning on the top sided textures that looks wierd (if direction isn´t north)
+    //TODO bad performance with guitar voxelshape (maybe simplify the shape)
     @Override
     public VoxelShape getOutlineShape(BlockState state, BlockView view, BlockPos pos, ShapeContext ctx) {
         Direction dir = state.get(FACING);
@@ -164,13 +158,34 @@ public class DOMGuitarBlock extends DOMInstrumentBlock{
             default -> STANDING_SHAPE();
         };
     }
-
-    @Override
-    public BlockState getPlacementState(ItemPlacementContext ctx) {
-        return this.getDefaultState().with(INSTRUMENT, Instrument.GUITAR).with(Properties.HORIZONTAL_FACING, ctx.getPlayerFacing().getOpposite());
-    }
-    @Override
-    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState neighborState, WorldAccess world, BlockPos pos, BlockPos neighborPos) {
-        return this.getDefaultState().with(INSTRUMENT, Instrument.GUITAR).with(Properties.HORIZONTAL_FACING,state.get(Properties.HORIZONTAL_FACING));
-    }
+    Stream.of(
+            Block.createCuboidShape(8, 2, 6.5, 8, 19, 7),
+            Block.createCuboidShape(9, 2, 6.5, 9, 18, 7),
+            Block.createCuboidShape(7, 2, 6.5, 7, 18, 7),
+            Block.createCuboidShape(9.5, 16, 7, 10.5, 19, 8),
+            Block.createCuboidShape(5.5, 16, 7, 6.5, 19, 8),
+            Block.createCuboidShape(6.5, 13, 7, 9.5, 16, 8),
+            Block.createCuboidShape(6.5, 11, 7, 9.5, 13, 9),
+            Block.createCuboidShape(7.5, 16, 7, 8.5, 19, 8),
+            Block.createCuboidShape(6.5, 17, 7, 7.5, 18, 8),
+            Block.createCuboidShape(8.5, 17, 7, 9.5, 18, 8),
+            Block.createCuboidShape(6.5, 19, 7, 9.5, 20, 8),
+            Block.createCuboidShape(7.5, 7, 7, 8.5, 11, 8),
+            Block.createCuboidShape(7.5, 0, 7, 8.5, 3, 8),
+            Block.createCuboidShape(8.5, 6, 7, 9.5, 11, 8),
+            Block.createCuboidShape(6.5, 6, 7, 7.5, 11, 8),
+            Block.createCuboidShape(6.5, 0, 7, 7.5, 4, 8),
+            Block.createCuboidShape(8.5, 0, 7, 9.5, 4, 8),
+            Block.createCuboidShape(11.5, 6, 7, 12.5, 8, 10),
+            Block.createCuboidShape(3.5, 6, 7, 4.5, 8, 10),
+            Block.createCuboidShape(11.5, 2, 7, 12.5, 5, 10),
+            Block.createCuboidShape(3.5, 2, 7, 4.5, 5, 10),
+            Block.createCuboidShape(6.5, 0, 8, 9.5, 11, 10),
+            Block.createCuboidShape(5.5, 0, 7, 6.5, 10, 10),
+            Block.createCuboidShape(9.5, 0, 7, 10.5, 10, 10),
+            Block.createCuboidShape(4.5, 1, 7, 5.5, 9, 10),
+            Block.createCuboidShape(10.5, 1, 7, 11.5, 9, 10),
+            Block.createCuboidShape(6.5, 1, 6, 9.5, 2, 7)
+            ).reduce((v1, v2) -> VoxelShapes.combineAndSimplify(v1, v2, BooleanBiFunction.OR)).get();
+    */
 }
