@@ -53,13 +53,13 @@ public class DOMShovelMixin {
             if (blockState4 != null && world.getBlockState(blockPos.up()).isAir()) {
                 world.playSound(playerEntity, blockPos, SoundEvents.ITEM_SHOVEL_FLATTEN, SoundCategory.BLOCKS, 1.0F, 1.0F);
                 blockState5 = blockState4;
-            } else if (blockState.getBlock() instanceof CampfireBlock && (Boolean)blockState.get(CampfireBlock.LIT)) {
+            } else if (blockState.getBlock() instanceof CampfireBlock && blockState.get(CampfireBlock.LIT)) {
                 if (!world.isClient()) {
-                    world.syncWorldEvent((PlayerEntity)null, 1009, blockPos, 0);
+                    world.syncWorldEvent(null, 1009, blockPos, 0);
                 }
 
                 CampfireBlock.extinguish(context.getPlayer(), world, blockPos, blockState);
-                blockState5 = (BlockState)blockState.with(CampfireBlock.LIT, false);
+                blockState5 = blockState.with(CampfireBlock.LIT, false);
             }
 
             if (blockState5 != null) {

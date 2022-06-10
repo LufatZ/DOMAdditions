@@ -1,5 +1,15 @@
 package de.dayofmind.additions.block;
 
+import de.dayofmind.additions.block.instruments.DOMGuitarBlock;
+import de.dayofmind.additions.block.lanterns.DOMCopperLantern;
+import de.dayofmind.additions.block.lanterns.DOMNetheriteLantern;
+import de.dayofmind.additions.block.slabs.DOMGrassSlab;
+import de.dayofmind.additions.block.slabs.DOMMagmaSlab;
+import de.dayofmind.additions.block.slabs.DOMShortSlab;
+import de.dayofmind.additions.block.stairs.DOMGrassStair;
+import de.dayofmind.additions.block.stairs.DOMMagmaStair;
+import de.dayofmind.additions.block.stairs.DOMShortStairs;
+import de.dayofmind.additions.block.stairs.DOMStairs;
 import de.dayofmind.additions.item.DOMGuitar;
 import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
@@ -45,8 +55,8 @@ public class DOMBlocks {
         public static final Block CRYING_OBSIDIAN_STAIR = new DOMStairs(Blocks.CRYING_OBSIDIAN.getDefaultState(),FabricBlockSettings.copyOf(Blocks.CRYING_OBSIDIAN));
 
     //lanterns
-        public static final Block NETHERITE_LANTERN = new DOMLanterns(FabricBlockSettings.copyOf(Blocks.LANTERN));
-        public static final Block COPPER_LANTERN = new DOMLanterns(FabricBlockSettings.copyOf(Blocks.LANTERN));
+        public static final Block NETHERITE_LANTERN = new DOMNetheriteLantern(FabricBlockSettings.copyOf(Blocks.LANTERN));
+        public static final Block COPPER_LANTERN = new DOMCopperLantern(FabricBlockSettings.copyOf(Blocks.LANTERN));
 
     //blocks
     //instruments

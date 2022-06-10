@@ -1,5 +1,6 @@
-package de.dayofmind.additions.block;
+package de.dayofmind.additions.block.stairs;
 
+import de.dayofmind.additions.block.slabs.DOMShortSlab;
 import net.minecraft.block.*;
 import net.minecraft.block.enums.BlockHalf;
 import net.minecraft.util.math.BlockPos;
@@ -30,7 +31,7 @@ public class DOMShortStairs extends StairsBlock implements Waterloggable {
     }
 
     private static VoxelShape[] composeShapes(VoxelShape base, VoxelShape northWest, VoxelShape northEast, VoxelShape southWest, VoxelShape southEast) {
-        return (VoxelShape[]) IntStream.range(0, 16).mapToObj(i -> DOMShortStairs.composeShape(i, base, northWest, northEast, southWest, southEast)).toArray(VoxelShape[]::new);
+        return IntStream.range(0, 16).mapToObj(i -> DOMShortStairs.composeShape(i, base, northWest, northEast, southWest, southEast)).toArray(VoxelShape[]::new);
     }
 
     private static VoxelShape composeShape(int i, VoxelShape base, VoxelShape northWest, VoxelShape northEast, VoxelShape southWest, VoxelShape southEast) {

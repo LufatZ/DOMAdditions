@@ -1,4 +1,4 @@
-package de.dayofmind.additions.block;
+package de.dayofmind.additions.block.stairs;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.StairsBlock;

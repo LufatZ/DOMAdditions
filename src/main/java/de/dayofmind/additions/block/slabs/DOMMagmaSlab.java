@@ -1,4 +1,4 @@
-package de.dayofmind.additions.block;
+package de.dayofmind.additions.block.slabs;
 
 import net.minecraft.block.*;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -47,7 +47,7 @@ public class DOMMagmaSlab extends SlabBlock implements Waterloggable {
     public void randomTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
         BlockPos blockPos = pos.up();
         if (world.getFluidState(pos).isIn(FluidTags.WATER)) {
-            world.playSound((PlayerEntity)null, pos, SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.BLOCKS, 0.5F, 2.6F + (world.random.nextFloat() - world.random.nextFloat()) * 0.8F);
+            world.playSound(null, pos, SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.BLOCKS, 0.5F, 2.6F + (world.random.nextFloat() - world.random.nextFloat()) * 0.8F);
             world.spawnParticles(ParticleTypes.LARGE_SMOKE, (double)blockPos.getX() + 0.5, (double)blockPos.getY() + 0.25, (double)blockPos.getZ() + 0.5, 8, 0.5, 0.25, 0.5, 0.0);
         }
 

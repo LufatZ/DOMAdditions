@@ -1,5 +1,6 @@
-package de.dayofmind.additions.block;
+package de.dayofmind.additions.block.slabs;
 
+import de.dayofmind.additions.block.DOMBlocks;
 import net.minecraft.block.*;
 import net.minecraft.block.enums.SlabType;
 import net.minecraft.server.world.ServerWorld;
@@ -17,24 +18,18 @@ import net.minecraft.world.chunk.light.ChunkLightProvider;
 
 import java.util.Random;
 
-public class DOMGrassSlab extends SlabBlock implements Waterloggable {
+public class DOMGrassSlab extends SlabBlock {
 
     public static final EnumProperty<SlabType> TYPE;
     public static final BooleanProperty WATERLOGGED;
     public static final BooleanProperty SNOWY;
-
-    static {//load Block properties
-        TYPE = Properties.SLAB_TYPE;
-        WATERLOGGED = Properties.WATERLOGGED;
-        SNOWY = Properties.SNOWY;}
-
 
     public DOMGrassSlab(Settings settings) {
         super(settings);setDefaultState(getStateManager().getDefaultState().with(WATERLOGGED, false).with(TYPE, SlabType.BOTTOM).with(SNOWY, false));
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> stateManager) { //add Block properties
+    protected void appendProperties(StateManager.Builder<Block, BlockState> stateManager) {
         stateManager.add(TYPE, WATERLOGGED, SNOWY);
     }
 
@@ -62,7 +57,7 @@ public class DOMGrassSlab extends SlabBlock implements Waterloggable {
             for (int i = 0; i < 4; ++i) {
                 BlockPos blockPos = pos.add(random.nextInt(3) - 1, random.nextInt(5) - 3, random.nextInt(3) - 1);
                 if (!world.getBlockState(blockPos).isOf(DOMBlocks.DIRT_SLAB) || !DOMGrassSlab.canSpread(blockState, world, blockPos)) continue;
-                world.setBlockState(blockPos, (BlockState)blockState.with(SNOWY, world.getBlockState(blockPos.up()).isOf(Blocks.SNOW)));
+                world.setBlockState(blockPos, blockState.with(SNOWY, world.getBlockState(blockPos.up()).isOf(Blocks.SNOW)));
             }
         }
     }
@@ -84,4 +79,11 @@ public class DOMGrassSlab extends SlabBlock implements Waterloggable {
         int i = ChunkLightProvider.getRealisticOpacity(world, state, pos, blockState, blockPos, Direction.UP, blockState.getOpacity(world, blockPos));
         return i < world.getMaxLightLevel();
     }
+
+    static {
+        TYPE = Properties.SLAB_TYPE;
+        WATERLOGGED = Properties.WATERLOGGED;
+        SNOWY = Properties.SNOWY;}
+
+
 }

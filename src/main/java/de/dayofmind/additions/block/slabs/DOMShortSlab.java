@@ -1,4 +1,4 @@
-package de.dayofmind.additions.block;
+package de.dayofmind.additions.block.slabs;
 
 import net.minecraft.block.*;
 import net.minecraft.block.enums.SlabType;
@@ -10,9 +10,9 @@ public class DOMShortSlab extends SlabBlock implements Waterloggable {
     public DOMShortSlab(Settings settings) {
         super(settings);
     }
-    protected static final VoxelShape BOTTOM_SHAPE = Block.createCuboidShape(0.0, 0.0, 0.0, 16.0, 7.0, 16.0);
-    protected static final VoxelShape TOP_SHAPE =    Block.createCuboidShape(0.0, 8.0, 0.0, 16.0, 15.0, 16.0);
-    protected static final VoxelShape DOUBLE_SHAPE = Block.createCuboidShape(0.0, 0.0, 0.0, 16.0, 15.0, 16.0);
+    public static final VoxelShape BOTTOM_SHAPE = Block.createCuboidShape(0.0, 0.0, 0.0, 16.0, 7.0, 16.0);
+    public static final VoxelShape TOP_SHAPE =    Block.createCuboidShape(0.0, 8.0, 0.0, 16.0, 15.0, 16.0);
+    public static final VoxelShape DOUBLE_SHAPE = Block.createCuboidShape(0.0, 0.0, 0.0, 16.0, 15.0, 16.0);
 
     @Override
     public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
@@ -20,7 +20,6 @@ public class DOMShortSlab extends SlabBlock implements Waterloggable {
         switch (slabType) {
             case DOUBLE -> {return DOUBLE_SHAPE;}
             case TOP -> {return TOP_SHAPE;}
-            case BOTTOM -> {return BOTTOM_SHAPE;}
             default -> {return BOTTOM_SHAPE;}
         }
     }

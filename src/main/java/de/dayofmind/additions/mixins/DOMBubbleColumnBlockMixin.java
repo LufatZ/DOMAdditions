@@ -24,9 +24,9 @@ public class DOMBubbleColumnBlockMixin {
         if (state.isOf(Blocks.BUBBLE_COLUMN)) {
             return state;
         } else if (state.isOf(Blocks.SOUL_SAND)) {
-            return (BlockState) Blocks.BUBBLE_COLUMN.getDefaultState().with(DRAG, false);
+            return Blocks.BUBBLE_COLUMN.getDefaultState().with(DRAG, false);
         }else {
-            return state.isOf(Blocks.MAGMA_BLOCK) || state.isOf(DOMBlocks.MAGMA_STAIR) || state.isOf(DOMBlocks.MAGMA_SLAB) ? (BlockState)Blocks.BUBBLE_COLUMN.getDefaultState().with(DRAG, true) : Blocks.WATER.getDefaultState();
+            return state.isOf(Blocks.MAGMA_BLOCK) || state.isOf(DOMBlocks.MAGMA_STAIR) || state.isOf(DOMBlocks.MAGMA_SLAB) ? Blocks.BUBBLE_COLUMN.getDefaultState().with(DRAG, true) : Blocks.WATER.getDefaultState();
         }
     }
 }
