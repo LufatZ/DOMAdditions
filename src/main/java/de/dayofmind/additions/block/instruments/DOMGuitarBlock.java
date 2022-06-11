@@ -94,7 +94,7 @@ public class DOMGuitarBlock extends DOMInstrumentBlock {
                 Block.createCuboidShape(6, 1, 10.5, 9, 9, 11.5),
                 Block.createCuboidShape(9, 1, 6.5, 10, 2, 9.5)
         );
-        STANDING_WEST_SHAPE = VoxelShapes.union(
+        STANDING_SOUTH_SHAPE = VoxelShapes.union(
                 Block.createCuboidShape(8, 2, 9, 8, 19, 9.5),
                 Block.createCuboidShape(7, 2, 9, 7, 18, 9.5),
                 Block.createCuboidShape(9, 2, 9, 9, 18, 9.5),
@@ -123,7 +123,7 @@ public class DOMGuitarBlock extends DOMInstrumentBlock {
                 Block.createCuboidShape(4.5, 1, 6, 5.5, 9, 9),
                 Block.createCuboidShape(6.5, 1, 9, 9.5, 2, 10)
         );
-        STANDING_SOUTH_SHAPE = VoxelShapes.union(
+        STANDING_WEST_SHAPE = VoxelShapes.union(
                 Block.createCuboidShape(6.5, 2, 8, 7, 19, 8),
                 Block.createCuboidShape(6.5, 2, 7, 7, 18, 7),
                 Block.createCuboidShape(6.5, 2, 9, 7, 18, 9),
