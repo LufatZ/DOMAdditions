@@ -22,8 +22,6 @@ public class DOMGuitarBlock extends DOMInstrumentBlock {
         this.setDefaultState(this.stateManager.getDefaultState().with(INSTRUMENT, Instrument.GUITAR).with(NOTE, 0).with(POWERED, false).with(FACING, Direction.NORTH).with(WATERLOGGED, false));
 
     }
-    //TODO don´t know why, but maybe it is the lightning on the top sided textures that looks wierd (if direction isn´t north)
-
     @Override
     public VoxelShape getOutlineShape(BlockState state, BlockView view, BlockPos pos, ShapeContext ctx) {
         Direction dir = state.get(FACING);

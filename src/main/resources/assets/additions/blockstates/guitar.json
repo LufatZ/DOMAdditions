@@ -1,8 +1,8 @@
 {
   "variants": {
-    "facing=north": { "model": "additions:block/guitar", "uvlock": true },
-    "facing=east":  { "model": "additions:block/guitar", "y":  90, "uvlock": true },
-    "facing=south": { "model": "additions:block/guitar", "y": 180, "uvlock": true },
-    "facing=west":  { "model": "additions:block/guitar", "y": 270, "uvlock": true }
+    "facing=north": { "model": "additions:block/guitar", "uvlock": false },
+    "facing=east":  { "model": "additions:block/guitar", "y":  90, "uvlock": false },
+    "facing=south": { "model": "additions:block/guitar", "y": 180, "uvlock": false },
+    "facing=west":  { "model": "additions:block/guitar", "y": 270, "uvlock": false }
   }
 }
