@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "III",
+    "IiI",
+    "uuu"
+  ],
+  "key": {
+    "I": {
+      "item": "minecraft:oak_planks"
+    },
+    "i": {
+      "item": "minecraft:note_block"
+    },
+    "u": {
+      "item": "minecraft:string"
+    }
+  },
+  "result": {
+    "item": "additions:guitar"
+  }
+}

@@ -7,6 +7,11 @@
   "block.additions.gold_slab": "Gold Stufe",
   "block.additions.iron_slab": "Eisen Stufe",
   "block.additions.diamond_slab": "Diamant Stufe",
+  "block.additions.smooth_basalt_slab": "Glatte Basalt Stufe",
+  "block.additions.polished_basalt_slab": "Polierte Basalt Stufe",
+  "block.additions.magma_slab": "Magma Stufe",
+  "block.additions.obsidian_slab": "Obsidian Stufe",
+  "block.additions.crying_obsidian_slab": "Weinende Obsidian Stufe",
 
   "block.additions.dirt_stair": "Erd Treppe",
   "block.additions.dirt_path_stair": "Trampelpfad Treppe",
@@ -14,7 +19,14 @@
   "block.additions.gold_stair": "Gold Treppe",
   "block.additions.iron_stair": "Eisen Treppe",
   "block.additions.diamond_stair": "Diamant Treppe",
+  "block.additions.smooth_basalt_stair": "Glatte Basalt Treppe",
+  "block.additions.polished_basalt_stair": "Polierte Basalt Treppe",
+  "block.additions.magma_stair": "Magma Treppe",
+  "block.additions.obsidian_stair": "Obsidian Treppe",
+  "block.additions.crying_obsidian_stair": "Weinende Obsidian Treppe",
 
   "block.additions.netherite_lantern": "Netherite Laterne",
-  "block.additions.copper_lantern": "Kupfer Laterne"
+  "block.additions.copper_lantern": "Kupfer Laterne",
+
+  "block.additions.guitar": "Gitarre"
 }

@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "   ",
+    "iIi",
+    "   "
+  ],
+  "key": {
+    "I": {
+      "item": "minecraft:lantern"
+    },
+    "i": {
+      "item": "minecraft:copper_ingot"
+    }
+  },
+  "result": {
+    "item": "additions:copper_lantern"
+  }
+}
