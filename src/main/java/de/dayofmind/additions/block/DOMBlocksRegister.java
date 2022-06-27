@@ -24,10 +24,10 @@ import net.minecraft.util.registry.Registry;
 
 import static de.dayofmind.additions.Additions.MOD_ID;
 
-public class DOMBlocks {
+public class DOMBlocksRegister {
 
     //adding DayOfMind Item Group
-    public static final ItemGroup DayOfMind = FabricItemGroupBuilder.build(new Identifier(MOD_ID, "general"), () -> new ItemStack(DOMBlocks.GRASS_STAIR));
+    public static final ItemGroup DayOfMind = FabricItemGroupBuilder.build(new Identifier(MOD_ID, "general"), () -> new ItemStack(DOMBlocksRegister.GRASS_STAIR));
 
     //slabs
         public static final Block DIRT_SLAB = new SlabBlock(FabricBlockSettings.copyOf(Blocks.DIRT));
@@ -63,7 +63,7 @@ public class DOMBlocks {
         public static final Block GUITAR = new DOMGuitarBlock(FabricBlockSettings.of(Material.WOOD, MapColor.BROWN).strength(2.0F, 3.0F).sounds(BlockSoundGroup.WOOD));
 
     //items
-        public static final Item GUITAR_ITEM = new DOMGuitar(DOMBlocks.GUITAR,(new Item.Settings().group(DayOfMind)));
+        public static final Item GUITAR_ITEM = new DOMGuitar(DOMBlocksRegister.GUITAR,(new Item.Settings().group(DayOfMind)));
 
 
     public static void registerBlocks(){

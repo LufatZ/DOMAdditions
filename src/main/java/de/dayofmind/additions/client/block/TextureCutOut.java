@@ -1,11 +1,11 @@
-package de.dayofmind.additions.client;
+package de.dayofmind.additions.client.block;
 
-import de.dayofmind.additions.block.DOMBlocks;
+import de.dayofmind.additions.block.DOMBlocksRegister;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.minecraft.client.render.RenderLayer;
 
-import static de.dayofmind.additions.block.DOMBlocks.GRASS_SLAB;
-import static de.dayofmind.additions.block.DOMBlocks.GRASS_STAIR;
+import static de.dayofmind.additions.block.DOMBlocksRegister.GRASS_SLAB;
+import static de.dayofmind.additions.block.DOMBlocksRegister.GRASS_STAIR;
 
 public class TextureCutOut {
     public static void CutOut() {
@@ -14,6 +14,6 @@ public class TextureCutOut {
         //stair
         BlockRenderLayerMap.INSTANCE.putBlock(GRASS_STAIR, RenderLayer.getCutoutMipped());
         //lanterns
-        BlockRenderLayerMap.INSTANCE.putBlocks(RenderLayer.getCutout(), DOMBlocks.COPPER_LANTERN, DOMBlocks.NETHERITE_LANTERN);
+        BlockRenderLayerMap.INSTANCE.putBlocks(RenderLayer.getCutout(), DOMBlocksRegister.COPPER_LANTERN, DOMBlocksRegister.NETHERITE_LANTERN);
     }
 }

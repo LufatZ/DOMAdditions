@@ -1,6 +1,6 @@
 package de.dayofmind.additions.mixins;
 
-import de.dayofmind.additions.block.DOMBlocks;
+import de.dayofmind.additions.block.DOMBlocksRegister;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.BubbleColumnBlock;
@@ -17,7 +17,7 @@ public class DOMBubbleColumnBlockMixin {
     @Overwrite
         public boolean canPlaceAt(BlockState state, WorldView world, BlockPos pos) {
             BlockState blockState = world.getBlockState(pos.down());
-            return blockState.isOf(Blocks.BUBBLE_COLUMN) || blockState.isOf(DOMBlocks.MAGMA_SLAB) || blockState.isOf(DOMBlocks.MAGMA_STAIR) || blockState.isOf(Blocks.MAGMA_BLOCK) || blockState.isOf(Blocks.SOUL_SAND);
+            return blockState.isOf(Blocks.BUBBLE_COLUMN) || blockState.isOf(DOMBlocksRegister.MAGMA_SLAB) || blockState.isOf(DOMBlocksRegister.MAGMA_STAIR) || blockState.isOf(Blocks.MAGMA_BLOCK) || blockState.isOf(Blocks.SOUL_SAND);
         }
     @Overwrite
     private static BlockState getBubbleState(BlockState state) {
@@ -26,7 +26,7 @@ public class DOMBubbleColumnBlockMixin {
         } else if (state.isOf(Blocks.SOUL_SAND)) {
             return Blocks.BUBBLE_COLUMN.getDefaultState().with(DRAG, false);
         }else {
-            return state.isOf(Blocks.MAGMA_BLOCK) || state.isOf(DOMBlocks.MAGMA_STAIR) || state.isOf(DOMBlocks.MAGMA_SLAB) ? Blocks.BUBBLE_COLUMN.getDefaultState().with(DRAG, true) : Blocks.WATER.getDefaultState();
+            return state.isOf(Blocks.MAGMA_BLOCK) || state.isOf(DOMBlocksRegister.MAGMA_STAIR) || state.isOf(DOMBlocksRegister.MAGMA_SLAB) ? Blocks.BUBBLE_COLUMN.getDefaultState().with(DRAG, true) : Blocks.WATER.getDefaultState();
         }
     }
 }
