@@ -83,7 +83,7 @@ public class DOMInstrumentBlock extends HorizontalFacingBlock implements Waterlo
         int i = state.get(NOTE);
         float f = (float)Math.pow(2.0, (double)(i - 12) / 12.0);
         world.playSound(null, pos, state.get(INSTRUMENT).getSound(), SoundCategory.RECORDS, 3.0F, f);
-        world.addParticle(ParticleTypes.NOTE, (double)pos.getX() + 0.5, (double)pos.getY() + 1.2, (double)pos.getZ() + 0.5, (double)i / 24.0, 0.0, 0.0);
+        world.addParticle(ParticleTypes.NOTE, (double)pos.getX() + 0.5, (double)pos.getY() + 1.5, (double)pos.getZ() + 0.5, (double)i / 24.0, 0.0, 0.0);
         return true;
     }
 
