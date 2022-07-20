@@ -19,7 +19,8 @@
       "de.dayofmind.additions.client.AdditionsClient"
     ],
     "main": [
-      "de.dayofmind.additions.Additions"
+      "de.dayofmind.additions.Additions",
+      "de.dayofmind.additions.entity.EntityRegister"
     ]
   },
   "mixins": [
