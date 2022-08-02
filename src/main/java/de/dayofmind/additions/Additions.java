@@ -1,6 +1,7 @@
 package de.dayofmind.additions;
 
 import de.dayofmind.additions.block.DOMBlocksRegister;
+import de.dayofmind.additions.item.DOMItemsRegister;
 import net.fabricmc.api.ModInitializer;
 
 public class Additions implements ModInitializer {
@@ -15,7 +16,7 @@ public class Additions implements ModInitializer {
         System.out.println("Please report bugs to LufatZ or MysticBanana");
         //Register DoM blocks
         DOMBlocksRegister.registerBlocks();
-        //Register DoM entity's
-        //DOMEntityRegister.RegisterEntitys();
+        //Register DoM items
+        DOMItemsRegister.registerItems();
     }
     }

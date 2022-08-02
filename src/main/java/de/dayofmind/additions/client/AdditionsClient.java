@@ -2,13 +2,11 @@ package de.dayofmind.additions.client;
 
 import de.dayofmind.additions.client.block.TextureCutOut;
 import de.dayofmind.additions.client.block.TintBlocks;
+import de.dayofmind.additions.client.entity.mobs.wandering_musican.DOMWanderingMusicanRenderer;
 import de.dayofmind.additions.entity.EntityRegister;
-import de.dayofmind.additions.entity.mobs.cube.CubeEntityModel;
-import de.dayofmind.additions.entity.mobs.cube.CubeEntityRenderer;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.minecraft.client.render.entity.model.EntityModelLayer;
 import net.minecraft.util.Identifier;
@@ -22,9 +20,9 @@ public class AdditionsClient implements ClientModInitializer {
         TintBlocks.TintGrassBlocks();
         TextureCutOut.CutOut();
 
-        // In 1.17, use EntityRendererRegistry.register (seen below) instead of EntityRendererRegistry.INSTANCE.register (seen above)
-        EntityRendererRegistry.register(EntityRegister.CUBE, CubeEntityRenderer::new);
+        //ENTITY
+        //WanderingMusician
+        EntityRendererRegistry.register(EntityRegister.WANDERING_MUSICAN, DOMWanderingMusicanRenderer::new);
 
-        EntityModelLayerRegistry.registerModelLayer(MODEL_CUBE_LAYER, CubeEntityModel::getTexturedModelData);
     }
 }

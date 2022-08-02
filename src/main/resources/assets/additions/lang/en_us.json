@@ -28,5 +28,7 @@
   "block.additions.netherite_lantern": "Netherite Lantern",
   "block.additions.copper_lantern": "Copper Lantern",
 
-  "block.additions.guitar": "Guitar"
+  "block.additions.guitar": "Guitar",
+
+  "item.additions.wandering_musican_spawn_egg": "Wandering Musican Spawn Egg"
 }

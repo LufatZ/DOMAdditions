@@ -20,6 +20,8 @@ repositories {
     maven { url "https://maven.shedaniel.me" }
     //WTHIT
     maven { url "https://maven.bai.lol" }
+    //geckolib
+    maven { url 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/' }
 }
 
 dependencies {
@@ -35,10 +37,12 @@ dependencies {
     //modmenu
     modImplementation "com.terraformersmc:${project.modmenu}"
     //REI
-    modRuntimeOnly "me.shedaniel:RoughlyEnoughItems-fabric:${project.rei}"
+    //modRuntimeOnly "me.shedaniel:RoughlyEnoughItems-fabric:${project.rei}"
     //WTHIT
     modRuntimeOnly "mcp.mobius.waila:wthit:${project.wthit}"
     modRuntimeOnly "lol.bai:badpackets:${project.badpackets}"
+    //geckolib
+    modImplementation "software.bernie.geckolib:${project.geckolib}"
 }
 
 processResources {
