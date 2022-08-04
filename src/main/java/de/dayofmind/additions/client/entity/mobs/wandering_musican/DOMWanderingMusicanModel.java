@@ -25,7 +25,7 @@ public class DOMWanderingMusicanModel extends AnimatedGeoModel<DOMWanderingMusic
         return new Identifier(MOD_ID, "animations/dom_wandering_musican.animation.json");
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @SuppressWarnings({ "unchecked"})
     @Override
     public void setLivingAnimations(DOMWanderingMusician entity, Integer uniqueID, AnimationEvent customPredicate) {
         super.setLivingAnimations(entity, uniqueID, customPredicate);
