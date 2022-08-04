@@ -2,8 +2,11 @@ package de.dayofmind.additions.client;
 
 import de.dayofmind.additions.client.block.TextureCutOut;
 import de.dayofmind.additions.client.block.TintBlocks;
+import de.dayofmind.additions.client.config.DOMConfigBuilder;
 import de.dayofmind.additions.client.entity.mobs.wandering_musican.DOMWanderingMusicanRenderer;
 import de.dayofmind.additions.entity.EntityRegister;
+import me.shedaniel.autoconfig.AutoConfig;
+import me.shedaniel.autoconfig.serializer.Toml4jConfigSerializer;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -24,5 +27,8 @@ public class AdditionsClient implements ClientModInitializer {
         //WanderingMusician
         EntityRendererRegistry.register(EntityRegister.WANDERING_MUSICAN, DOMWanderingMusicanRenderer::new);
 
+        //ModMenuIntegration CONFIG
+        //config
+        AutoConfig.register(DOMConfigBuilder.ModConfig.class, Toml4jConfigSerializer::new);
     }
 }

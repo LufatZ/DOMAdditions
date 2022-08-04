@@ -30,5 +30,13 @@
 
   "block.additions.guitar": "Guitar",
 
-  "item.additions.wandering_musican_spawn_egg": "Wandering Musican Spawn Egg"
+  "item.additions.wandering_musican_spawn_egg": "Wandering Musican Spawn Egg",
+
+  "text.autoconfig.additions.title": "DayOfMind Configuration",
+  "text.autoconfig.additions.category.experimental": "Enable experimental features",
+  "text.autoconfig.additions.option.ExperimentalFeatures.Entity": "experimental entity's",
+  "text.autoconfig.additions.option.ExperimentalFeatures.Entity.@Tooltip": "Adds experimental entities like wandering musican to the game",
+  "text.autoconfig.additions.option.ExperimentalFeatures.Blocks": "experimental blocks & items",
+  "text.autoconfig.additions.option.ExperimentalFeatures.Blocks.@Tooltip": "Adds experimental blocks like the guitar to the game",
+  "text.autoconfig.additions.category.about_us": "About us"
 }
