@@ -1,7 +1,6 @@
 package de.dayofmind.additions.entity;
 
 import de.dayofmind.additions.entity.mobs.wandering_musician.DOMWanderingMusician;
-import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
 import net.minecraft.entity.EntityDimensions;
@@ -12,13 +11,10 @@ import net.minecraft.util.registry.Registry;
 
 import static de.dayofmind.additions.Additions.MOD_ID;
 
-public class EntityRegister implements ModInitializer {
+public class EntityRegister {
 
 
-    @Override
-    public void onInitialize() {
-        registerAttributes();
-    }
+
 
     /*
      * Registers Entity's
@@ -32,7 +28,7 @@ public class EntityRegister implements ModInitializer {
     /*
      * Registers Entity's Attributes
      */
-    private static void registerAttributes(){
+    public static void registerAttributes(){
         FabricDefaultAttributeRegistry.register(EntityRegister.WANDERING_MUSICAN, DOMWanderingMusician.setAttributes());
     }
 }

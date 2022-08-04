@@ -19,8 +19,7 @@
       "de.dayofmind.additions.client.AdditionsClient"
     ],
     "main": [
-      "de.dayofmind.additions.Additions",
-      "de.dayofmind.additions.entity.EntityRegister"
+      "de.dayofmind.additions.Additions"
     ],
     "modmenu": [
       "de.dayofmind.additions.client.config.DOMModMenuIntegration"

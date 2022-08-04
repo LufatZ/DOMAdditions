@@ -4,6 +4,8 @@ import de.dayofmind.additions.block.DOMBlocksRegister;
 import de.dayofmind.additions.item.DOMItemsRegister;
 import net.fabricmc.api.ModInitializer;
 
+import static de.dayofmind.additions.entity.EntityRegister.registerAttributes;
+
 public class Additions implements ModInitializer {
 
     public static String MOD_ID = "additions";
@@ -18,5 +20,7 @@ public class Additions implements ModInitializer {
         DOMBlocksRegister.registerBlocks();
         //Register DoM items
         DOMItemsRegister.registerItems();
+        //Register DoM entitys
+        registerAttributes();
     }
     }
