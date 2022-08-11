@@ -100,6 +100,7 @@ public class DOMBlocksRegister {
         //blocks
         //instruments
             registerBlock("guitar", GUITAR, (BlockItem) GUITAR_ITEM);
+
     }
 
 

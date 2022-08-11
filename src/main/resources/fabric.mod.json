@@ -20,9 +20,6 @@
     ],
     "main": [
       "de.dayofmind.additions.Additions"
-    ],
-    "modmenu": [
-      "de.dayofmind.additions.client.config.DOMModMenuIntegration"
     ]
   },
   "mixins": [

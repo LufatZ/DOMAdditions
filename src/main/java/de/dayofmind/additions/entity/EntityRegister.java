@@ -1,5 +1,6 @@
 package de.dayofmind.additions.entity;
 
+import de.dayofmind.additions.config.ModConfig;
 import de.dayofmind.additions.entity.mobs.wandering_musician.DOMWanderingMusician;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
@@ -13,11 +14,8 @@ import static de.dayofmind.additions.Additions.MOD_ID;
 
 public class EntityRegister {
 
-
-
-
     /*
-     * Registers Entity's
+     * Add a new entity
      */
     public static final EntityType<DOMWanderingMusician> WANDERING_MUSICAN = Registry.register(
             Registry.ENTITY_TYPE,
@@ -29,6 +27,8 @@ public class EntityRegister {
      * Registers Entity's Attributes
      */
     public static void registerAttributes(){
-        FabricDefaultAttributeRegistry.register(EntityRegister.WANDERING_MUSICAN, DOMWanderingMusician.setAttributes());
+        if(ModConfig.ExperimentalSettings.ExperimentalEntities) {
+            FabricDefaultAttributeRegistry.register(EntityRegister.WANDERING_MUSICAN, DOMWanderingMusician.setAttributes());
+        }
     }
 }
