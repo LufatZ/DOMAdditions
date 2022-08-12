@@ -16,15 +16,15 @@ public class DOMItemsRegister {
         if (ModConfig.ExperimentalSettings.ExperimentalEntities){
             return new SpawnEggItem(EntityRegister.WANDERING_MUSICAN, 0x1F1F1F, 0xE1C288,(new Item.Settings().group(DayOfMind).maxCount(1)));
         }
-        else {
-            return new SpawnEggItem(EntityRegister.WANDERING_MUSICAN, 0x1F1F1F, 0xE1C288,(new Item.Settings().maxCount(1)));
-        }
+        return null;
     }
 
 
     public static void registerItems(){
         //SpawnEgg of experimental Entities
+        if (ModConfig.ExperimentalSettings.ExperimentalEntities) {
             registerItem("wandering_musican_spawn_egg", WANDERING_MUSICAN_SPAWN_EGG());
+        }
     }
     private static void registerItem(String name, Item item){
         Registry.register(Registry.ITEM, new Identifier(MOD_ID, name), item);

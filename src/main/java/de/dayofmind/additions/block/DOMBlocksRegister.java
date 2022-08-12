@@ -10,6 +10,7 @@ import de.dayofmind.additions.block.stairs.DOMGrassStair;
 import de.dayofmind.additions.block.stairs.DOMMagmaStair;
 import de.dayofmind.additions.block.stairs.DOMShortStairs;
 import de.dayofmind.additions.block.stairs.DOMStairs;
+import de.dayofmind.additions.config.ModConfig;
 import de.dayofmind.additions.item.DOMGuitar;
 import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
@@ -23,11 +24,13 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
 import static de.dayofmind.additions.Additions.MOD_ID;
+import static de.dayofmind.additions.block.DOMBlocksRegister.EXPERIMENTAL.GUITAR;
+import static de.dayofmind.additions.block.DOMBlocksRegister.EXPERIMENTAL.GUITAR_ITEM;
 
 public class DOMBlocksRegister {
 
     //adding DayOfMind Item Group
-    public static final ItemGroup DayOfMind = FabricItemGroupBuilder.build(new Identifier(MOD_ID, "general"), () -> new ItemStack(DOMBlocksRegister.GRASS_STAIR));
+        public static final ItemGroup DayOfMind = FabricItemGroupBuilder.build(new Identifier(MOD_ID, "general"), () -> new ItemStack(DOMBlocksRegister.GRASS_STAIR));
 
     //slabs
         public static final Block DIRT_SLAB = new SlabBlock(FabricBlockSettings.copyOf(Blocks.DIRT));
@@ -59,12 +62,19 @@ public class DOMBlocksRegister {
         public static final Block COPPER_LANTERN = new DOMCopperLantern(FabricBlockSettings.copyOf(Blocks.LANTERN));
 
     //blocks
-    //instruments
-        public static final Block GUITAR = new DOMGuitarBlock(FabricBlockSettings.of(Material.WOOD, MapColor.BROWN).strength(2.0F, 3.0F).sounds(BlockSoundGroup.WOOD));
+        public static class EXPERIMENTAL {
+            /*
+            #
+            #EXPERIMENTAL FEATURES
+            #
+             */
 
-    //items
-        public static final Item GUITAR_ITEM = new DOMGuitar(DOMBlocksRegister.GUITAR,(new Item.Settings().group(DayOfMind)));
+            //instruments
+                public static final Block GUITAR = new DOMGuitarBlock(FabricBlockSettings.of(Material.WOOD, MapColor.BROWN).strength(2.0F, 3.0F).sounds(BlockSoundGroup.WOOD));
 
+            //items
+                public static final Item GUITAR_ITEM = new DOMGuitar(GUITAR,(new Item.Settings().group(DayOfMind)));
+        }
 
     public static void registerBlocks(){
 
@@ -99,8 +109,9 @@ public class DOMBlocksRegister {
             registerBlock("copper_lantern", COPPER_LANTERN);
         //blocks
         //instruments
+        if (ModConfig.ExperimentalSettings.ExperimentalBlocks) {
             registerBlock("guitar", GUITAR, (BlockItem) GUITAR_ITEM);
-
+        }
     }
 
 

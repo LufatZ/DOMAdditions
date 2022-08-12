@@ -15,7 +15,6 @@ public class ModConfig extends Config {
     public ModConfig() {
         // Replace modid with your mod's ID
         super(ConfigOptions.mod(MOD_ID).branch(new String[]{"config"}).fileHeader("Please edit this config in-game"));
-        ConfigScreenBuilder.setMain(MOD_ID, new ClothConfigScreenBuilder());
     }
     @Transitive
     @ConfigEntries(includeAll = true)
