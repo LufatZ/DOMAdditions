@@ -3,6 +3,7 @@ package de.dayofmind.additions.block;
 import de.dayofmind.additions.block.instruments.DOMGuitarBlock;
 import de.dayofmind.additions.block.lanterns.DOMCopperLantern;
 import de.dayofmind.additions.block.lanterns.DOMNetheriteLantern;
+import de.dayofmind.additions.block.slabs.DOMCryingObsidianSlab;
 import de.dayofmind.additions.block.slabs.DOMGrassSlab;
 import de.dayofmind.additions.block.slabs.DOMMagmaSlab;
 import de.dayofmind.additions.block.slabs.DOMShortSlab;
@@ -43,7 +44,7 @@ public class DOMBlocksRegister {
         public static final Block POLISHED_BASALT_SLAB = new SlabBlock(FabricBlockSettings.copyOf(Blocks.POLISHED_BASALT));
         public static final Block MAGMA_SLAB = new DOMMagmaSlab(FabricBlockSettings.copyOf(Blocks.MAGMA_BLOCK));
         public static final Block OBSIDIAN_SLAB = new SlabBlock(FabricBlockSettings.copyOf(Blocks.OBSIDIAN));
-        public static final Block CRYING_OBSIDIAN_SLAB = new SlabBlock(FabricBlockSettings.copyOf(Blocks.CRYING_OBSIDIAN));
+        public static final Block CRYING_OBSIDIAN_SLAB = new DOMCryingObsidianSlab(FabricBlockSettings.copyOf(Blocks.CRYING_OBSIDIAN));
     //stairs
         public static final Block DIRT_STAIR = new DOMStairs(Blocks.DIRT.getDefaultState(),FabricBlockSettings.copyOf(Blocks.DIRT));
         public static final Block GRASS_STAIR = new DOMGrassStair(Blocks.ACACIA_STAIRS.getDefaultState(),FabricBlockSettings.copyOf(Blocks.GRASS_BLOCK)); //TODO Temporary Default state as acacia stair, better fix later
