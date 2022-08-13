@@ -1,12 +1,9 @@
 package de.dayofmind.additions.config;
 
-import me.lortseam.completeconfig.api.ConfigEntries;
 import me.lortseam.completeconfig.api.ConfigEntry;
 import me.lortseam.completeconfig.api.ConfigGroup;
 import me.lortseam.completeconfig.data.Config;
 import me.lortseam.completeconfig.data.ConfigOptions;
-import me.lortseam.completeconfig.gui.ConfigScreenBuilder;
-import me.lortseam.completeconfig.gui.cloth.ClothConfigScreenBuilder;
 
 import static de.dayofmind.additions.Additions.MOD_ID;
 
@@ -14,14 +11,15 @@ public class ModConfig extends Config {
 
     public ModConfig() {
         // Replace modid with your mod's ID
-        super(ConfigOptions.mod(MOD_ID).branch(new String[]{"config"}).fileHeader("Please edit this config in-game"));
+        super(ConfigOptions.mod(MOD_ID).branch(new String[]{"config"}).fileHeader("Please edit this config in-game \n Settings must be the same as on the server you are playing on"));
     }
+
     @Transitive
-    @ConfigEntries(includeAll = true)
     public static class ExperimentalSettings implements ConfigGroup {
-        @ConfigEntry(requiresRestart = true)
+
+        @ConfigEntry(requiresRestart = true, comment = "Adds experimental entities like the musican to the game")
         public static boolean ExperimentalEntities;
-        @ConfigEntry(requiresRestart = true)
+        @ConfigEntry(requiresRestart = true, comment = "Adds experimental blocks like the guitar to the game")
         public static  boolean ExperimentalBlocks;
     }
 
