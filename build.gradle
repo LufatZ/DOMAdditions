@@ -1,7 +1,24 @@
+//for
+buildscript {
+    dependencies {
+        classpath 'de.guntram.mcmod:crowdin-translate:1.3+1.17'
+    }
+    repositories {
+        maven {
+            name = 'CrowdinTranslate source'
+            url = "https://minecraft.guntram.de/maven/"
+        }
+    }
+}
 plugins {
     id 'fabric-loom' version '0.12-SNAPSHOT'
     id 'maven-publish'
 }
+
+apply plugin: 'de.guntram.mcmod.crowdin-translate'
+crowdintranslate.crowdinProjectName = 'dayofmind-additions'
+crowdintranslate.minecraftProjectName = 'additions'
+crowdintranslate.verbose = false
 
 version = project.mod_version
 group = project.maven_group
@@ -15,28 +32,40 @@ repositories {
 
     //added Mods
     //modMenu
-    maven{ url "https://maven.terraformersmc.com/releases/" }
+    maven{
+        url = "https://maven.terraformersmc.com/releases/"
+    }
     //REI
-    maven { url "https://maven.shedaniel.me" }
+    maven {
+        url = "https://maven.shedaniel.me"
+    }
     //WTHIT
-    maven { url "https://maven.bai.lol" }
+    maven {
+        url = "https://maven.bai.lol"
+    }
     //geckolib
-    maven { url 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/' }
+    maven {
+        url = 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/'
+    }
 
     //complete config
     maven {
-        url 'https://jitpack.io'
+        url = 'https://jitpack.io'
     }
     maven {
-        url "https://maven.terraformersmc.com/"
+        url = "https://maven.terraformersmc.com/"
     }
     maven {
-        url "https://maven.shedaniel.me/"
+        url = "https://maven.shedaniel.me/"
     }
     maven {
-        url "https://maven.siphalor.de/"
+        url = "https://maven.siphalor.de/"
     }
-
+    //crowdin
+    maven {
+        name = 'CrowdinTranslate source'
+        url = "https://minecraft.guntram.de/maven/"
+    }
 }
 
 dependencies {
@@ -58,13 +87,13 @@ dependencies {
     modRuntimeOnly "lol.bai:badpackets:${project.badpackets}"
     //geckolib
     modImplementation "software.bernie.geckolib:${project.geckolib}"
-
-
     //complete config
     modImplementation("com.gitlab.Lortseam.completeconfig:base:2.0.0")
     //cloth config modul
     modImplementation("com.gitlab.Lortseam.completeconfig:gui-cloth:2.0.0")
-
+    //crowdin
+    modImplementation('de.guntram.mcmod:crowdin-translate:1.4+1.19')
+    include "de.guntram.mcmod:crowdin-translate:1.4+1.19"
 }
 
 processResources {
@@ -121,4 +150,7 @@ publishing {
         // The repositories here will be used for publishing your artifact, not for
         // retrieving dependencies.
     }
+}
+build {
+    dependsOn downloadTranslations
 }
