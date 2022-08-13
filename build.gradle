@@ -11,7 +11,7 @@ buildscript {
     }
 }
 plugins {
-    id 'fabric-loom' version '0.12-SNAPSHOT'
+    id 'fabric-loom' version '0.13-SNAPSHOT'
     id 'maven-publish'
 }
 
@@ -62,8 +62,14 @@ repositories {
     }
     //crowdin
     maven {
-        name = 'CrowdinTranslate source'
         url = "https://minecraft.guntram.de/maven/"
+    }
+    //jei only runtime
+    maven {
+        url = "https://dvs1.progwml6.com/files/maven/"
+    }
+    maven {
+        url = "https://modmaven.dev"
     }
 }
 
@@ -79,8 +85,6 @@ dependencies {
     //added mods
     //modmenu
     modImplementation "com.terraformersmc:${project.modmenu}"
-    //REI
-    //modRuntimeOnly "me.shedaniel:RoughlyEnoughItems-fabric:${project.rei}"
     //WTHIT
     modRuntimeOnly "mcp.mobius.waila:wthit:${project.wthit}"
     modRuntimeOnly "lol.bai:badpackets:${project.badpackets}"
@@ -93,6 +97,8 @@ dependencies {
     //crowdin
     modImplementation("de.guntram.mcmod:crowdin-translate:${project.crowdin}")
     include "de.guntram.mcmod:crowdin-translate:${project.crowdin}"
+    //JEI only runtime
+    modRuntimeOnly "mezz.jei:${project.jei}"
 }
 
 processResources {
