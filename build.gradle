@@ -35,10 +35,9 @@ repositories {
     maven{
         url = "https://maven.terraformersmc.com/releases/"
     }
-    //REI
-    maven {
-        url = "https://maven.shedaniel.me"
-    }
+    //REI & Architectury
+    maven { url "<https://maven.shedaniel.me/>" }
+    maven { url "<https://maven.architectury.dev/>" }
     //WTHIT
     maven {
         url = "https://maven.bai.lol"
@@ -81,7 +80,7 @@ dependencies {
     //modmenu
     modImplementation "com.terraformersmc:${project.modmenu}"
     //REI
-    modRuntimeOnly "me.shedaniel:RoughlyEnoughItems-fabric:${project.rei}"
+    //modRuntimeOnly "me.shedaniel:RoughlyEnoughItems-fabric:${project.rei}"
     //WTHIT
     modRuntimeOnly "mcp.mobius.waila:wthit:${project.wthit}"
     modRuntimeOnly "lol.bai:badpackets:${project.badpackets}"
