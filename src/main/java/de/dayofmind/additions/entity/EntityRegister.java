@@ -27,11 +27,11 @@ public class EntityRegister {
      * Registers Entity's Attributes
      */
     public static void registerAttributes(){
+        System.out.println("DOM | Adding entities");
         if(ModConfig.ExperimentalSettings.ExperimentalEntities) {
             FabricDefaultAttributeRegistry.register(EntityRegister.WANDERING_MUSICAN, DOMWanderingMusician.setAttributes());
             System.out.println("DOM | Experimental entity added to DayOfMind");
         }
-
         System.out.println("DOM | DayOfMind successful added entities to minecraft");
     }
 }

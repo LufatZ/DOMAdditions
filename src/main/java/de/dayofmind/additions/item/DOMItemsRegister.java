@@ -18,14 +18,12 @@ public class DOMItemsRegister {
         }
         return null;
     }
-
-
     public static void registerItems(){
+        System.out.println("DOM | Adding items");
         //SpawnEgg of experimental Entities
         if (ModConfig.ExperimentalSettings.ExperimentalEntities) {
             registerItem("wandering_musican_spawn_egg", WANDERING_MUSICAN_SPAWN_EGG());
         }
-
         System.out.println("DOM | DayOfMind successful added items to minecraft");
     }
     private static void registerItem(String name, Item item){

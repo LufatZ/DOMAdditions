@@ -33,13 +33,10 @@ public class Additions implements ModInitializer {
         System.out.println("DOM | download translation from crowdin");
         CrowdinTranslate.downloadTranslations("dayofmind-additions", "additions", true);
         //Register DoM blocks
-        System.out.println("DOM | Adding blocks");
         DOMBlocksRegister.registerBlocks();
         //Register DoM items
-        System.out.println("DOM | Adding items");
         DOMItemsRegister.registerItems();
         //Register DoM entities
-        System.out.println("DOM | Adding entities");
         registerAttributes();
     }
 }
