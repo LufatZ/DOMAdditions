@@ -25,6 +25,8 @@ public class DOMItemsRegister {
         if (ModConfig.ExperimentalSettings.ExperimentalEntities) {
             registerItem("wandering_musican_spawn_egg", WANDERING_MUSICAN_SPAWN_EGG());
         }
+
+        System.out.println("DOM | DayOfMind successful added items to minecraft");
     }
     private static void registerItem(String name, Item item){
         Registry.register(Registry.ITEM, new Identifier(MOD_ID, name), item);

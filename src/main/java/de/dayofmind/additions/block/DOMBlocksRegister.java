@@ -78,8 +78,6 @@ public class DOMBlocksRegister {
 
     public static void registerBlocks(){
 
-        System.out.println("DayOfMind is just adding blocks to minecraft");
-
         //slabs
             registerBlock("dirt_slab", DIRT_SLAB);
             registerBlock("grass_slab", GRASS_SLAB);
@@ -111,7 +109,11 @@ public class DOMBlocksRegister {
         //instruments
         if (ModConfig.ExperimentalSettings.ExperimentalBlocks) {
             registerBlock("guitar", GUITAR, (BlockItem) GUITAR_ITEM);
+            System.out.println("DOM | Experimental guitar added to DayOfMind");
         }
+
+
+        System.out.println("DOM | DayOfMind successful added blocks to minecraft");
     }
 
 
