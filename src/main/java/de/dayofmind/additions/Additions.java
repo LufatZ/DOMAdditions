@@ -30,7 +30,8 @@ public class Additions implements ModInitializer {
             System.out.println("DOM | If you want to play with experimental settings on servers, they must also be enabled on the server and client.");
         }
         //crowdin TODO lang file will not be downloaded
-        CrowdinTranslate.downloadTranslations("dayofmind-additions", "additions");
+        System.out.println("DOM | download translation from crowdin");
+        CrowdinTranslate.downloadTranslations("dayofmind-additions", "additions", true);
         //Register DoM blocks
         System.out.println("DOM | Adding blocks");
         DOMBlocksRegister.registerBlocks();

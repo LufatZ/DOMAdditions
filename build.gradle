@@ -18,7 +18,7 @@ plugins {
 apply plugin: 'de.guntram.mcmod.crowdin-translate'
 crowdintranslate.crowdinProjectName = 'dayofmind-additions'
 crowdintranslate.minecraftProjectName = 'additions'
-crowdintranslate.verbose = false
+crowdintranslate.verbose = true
 
 version = project.mod_version
 group = project.maven_group
