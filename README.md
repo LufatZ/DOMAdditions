@@ -1,6 +1,6 @@
 # **DOMAdditions**
 ___
-![img.png](https://bisecthosting.com/images/CF/DayOfMind/BH_DM_Header.png)
+![img.png](https://www.bisecthosting.com/images/CF/DayofMind_revamp/bh_header.png)
 [![Crowdin](https://badges.crowdin.net/dayofmind-additions/localized.svg)](https://crowdin.com/project/dayofmind-additions)
 <br>help us to translate our project! https://crwd.in/dayofmind-additions
 ### About DayOfMind Additions
