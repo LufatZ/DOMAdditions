@@ -1,0 +1,9 @@
+{
+  "parent": "minecraft:block/outer_stairs",
+  "textures": {
+    "particle": "block/smooth_basalt",
+    "bottom": "block/smooth_basalt",
+    "top": "block/smooth_basalt",
+    "side": "block/smooth_basalt"
+  }
+}

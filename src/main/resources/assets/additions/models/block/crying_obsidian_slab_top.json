@@ -1,0 +1,9 @@
+{
+  "parent": "block/slab_top",
+  "textures": {
+    "particle": "block/crying_obsidian",
+    "bottom": "block/crying_obsidian",
+    "top": "block/crying_obsidian",
+    "side": "block/crying_obsidian"
+  }
+}

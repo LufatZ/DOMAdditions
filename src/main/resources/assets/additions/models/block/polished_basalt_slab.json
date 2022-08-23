@@ -1,0 +1,9 @@
+{
+  "parent": "block/slab",
+  "textures": {
+    "particle": "block/polished_basalt_top",
+    "bottom": "block/polished_basalt_top",
+    "top": "block/polished_basalt_top",
+    "side": "block/polished_basalt_side"
+  }
+}

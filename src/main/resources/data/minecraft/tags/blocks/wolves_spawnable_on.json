@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "additions:grass_slab",
+    "additions:grass_stair",
+    "additions:dirt_slab",
+    "additions:dirt_stair"
+  ]
+}

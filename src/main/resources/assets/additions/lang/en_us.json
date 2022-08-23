@@ -7,11 +7,34 @@
   "block.additions.gold_slab": "Gold Slab",
   "block.additions.iron_slab": "Iron Slab",
   "block.additions.diamond_slab": "Diamond Slab",
+  "block.additions.smooth_basalt_slab": "Smooth Basalt Slab",
+  "block.additions.polished_basalt_slab": "Polished Basalt Slab",
+  "block.additions.magma_slab": "Magma Slab",
+  "block.additions.obsidian_slab": "Obsidian Slab",
+  "block.additions.crying_obsidian_slab": "Crying Obsidian Slab",
 
   "block.additions.dirt_stair": "Dirt Stair",
   "block.additions.dirt_path_stair": "Dirt Path Stair",
   "block.additions.grass_stair": "Grass Stair",
   "block.additions.gold_stair": "Gold Stair",
   "block.additions.iron_stair": "Iron Stair",
-  "block.additions.diamond_stair": "Diamond Stair"
+  "block.additions.diamond_stair": "Diamond Stair",
+  "block.additions.smooth_basalt_stair": "Smooth Basalt Stair",
+  "block.additions.polished_basalt_stair": "Polished Basalt Stair",
+  "block.additions.magma_stair": "Magma Stair",
+  "block.additions.obsidian_stair": "Obsidian Stair",
+  "block.additions.crying_obsidian_stair": "Crying Obsidian Stair",
+
+  "block.additions.netherite_lantern": "Netherite Lantern",
+  "block.additions.copper_lantern": "Copper Lantern",
+
+  "block.additions.guitar": "Guitar",
+
+  "item.additions.wandering_musican_spawn_egg": "Wandering Musican Spawn Egg",
+
+
+  "config.additions.experimentalSettings.ExperimentalEntities": "Enable experimental entity's",
+  "config.additions.experimentalSettings.ExperimentalEntities.description": "Adds experimental entities \nlike wandering musican to the game \n\nmust be the same as on the server you are playing on",
+  "config.additions.experimentalSettings.ExperimentalBlocks": "Enable experimental blocks & items",
+  "config.additions.experimentalSettings.ExperimentalBlocks.description": "Adds experimental blocks \nlike the guitar to the game \n\nmust be the same as on the server you are playing on"
 }

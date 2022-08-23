@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "   ",
+    "iIi",
+    "   "
+  ],
+  "key": {
+    "I": {
+      "item": "minecraft:lantern"
+    },
+    "i": {
+      "item": "minecraft:netherite_ingot"
+    }
+  },
+  "result": {
+    "item": "additions:netherite_lantern"
+  }
+}

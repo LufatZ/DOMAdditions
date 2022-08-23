@@ -2,7 +2,7 @@ package de.dayofmind.additions.mixins;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
-import de.dayofmind.additions.block.DOMBlocks;
+import de.dayofmind.additions.block.DOMBlocksRegister;
 import net.minecraft.block.*;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemUsageContext;
@@ -26,7 +26,7 @@ import static net.minecraft.block.StairsBlock.WATERLOGGED;
 
 @Mixin(ShovelItem.class)
 public class DOMShovelMixin {
-    private static final Map<Block, BlockState> PATH_STATES2 = Maps.newHashMap(new ImmutableMap.Builder<Block, BlockState>().put(DOMBlocks.DIRT_SLAB, DOMBlocks.DIRT_PATH_SLAB.getDefaultState()).put(DOMBlocks.GRASS_SLAB, DOMBlocks.DIRT_PATH_SLAB.getDefaultState()).put(DOMBlocks.DIRT_STAIR, DOMBlocks.DIRT_PATH_STAIR.getDefaultState()).put(DOMBlocks.GRASS_STAIR, DOMBlocks.DIRT_PATH_STAIR.getDefaultState()).build());
+    private static final Map<Block, BlockState> PATH_STATES2 = Maps.newHashMap(new ImmutableMap.Builder<Block, BlockState>().put(DOMBlocksRegister.DIRT_SLAB, DOMBlocksRegister.DIRT_PATH_SLAB.getDefaultState()).put(DOMBlocksRegister.GRASS_SLAB, DOMBlocksRegister.DIRT_PATH_SLAB.getDefaultState()).put(DOMBlocksRegister.DIRT_STAIR, DOMBlocksRegister.DIRT_PATH_STAIR.getDefaultState()).put(DOMBlocksRegister.GRASS_STAIR, DOMBlocksRegister.DIRT_PATH_STAIR.getDefaultState()).build());
 
     @Inject(at = @At("HEAD"), method = "useOnBlock")
     public void useOnBlock(ItemUsageContext context, CallbackInfoReturnable<ActionResult> cir) {
@@ -53,13 +53,13 @@ public class DOMShovelMixin {
             if (blockState4 != null && world.getBlockState(blockPos.up()).isAir()) {
                 world.playSound(playerEntity, blockPos, SoundEvents.ITEM_SHOVEL_FLATTEN, SoundCategory.BLOCKS, 1.0F, 1.0F);
                 blockState5 = blockState4;
-            } else if (blockState.getBlock() instanceof CampfireBlock && (Boolean)blockState.get(CampfireBlock.LIT)) {
+            } else if (blockState.getBlock() instanceof CampfireBlock && blockState.get(CampfireBlock.LIT)) {
                 if (!world.isClient()) {
-                    world.syncWorldEvent((PlayerEntity)null, 1009, blockPos, 0);
+                    world.syncWorldEvent(null, 1009, blockPos, 0);
                 }
 
                 CampfireBlock.extinguish(context.getPlayer(), world, blockPos, blockState);
-                blockState5 = (BlockState)blockState.with(CampfireBlock.LIT, false);
+                blockState5 = blockState.with(CampfireBlock.LIT, false);
             }
 
             if (blockState5 != null) {

@@ -1,5 +1,9 @@
 {
   "replace": false,
   "values": [
+    "additions:obsidian_slab",
+    "additions:obsidian_stair",
+    "additions:crying_obsidian_slab",
+    "additions:crying_obsidian_stair"
   ]
 }

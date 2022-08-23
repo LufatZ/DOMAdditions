@@ -6,6 +6,11 @@
     "additions:dirt_path_stair",
     "additions:gold_stair",
     "additions:iron_stair",
-    "additions:diamond_stair"
+    "additions:diamond_stair",
+    "additions:smooth_basalt_stair",
+    "additions:polished_basalt_stair",
+    "additions:magma_stair",
+    "additions:crying_obsidian_stair",
+    "additions:obsidian_stair"
   ]
 }

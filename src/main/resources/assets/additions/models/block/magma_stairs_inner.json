@@ -1,0 +1,9 @@
+{
+  "parent": "minecraft:block/inner_stairs",
+  "textures": {
+    "particle": "block/magma",
+    "bottom": "block/magma",
+    "top": "block/magma",
+    "side": "block/magma"
+  }
+}
