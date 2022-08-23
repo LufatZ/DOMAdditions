@@ -28,10 +28,10 @@ public class DOMCryingObsidianSlab extends SlabBlock{
                     if (slabType == SlabType.DOUBLE){
                         world.addParticle(ParticleTypes.DRIPPING_OBSIDIAN_TEAR, (double) pos.getX() + d, (double) pos.getY() + e, (double) pos.getZ() + f, 0.0, 0.0, 0.0);
                     }
-                    if (slabType == SlabType.BOTTOM){
+                    else if (slabType == SlabType.BOTTOM){
                         world.addParticle(ParticleTypes.DRIPPING_OBSIDIAN_TEAR, (double) pos.getX() + d, (double) pos.getY() + 0.3, (double) pos.getZ() + f, 0.0, 0.0, 0.0);
                     }
-                    if (slabType == SlabType.TOP){
+                    else if (slabType == SlabType.TOP){
                         world.addParticle(ParticleTypes.DRIPPING_OBSIDIAN_TEAR, (double) pos.getX() + d, (double) pos.getY() + 0.8, (double) pos.getZ() + f, 0.0, 0.0, 0.0);
                     }
                 }
