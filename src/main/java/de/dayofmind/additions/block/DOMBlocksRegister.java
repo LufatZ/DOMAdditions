@@ -46,17 +46,18 @@ public class DOMBlocksRegister {
         public static final Block OBSIDIAN_SLAB = new SlabBlock(FabricBlockSettings.copyOf(Blocks.OBSIDIAN));
         public static final Block CRYING_OBSIDIAN_SLAB = new DOMCryingObsidianSlab(FabricBlockSettings.copyOf(Blocks.CRYING_OBSIDIAN));
     //stairs
-        public static final Block DIRT_STAIR = new DOMStairs(Blocks.DIRT.getDefaultState(),FabricBlockSettings.copyOf(Blocks.DIRT));
-        public static final Block GRASS_STAIR = new DOMGrassStair(Blocks.ACACIA_STAIRS.getDefaultState(),FabricBlockSettings.copyOf(Blocks.GRASS_BLOCK)); //TODO Temporary Default state as acacia stair, better fix later
-        public static final Block DIRT_PATH_STAIR = new DOMShortStairs(Blocks.DIRT_PATH.getDefaultState(),FabricBlockSettings.copyOf(Blocks.DIRT_PATH));
-        public static final Block GOLD_STAIR = new DOMStairs(Blocks.GOLD_BLOCK.getDefaultState(),FabricBlockSettings.copyOf(Blocks.GOLD_BLOCK));
-        public static final Block IRON_STAIR = new DOMStairs(Blocks.IRON_BLOCK.getDefaultState(),FabricBlockSettings.copyOf(Blocks.IRON_BLOCK));
-        public static final Block DIAMOND_STAIR = new DOMStairs(Blocks.DIAMOND_BLOCK.getDefaultState(),FabricBlockSettings.copyOf(Blocks.DIAMOND_BLOCK));
-        public static final Block SMOOTH_BASALT_STAIR = new DOMStairs(Blocks.BASALT.getDefaultState(),FabricBlockSettings.copyOf(Blocks.BASALT));
-        public static final Block POLISHED_BASALT_STAIR = new DOMStairs(Blocks.POLISHED_BASALT.getDefaultState(),FabricBlockSettings.copyOf(Blocks.POLISHED_BASALT));
-        public static final Block MAGMA_STAIR = new DOMMagmaStair(Blocks.MAGMA_BLOCK.getDefaultState(),FabricBlockSettings.copyOf(Blocks.MAGMA_BLOCK));
-        public static final Block OBSIDIAN_STAIR = new DOMStairs(Blocks.OBSIDIAN.getDefaultState(),FabricBlockSettings.copyOf(Blocks.OBSIDIAN));
-        public static final Block CRYING_OBSIDIAN_STAIR = new DOMStairs(Blocks.CRYING_OBSIDIAN.getDefaultState(),FabricBlockSettings.copyOf(Blocks.CRYING_OBSIDIAN));
+    //TODO rework of stairs... have to tag copy accacia stairs because of wierd block behavior
+        public static final Block DIRT_STAIR = new DOMStairs(Blocks.ACACIA_STAIRS.getDefaultState(),FabricBlockSettings.of(Material.SOIL, MapColor.DIRT_BROWN).strength(0.5F).sounds(BlockSoundGroup.GRAVEL));
+        public static final Block GRASS_STAIR = new DOMGrassStair(Blocks.ACACIA_STAIRS.getDefaultState(),FabricBlockSettings.of(Material.SOLID_ORGANIC).ticksRandomly().strength(0.6F).sounds(BlockSoundGroup.GRASS));
+        public static final Block DIRT_PATH_STAIR = new DOMShortStairs(Blocks.ACACIA_STAIRS.getDefaultState(),FabricBlockSettings.of(Material.SOIL).strength(0.65F).sounds(BlockSoundGroup.GRASS));
+        public static final Block GOLD_STAIR = new DOMStairs(Blocks.ACACIA_STAIRS.getDefaultState(),FabricBlockSettings.of(Material.METAL, MapColor.GOLD).requiresTool().strength(3.0F, 6.0F).sounds(BlockSoundGroup.METAL));
+        public static final Block IRON_STAIR = new DOMStairs(Blocks.ACACIA_STAIRS.getDefaultState(),FabricBlockSettings.of(Material.METAL, MapColor.IRON_GRAY).requiresTool().strength(5.0F, 6.0F).sounds(BlockSoundGroup.METAL));
+        public static final Block DIAMOND_STAIR = new DOMStairs(Blocks.ACACIA_STAIRS.getDefaultState(),FabricBlockSettings.of(Material.METAL, MapColor.DIAMOND_BLUE).requiresTool().strength(5.0F, 6.0F).sounds(BlockSoundGroup.METAL));
+        public static final Block SMOOTH_BASALT_STAIR = new DOMStairs(Blocks.ACACIA_STAIRS.getDefaultState(),FabricBlockSettings.of(Material.STONE, MapColor.BLACK).requiresTool().strength(1.25F, 4.2F).sounds(BlockSoundGroup.BASALT));
+        public static final Block POLISHED_BASALT_STAIR = new DOMStairs(Blocks.ACACIA_STAIRS.getDefaultState(),FabricBlockSettings.of(Material.STONE, MapColor.BLACK).requiresTool().strength(1.25F, 4.2F).sounds(BlockSoundGroup.BASALT));
+        public static final Block MAGMA_STAIR = new DOMMagmaStair(Blocks.ACACIA_STAIRS.getDefaultState(),FabricBlockSettings.copyOf(Blocks.MAGMA_BLOCK));
+        public static final Block OBSIDIAN_STAIR = new DOMStairs(Blocks.ACACIA_STAIRS.getDefaultState(),FabricBlockSettings.of(Material.STONE, MapColor.BLACK).requiresTool().strength(50.0F, 1200.0F));
+        public static final Block CRYING_OBSIDIAN_STAIR = new DOMStairs(Blocks.ACACIA_STAIRS.getDefaultState(),FabricBlockSettings.copyOf(Blocks.CRYING_OBSIDIAN));
 
     //lanterns
         public static final Block NETHERITE_LANTERN = new DOMNetheriteLantern(FabricBlockSettings.copyOf(Blocks.LANTERN));

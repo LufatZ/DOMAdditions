@@ -27,7 +27,7 @@ public class Additions implements ModInitializer {
         //check configs
         if(ModConfig.ExperimentalSettings.ExperimentalEntities || ModConfig.ExperimentalSettings.ExperimentalBlocks) {
             System.out.println("DOM | You are using experimental settings. you may experience crashes and abnormal behavior.");
-            System.out.println("DOM | If you want to play with experimental settings on servers, they must also be enabled on the server and client.");
+            System.out.println("DOM | If you want to play with experimental settings on servers, they must be enabled on the server and client.");
         }
         //crowdin TODO lang file will not be downloaded
         System.out.println("DOM | download translation from crowdin");
