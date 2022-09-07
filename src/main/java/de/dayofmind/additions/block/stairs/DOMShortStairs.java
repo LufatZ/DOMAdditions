@@ -10,7 +10,7 @@ import net.minecraft.world.BlockView;
 
 import java.util.stream.IntStream;
 
-public class DOMShortStairs extends StairsBlock implements Waterloggable {
+public class DOMShortStairs extends DOMStairs implements Waterloggable {
 
     protected static final VoxelShape TOP_SHAPE = DOMShortSlab.TOP_SHAPE;
     protected static final VoxelShape BOTTOM_SHAPE = DOMShortSlab.BOTTOM_SHAPE;
