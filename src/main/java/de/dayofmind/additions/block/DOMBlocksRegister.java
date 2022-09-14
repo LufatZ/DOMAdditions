@@ -3,6 +3,7 @@ package de.dayofmind.additions.block;
 import de.dayofmind.additions.block.instruments.DOMGuitarBlock;
 import de.dayofmind.additions.block.lanterns.DOMCopperLantern;
 import de.dayofmind.additions.block.lanterns.DOMNetheriteLantern;
+import de.dayofmind.additions.block.lanterns.DOMRedstoneLantern;
 import de.dayofmind.additions.block.slabs.DOMCryingObsidianSlab;
 import de.dayofmind.additions.block.slabs.DOMGrassSlab;
 import de.dayofmind.additions.block.slabs.DOMMagmaSlab;
@@ -21,14 +22,23 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.sound.BlockSoundGroup;
+import net.minecraft.state.property.Properties;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
+
+import java.util.function.ToIntFunction;
 
 import static de.dayofmind.additions.Additions.MOD_ID;
 import static de.dayofmind.additions.block.DOMBlocksRegister.EXPERIMENTAL.GUITAR;
 import static de.dayofmind.additions.block.DOMBlocksRegister.EXPERIMENTAL.GUITAR_ITEM;
 
 public class DOMBlocksRegister {
+    //helpers
+    private static ToIntFunction<BlockState> createLightLevelFromLitBlockState(int litLevel) {
+        return (state) -> {
+            return (Boolean)state.get(Properties.LIT) ? litLevel : 0;
+        };
+    }
 
     //adding DayOfMind Item Group
         public static final ItemGroup DayOfMind = FabricItemGroupBuilder.build(new Identifier(MOD_ID, "general"), () -> new ItemStack(DOMBlocksRegister.GRASS_STAIR));
@@ -62,6 +72,10 @@ public class DOMBlocksRegister {
     //lanterns
         public static final Block NETHERITE_LANTERN = new DOMNetheriteLantern(FabricBlockSettings.copyOf(Blocks.LANTERN));
         public static final Block COPPER_LANTERN = new DOMCopperLantern(FabricBlockSettings.copyOf(Blocks.LANTERN));
+
+        public static final Block NETHERITE_REDSTONE_LANTERN = new DOMRedstoneLantern(FabricBlockSettings.copyOf(NETHERITE_LANTERN).luminance(createLightLevelFromLitBlockState(15)));
+        public static final Block COPPER_REDSTONE_LANTERN = new DOMRedstoneLantern(FabricBlockSettings.copyOf(COPPER_LANTERN).luminance(createLightLevelFromLitBlockState(15)));
+        public static final Block REDSTONE_LANTERN = new DOMRedstoneLantern(FabricBlockSettings.copyOf(Blocks.LANTERN).luminance(createLightLevelFromLitBlockState(15)));
 
     //blocks
         public static class EXPERIMENTAL {
@@ -107,6 +121,10 @@ public class DOMBlocksRegister {
         //lanterns
             registerBlock("netherite_lantern", NETHERITE_LANTERN);
             registerBlock("copper_lantern", COPPER_LANTERN);
+
+            registerBlock("netherite_redstone_lantern", NETHERITE_REDSTONE_LANTERN);
+            registerBlock("copper_redstone_lantern", COPPER_REDSTONE_LANTERN);
+            registerBlock("redstone_lantern", REDSTONE_LANTERN);
         //blocks
         //instruments
             if (ModConfig.ExperimentalSettings.ExperimentalBlocks) {
