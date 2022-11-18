@@ -64,12 +64,10 @@ repositories {
     maven {
         url = "https://minecraft.guntram.de/maven/"
     }
-    //jei only runtime
+    //emi
     maven {
-        url = "https://dvs1.progwml6.com/files/maven/"
-    }
-    maven {
-        url = "https://modmaven.dev"
+        name = "TerraformersMC"
+        url = "https://maven.terraformersmc.com/"
     }
 }
 
@@ -97,8 +95,8 @@ dependencies {
     //crowdin
     modImplementation("de.guntram.mcmod:crowdin-translate:${project.crowdin}")
     include "de.guntram.mcmod:crowdin-translate:${project.crowdin}"
-    //JEI only runtime
-    modRuntimeOnly "mezz.jei:${project.jei}"
+    //emi
+    modImplementation "dev.emi:emi:${project.emi}"
 }
 
 processResources {
