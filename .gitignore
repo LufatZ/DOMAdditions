@@ -116,3 +116,13 @@ run/
 
 # Avoid ignoring Gradle wrapper jar file (.jar files are usually ignored)
 !gradle-wrapper.jar
+/src/main/resources/assets/additions/lang/es_ar.json
+/src/main/resources/assets/additions/lang/es_cl.json
+/src/main/resources/assets/additions/lang/es_ec.json
+/src/main/resources/assets/additions/lang/es_es.json
+/src/main/resources/assets/additions/lang/es_mx.json
+/src/main/resources/assets/additions/lang/es_uy.json
+/src/main/resources/assets/additions/lang/es_ve.json
+/src/main/resources/assets/additions/lang/zh_cn.json
+/src/main/resources/assets/additions/lang/de_de.json
+/src/main/resources/assets/additions/lang/ru_ru.json
