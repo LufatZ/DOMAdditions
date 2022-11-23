@@ -32,6 +32,9 @@
 
   "item.additions.wandering_musican_spawn_egg": "Wandering Musican Spawn Egg",
 
+  "item.additions.copper_nugget": "Copper Nugget",
+  "item.additions.netherite_nugget": "Netherite Nugget",
+
 
   "config.additions.experimentalSettings.ExperimentalEntities": "Enable experimental entity's",
   "config.additions.experimentalSettings.ExperimentalEntities.description": "Adds experimental entities \nlike wandering musican to the game \n\nmust be the same as on the server you are playing on",

@@ -12,7 +12,7 @@ import de.dayofmind.additions.block.stairs.DOMMagmaStair;
 import de.dayofmind.additions.block.stairs.DOMShortStairs;
 import de.dayofmind.additions.block.stairs.DOMStairs;
 import de.dayofmind.additions.config.ModConfig;
-import de.dayofmind.additions.item.DOMGuitar;
+import de.dayofmind.additions.item.instruments.DOMGuitar;
 import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.block.*;

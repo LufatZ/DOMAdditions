@@ -1,19 +1,19 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    "   ",
+    "iii",
     "iIi",
-    "   "
+    "iii"
   ],
   "key": {
     "I": {
-      "item": "minecraft:lantern"
+      "item": "minecraft:torch"
     },
     "i": {
-      "item": "minecraft:copper_ingot"
+      "item": "additions:netherite_nugget"
     }
   },
   "result": {
-    "item": "additions:copper_lantern"
+    "item": "additions:netherite_lantern"
   }
 }
