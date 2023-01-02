@@ -19,31 +19,31 @@ public class DOMConfig extends Config {
 
         //@ConfigEntry(comment = "This enables the wandering Musican")
         //boolean EnabledMusican;
-        @ConfigEntry(comment = "This enables the Guitar Block and item")
+        @ConfigEntry(comment = "This enables the Guitar Block and item", requiresRestart = true)
         public static boolean EnabledGuitar;
 
     }
     @Transitive
     public static class Features implements ConfigGroup {
-        @ConfigEntry(comment = "This adds more lantern variants")
+        @ConfigEntry(comment = "This adds more lantern variants", requiresRestart = true)
         public static boolean EnabledLantern = true;
-        @ConfigEntry(comment = "This adds more dirt variants")
+        @ConfigEntry(comment = "This adds more dirt variants", requiresRestart = true)
         public static boolean EnabledDirt = true;
-        @ConfigEntry(comment = "This adds more grass variants")
+        @ConfigEntry(comment = "This adds more grass variants", requiresRestart = true)
         public static boolean EnabledGrass = true;
-        @ConfigEntry(comment = "This adds more dirt path variants")
+        @ConfigEntry(comment = "This adds more dirt path variants", requiresRestart = true)
         public static boolean EnabledDirtPath = true;
-        @ConfigEntry(comment = "This adds more gold variants")
+        @ConfigEntry(comment = "This adds more gold variants", requiresRestart = true)
         public static boolean EnabledGold = true;
-        @ConfigEntry(comment = "This adds more iron variants")
+        @ConfigEntry(comment = "This adds more iron variants", requiresRestart = true)
         public static boolean EnabledIron = true;
-        @ConfigEntry(comment = "This adds more diamond variants")
+        @ConfigEntry(comment = "This adds more diamond variants", requiresRestart = true)
         public static boolean EnabledDia = true;
-        @ConfigEntry(comment = "This adds more basalt variants")
+        @ConfigEntry(comment = "This adds more basalt variants", requiresRestart = true)
         public static boolean EnabledBasalt = true;
-        @ConfigEntry(comment = "This adds more magma variants")
+        @ConfigEntry(comment = "This adds more magma variants", requiresRestart = true)
         public static boolean EnabledMagma = true;
-        @ConfigEntry(comment = "This adds more obsidian variants")
+        @ConfigEntry(comment = "This adds more obsidian variants", requiresRestart = true)
         public static boolean EnabledObsidian = true;
     }
     @Transitive

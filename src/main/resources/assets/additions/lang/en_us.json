@@ -63,7 +63,7 @@
   "config.additions.features.EnabledObsidian": "more obsidian variants",
   "config.additions.features.EnabledObsidian.description":"enable or disable this blocks",
   "config.additions.modSettings.EnabledTranslation": "Automatic Download of community translations",
-  "config.additions.modSettings.EnabledTranslation.description": "This enables the automatic download of additional or updated language files (crowdin).\n if you don´t want this, just disable this option and delete the <ModTranslations> folder in your game directory",
+  "config.additions.modSettings.EnabledTranslation.description": "This enables the automatic download of additional or updated language files (crowdin).\nif you don´t want this, just disable this option and delete the <ModTranslations> folder in your game directory",
 
 
 
