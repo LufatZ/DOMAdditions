@@ -1,15 +1,15 @@
 package de.dayofmind.additions.block.slabs;
 
-import de.dayofmind.additions.block.DOMBlocksRegister;
+import de.dayofmind.additions.block.DOMBlocksRegistry;
 import net.minecraft.block.*;
 import net.minecraft.block.enums.SlabType;
+import net.minecraft.registry.tag.BlockTags;
+import net.minecraft.registry.tag.FluidTags;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.EnumProperty;
 import net.minecraft.state.property.Properties;
-import net.minecraft.tag.BlockTags;
-import net.minecraft.tag.FluidTags;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.WorldAccess;
@@ -49,14 +49,14 @@ public class DOMGrassSlab extends SlabBlock {
 
     public void randomTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
         if (!DOMGrassSlab.canSurvive(state, world, pos)) {
-            world.setBlockState(pos, DOMBlocksRegister.DIRT_SLAB.getDefaultState().with(SlabBlock.TYPE, state.get(SlabBlock.TYPE)).with(SlabBlock.WATERLOGGED, state.get(SlabBlock.WATERLOGGED)));
+            world.setBlockState(pos, DOMBlocksRegistry.DIRT_SLAB.getDefaultState().with(SlabBlock.TYPE, state.get(SlabBlock.TYPE)).with(SlabBlock.WATERLOGGED, state.get(SlabBlock.WATERLOGGED)));
             return;
         }
         if (world.getLightLevel(pos.up()) >= 9) {
             BlockState blockState = this.getDefaultState();
             for (int i = 0; i < 4; ++i) {
                 BlockPos blockPos = pos.add(random.nextInt(3) - 1, random.nextInt(5) - 3, random.nextInt(3) - 1);
-                if (!world.getBlockState(blockPos).isOf(DOMBlocksRegister.DIRT_SLAB) || !DOMGrassSlab.canSpread(blockState, world, blockPos)) continue;
+                if (!world.getBlockState(blockPos).isOf(DOMBlocksRegistry.DIRT_SLAB) || !DOMGrassSlab.canSpread(blockState, world, blockPos)) continue;
                 world.setBlockState(blockPos, blockState.with(SNOWY, world.getBlockState(blockPos.up()).isOf(Blocks.SNOW)));
             }
         }

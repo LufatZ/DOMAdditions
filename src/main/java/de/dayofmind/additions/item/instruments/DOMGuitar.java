@@ -19,7 +19,7 @@ public class DOMGuitar extends BlockItem {
     public TypedActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
         ItemStack itemStack = player.getStackInHand(hand);
         float f = 16.0F;
-        world.playSoundFromEntity(player, player, SoundEvents.BLOCK_NOTE_BLOCK_GUITAR, SoundCategory.RECORDS, f, 1.0F);
+        world.playSoundFromEntity(player, player,SoundEvents.BLOCK_NOTE_BLOCK_GUITAR.value(), SoundCategory.RECORDS, f, 1.0F);
         world.emitGameEvent(GameEvent.INSTRUMENT_PLAY, player.getPos(), GameEvent.Emitter.of(player));
         return TypedActionResult.consume(itemStack);
     }

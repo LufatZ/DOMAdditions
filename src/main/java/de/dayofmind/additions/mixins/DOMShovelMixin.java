@@ -6,9 +6,9 @@ import net.minecraft.block.*;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.item.ShovelItem;
+import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.tag.BlockTags;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -20,7 +20,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.Map;
 
-import static de.dayofmind.additions.block.DOMBlocksRegister.*;
+import static de.dayofmind.additions.block.DOMBlocksRegistry.*;
 import static net.minecraft.block.StairsBlock.SHAPE;
 import static net.minecraft.block.StairsBlock.WATERLOGGED;
 

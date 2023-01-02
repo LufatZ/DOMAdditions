@@ -4,8 +4,8 @@ import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
 import net.minecraft.client.color.world.BiomeColors;
 import net.minecraft.client.color.world.GrassColors;
 
-import static de.dayofmind.additions.block.DOMBlocksRegister.GRASS_SLAB;
-import static de.dayofmind.additions.block.DOMBlocksRegister.GRASS_STAIR;
+import static de.dayofmind.additions.block.DOMBlocksRegistry.GRASS_SLAB;
+import static de.dayofmind.additions.block.DOMBlocksRegistry.GRASS_STAIR;
 
 public class TintBlocks {
 

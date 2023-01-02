@@ -11,7 +11,7 @@ buildscript {
     }
 }
 plugins {
-    id 'fabric-loom' version '0.13-SNAPSHOT'
+    id 'fabric-loom' version '1.0-SNAPSHOT'
     id 'maven-publish'
 }
 
@@ -31,13 +31,20 @@ repositories {
     // for more information about repositories.
 
     //added Mods
+    //config
+    maven {
+        url = 'https://jitpack.io'
+    }
+    maven {
+        url = "https://maven.shedaniel.me/"
+    }
+    maven {
+        url "https://maven.isxander.dev/releases"
+    }
     //modMenu
     maven{
         url = "https://maven.terraformersmc.com/releases/"
     }
-    //REI & Architectury
-    maven { url "<https://maven.shedaniel.me/>" }
-    maven { url "<https://maven.architectury.dev/>" }
     //WTHIT
     maven {
         url = "https://maven.bai.lol"
@@ -45,20 +52,6 @@ repositories {
     //geckolib
     maven {
         url = 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/'
-    }
-
-    //complete config
-    maven {
-        url = 'https://jitpack.io'
-    }
-    maven {
-        url = "https://maven.terraformersmc.com/"
-    }
-    maven {
-        url = "https://maven.shedaniel.me/"
-    }
-    maven {
-        url = "https://maven.siphalor.de/"
     }
     //crowdin
     maven {
@@ -81,17 +74,16 @@ dependencies {
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
     //added mods
+    //config
+    modImplementation("com.github.Lortseam.completeconfig:base:${project.complconfig}")
+    modImplementation("com.github.Lortseam.completeconfig:gui-yacl:${project.complconfig}")
     //modmenu
-    modImplementation "com.terraformersmc:${project.modmenu}"
+    modImplementation "com.terraformersmc:modmenu:${project.modmenu}"
     //WTHIT
     modRuntimeOnly "mcp.mobius.waila:wthit:${project.wthit}"
     modRuntimeOnly "lol.bai:badpackets:${project.badpackets}"
     //geckolib
     modImplementation "software.bernie.geckolib:${project.geckolib}"
-    //complete config
-    modImplementation("com.gitlab.Lortseam.completeconfig:base:${project.completeconfig}")
-    //cloth config modul
-    modImplementation("com.gitlab.Lortseam.completeconfig:gui-cloth:${project.completeconfig}")
     //crowdin
     modImplementation("de.guntram.mcmod:crowdin-translate:${project.crowdin}")
     include "de.guntram.mcmod:crowdin-translate:${project.crowdin}"

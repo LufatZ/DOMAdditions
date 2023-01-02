@@ -11,37 +11,26 @@ import de.dayofmind.additions.block.stairs.DOMGrassStair;
 import de.dayofmind.additions.block.stairs.DOMMagmaStair;
 import de.dayofmind.additions.block.stairs.DOMShortStairs;
 import de.dayofmind.additions.block.stairs.DOMStairs;
-import de.dayofmind.additions.config.ModConfig;
-import de.dayofmind.additions.item.instruments.DOMGuitar;
-import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.block.*;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
 import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
 
 import java.util.function.ToIntFunction;
 
 import static de.dayofmind.additions.Additions.MOD_ID;
-import static de.dayofmind.additions.block.DOMBlocksRegister.EXPERIMENTAL.GUITAR;
-import static de.dayofmind.additions.block.DOMBlocksRegister.EXPERIMENTAL.GUITAR_ITEM;
+import static de.dayofmind.additions.item.DOMItemsRegistry.GUITAR_ITEM;
 
-public class DOMBlocksRegister {
+public class DOMBlocksRegistry {
     //helpers
     private static ToIntFunction<BlockState> createLightLevelFromLitBlockState(int litLevel) {
-        return (state) -> {
-            return (Boolean)state.get(Properties.LIT) ? litLevel : 0;
-        };
+        return (state) -> (Boolean)state.get(Properties.LIT) ? litLevel : 0;
     }
-
-    //adding DayOfMind Item Group
-        public static final ItemGroup DayOfMind = FabricItemGroupBuilder.build(new Identifier(MOD_ID, "general"), () -> new ItemStack(DOMBlocksRegister.GRASS_STAIR));
-
     //slabs
         public static final Block DIRT_SLAB = new SlabBlock(FabricBlockSettings.copyOf(Blocks.DIRT));
         public static final Block GRASS_SLAB = new DOMGrassSlab(FabricBlockSettings.copyOf(Blocks.GRASS_BLOCK));
@@ -76,20 +65,10 @@ public class DOMBlocksRegister {
         // public static final Block COPPER_REDSTONE_LANTERN = new DOMRedstoneLantern(FabricBlockSettings.copyOf(COPPER_LANTERN).luminance(createLightLevelFromLitBlockState(15)));
         // public static final Block REDSTONE_LANTERN = new DOMRedstoneLantern(FabricBlockSettings.copyOf(Blocks.LANTERN).luminance(createLightLevelFromLitBlockState(15)));
 
-    //blocks
-        public static class EXPERIMENTAL {
-            /*
-            #
-            #EXPERIMENTAL FEATURES
-            #
-             */
 
-            //instruments
-                public static final Block GUITAR = new DOMGuitarBlock(FabricBlockSettings.of(Material.WOOD, MapColor.BROWN).strength(2.0F, 3.0F).sounds(BlockSoundGroup.WOOD));
+    //instruments
+        public static final Block GUITAR = new DOMGuitarBlock(FabricBlockSettings.of(Material.WOOD, MapColor.BROWN).strength(2.0F, 3.0F).sounds(BlockSoundGroup.WOOD));
 
-            //items
-                public static final Item GUITAR_ITEM = new DOMGuitar(GUITAR,(new Item.Settings().group(DayOfMind)));
-        }
 
     public static void registerBlocks(){
         System.out.println("DOM | Adding blocks");
@@ -120,19 +99,10 @@ public class DOMBlocksRegister {
         //lanterns
             registerBlock("netherite_lantern", NETHERITE_LANTERN);
             registerBlock("copper_lantern", COPPER_LANTERN);
-
-            // registerBlock("netherite_redstone_lantern", NETHERITE_REDSTONE_LANTERN);
-            // registerBlock("copper_redstone_lantern", COPPER_REDSTONE_LANTERN);
-            // registerBlock("redstone_lantern", REDSTONE_LANTERN);
-        //blocks
+            System.out.println("DOM | DayOfMind successful added blocks to minecraft");
         //instruments
-            if (ModConfig.ExperimentalSettings.ExperimentalBlocks) {
-                registerBlock("guitar", GUITAR, (BlockItem) GUITAR_ITEM);
-                System.out.println("DOM | Experimental guitar added to DayOfMind");
-            }
-        System.out.println("DOM | DayOfMind successful added blocks to minecraft");
+            registerBlock("guitar", GUITAR, (BlockItem) GUITAR_ITEM);
     }
-
 
     //for BlockItem registration
     private static void registerBlock(String name, Block block) {
@@ -140,9 +110,9 @@ public class DOMBlocksRegister {
     }
     private static void registerBlock(String name, Block block, BlockItem blockItem) {
         if (blockItem == null) {
-            blockItem = new BlockItem(block, new Item.Settings().group(DayOfMind));
+            blockItem = new BlockItem(block, new Item.Settings());
         }
-        Registry.register(Registry.BLOCK, new Identifier(MOD_ID, name), block);
-        Registry.register(Registry.ITEM, new Identifier(MOD_ID, name), blockItem);
+        Registry.register(Registries.BLOCK, new Identifier(MOD_ID, name), block);
+        Registry.register(Registries.ITEM, new Identifier(MOD_ID, name), blockItem);
     }
 }

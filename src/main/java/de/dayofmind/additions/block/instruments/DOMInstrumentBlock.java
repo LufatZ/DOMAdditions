@@ -45,7 +45,7 @@ public class DOMInstrumentBlock extends HorizontalFacingBlock implements Waterlo
     }
     public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState neighborState, WorldAccess world, BlockPos pos, BlockPos neighborPos) {
         if (state.get(WATERLOGGED)) {
-            world.createAndScheduleFluidTick(pos, Fluids.WATER, Fluids.WATER.getTickRate(world));
+            world.scheduleFluidTick(pos, Fluids.WATER, Fluids.WATER.getTickRate(world));
         }
 
         return super.getStateForNeighborUpdate(state, direction, neighborState, world, pos, neighborPos);
@@ -82,7 +82,7 @@ public class DOMInstrumentBlock extends HorizontalFacingBlock implements Waterlo
     public boolean onSyncedBlockEvent(BlockState state, World world, BlockPos pos, int type, int data) {
         int i = state.get(NOTE);
         float f = (float)Math.pow(2.0, (double)(i - 12) / 12.0);
-        world.playSound(null, pos, state.get(INSTRUMENT).getSound(), SoundCategory.RECORDS, 3.0F, f);
+        world.playSound(null, (double)pos.getX() + 0.5, (double)pos.getY() + 0.5, (double)pos.getZ() + 0.5,  state.get(INSTRUMENT).getSound(), SoundCategory.RECORDS, 3.0F, f, world.random.nextLong());
         world.addParticle(ParticleTypes.NOTE, (double)pos.getX() + 0.5, (double)pos.getY() + 1.5, (double)pos.getZ() + 0.5, (double)i / 24.0, 0.0, 0.0);
         return true;
     }

@@ -2,32 +2,26 @@ package de.dayofmind.additions.client;
 
 import de.dayofmind.additions.client.block.TextureCutOut;
 import de.dayofmind.additions.client.block.TintBlocks;
-import de.dayofmind.additions.client.entity.mobs.wandering_musican.DOMWanderingMusicanRenderer;
-import de.dayofmind.additions.entity.EntityRegister;
 import me.lortseam.completeconfig.gui.ConfigScreenBuilder;
-import me.lortseam.completeconfig.gui.cloth.ClothConfigScreenBuilder;
+import me.lortseam.completeconfig.gui.yacl.YaclScreenBuilder;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
-import net.minecraft.client.render.entity.model.EntityModelLayer;
-import net.minecraft.util.Identifier;
 
 import static de.dayofmind.additions.Additions.MOD_ID;
 
 @Environment(EnvType.CLIENT)
 public class AdditionsClient implements ClientModInitializer {
-
-    public static final EntityModelLayer MODEL_CUBE_LAYER = new EntityModelLayer(new Identifier("entitytesting", "cube"), "main");
-    @Override
+ @Override
     public void onInitializeClient() {
         //Config Screen(must be on client side)
-        ConfigScreenBuilder.setMain(MOD_ID, new ClothConfigScreenBuilder());
+        System.out.println("DOM | creating the config screen on the client");
+        ConfigScreenBuilder.setMain(MOD_ID, new YaclScreenBuilder());
         //texture stuff
+        System.out.println("DOM | Colors are added to blocks");
         TintBlocks.TintGrassBlocks();
+        System.out.println("DOM | blocks become transparent");
         TextureCutOut.CutOut();
         //ENTITY
-        //WanderingMusician
-        EntityRendererRegistry.register(EntityRegister.WANDERING_MUSICAN, DOMWanderingMusicanRenderer::new);
     }
 }
