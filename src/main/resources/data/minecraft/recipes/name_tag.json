@@ -13,7 +13,7 @@
       "item": "minecraft:iron_ingot"
     },
     "O": {
-      "item": "minecraft:oak_sign"
+      "tag": "minecraft:signs"
     },
     "P": {
       "item": "minecraft:paper"

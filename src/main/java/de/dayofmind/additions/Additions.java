@@ -1,42 +1,33 @@
 package de.dayofmind.additions;
 
-import de.dayofmind.additions.block.DOMBlocksRegister;
-import de.dayofmind.additions.config.ModConfig;
-import de.dayofmind.additions.item.DOMItemsRegister;
+import de.dayofmind.additions.ItemGroups.ItemGroup;
+import de.dayofmind.additions.block.DOMBlocksRegistry;
+import de.dayofmind.additions.config.DOMConfig;
+import de.dayofmind.additions.item.DOMItemsRegistry;
 import de.guntram.mcmod.crowdintranslate.CrowdinTranslate;
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.loader.api.FabricLoader;
 
-import static de.dayofmind.additions.entity.EntityRegister.registerAttributes;
 
 public class Additions implements ModInitializer {
-
     public static String MOD_ID = "additions";
     @Override
     public void onInitialize() {
-        System.out.println("DOM | DayOfMind is loading");
-        System.out.println("DOM | Thanks for playing DayOfMind");
-        System.out.println("DOM | Please take a look on my Discord: https://discord.com/invite/9EuPx2fJ4F");
-        System.out.println("DOM | Please report bugs to LufatZ or MysticBanana");
-        //register config | only if complete config is installed
-        if (FabricLoader.getInstance().isModLoaded("completeconfig-base")) {
-            System.out.println("DOM | Adding configs");
-            ModConfig config = new ModConfig();
-            config.load();
+        System.out.println("DOM | DayOfMind is loading \n Thanks for playing DayOfMind \n Please take a look on my Discord: https://discord.com/invite/9EuPx2fJ4F \n Please report bugs to LufatZ or MysticBanana");
+        DOMConfig config = new DOMConfig();
+        config.load();
+        //crowdin
+        if (DOMConfig.ModSettings.EnabledTranslation) {
+            System.out.println("DOM | you have enabled automatic download of translation \n download translation from crowdin");
+            CrowdinTranslate.downloadTranslations("dayofmind-additions", "additions", true);
         }
-        //check configs
-        if(ModConfig.ExperimentalSettings.ExperimentalEntities || ModConfig.ExperimentalSettings.ExperimentalBlocks) {
-            System.out.println("DOM | You are using experimental settings. you may experience crashes and abnormal behavior.");
-            System.out.println("DOM | If you want to play with experimental settings on servers, they must be enabled on the server and client.");
-        }
-        //crowdin TODO lang file will not be downloaded
-        System.out.println("DOM | download translation from crowdin");
-        CrowdinTranslate.downloadTranslations("dayofmind-additions", "additions", true);
         //Register DoM blocks
-        DOMBlocksRegister.registerBlocks();
+            DOMBlocksRegistry.registerBlocks();
         //Register DoM items
-        DOMItemsRegister.registerItems();
-        //Register DoM entities
-        registerAttributes();
+            DOMItemsRegistry.registerItems();
+        //TODO Register DoM entities
+        // registerAttributes();
+        //Register DOM ItemGroups
+            ItemGroup.DayOfMindItems();
+            ItemGroup.DayOfMindBlocks();
     }
 }
