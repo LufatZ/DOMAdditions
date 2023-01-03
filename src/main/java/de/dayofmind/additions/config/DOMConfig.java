@@ -45,6 +45,8 @@ public class DOMConfig extends Config {
         public static boolean EnabledMagma = true;
         @ConfigEntry(comment = "This adds more obsidian variants", requiresRestart = true)
         public static boolean EnabledObsidian = true;
+        @ConfigEntry(comment = "This adds decorative trapdoor variants", requiresRestart = true)
+        public static boolean EnabledDecorativeTrapdoor = true;
     }
     @Transitive
     public static class ModSettings implements ConfigGroup {

@@ -60,6 +60,9 @@ public class ItemGroup {
                         entries.add(CRYING_OBSIDIAN_STAIR);
                         entries.add(CRYING_OBSIDIAN_SLAB);
                     }
+                    if (DOMConfig.Features.EnabledDecorativeTrapdoor) {
+                        entries.add(Decorative_Iron_Trapdoor);
+                    }
                     if (DOMConfig.ExperimentalSettings.EnabledGuitar) {
                         entries.add(GUITAR_ITEM);
                     }

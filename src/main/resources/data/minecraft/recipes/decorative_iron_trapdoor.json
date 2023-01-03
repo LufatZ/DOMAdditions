@@ -1,0 +1,20 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "###",
+        "#O#",
+        "###"
+    ],
+    "key": {
+        "#": {
+            "item": "minecraft:iron_nugget"
+        },
+        "O": {
+            "item": "minecraft:oak_trapdoor"
+        }
+    },
+    "result": {
+        "item": "additions:decorative_iron_trapdoor",
+        "count": 1
+    }
+}

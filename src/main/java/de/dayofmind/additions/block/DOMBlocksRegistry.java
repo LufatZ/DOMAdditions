@@ -11,6 +11,7 @@ import de.dayofmind.additions.block.stairs.DOMGrassStair;
 import de.dayofmind.additions.block.stairs.DOMMagmaStair;
 import de.dayofmind.additions.block.stairs.DOMShortStairs;
 import de.dayofmind.additions.block.stairs.DOMStairs;
+import de.dayofmind.additions.block.trapdoors.DOMDecorativeIronTrapdoor;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.block.*;
 import net.minecraft.item.BlockItem;
@@ -18,6 +19,7 @@ import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.sound.BlockSoundGroup;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.Identifier;
 
@@ -65,6 +67,8 @@ public class DOMBlocksRegistry {
         // public static final Block COPPER_REDSTONE_LANTERN = new DOMRedstoneLantern(FabricBlockSettings.copyOf(COPPER_LANTERN).luminance(createLightLevelFromLitBlockState(15)));
         // public static final Block REDSTONE_LANTERN = new DOMRedstoneLantern(FabricBlockSettings.copyOf(Blocks.LANTERN).luminance(createLightLevelFromLitBlockState(15)));
 
+    //trapdoors
+        public static final Block Decorative_Iron_Trapdoor = new DOMDecorativeIronTrapdoor(FabricBlockSettings.of(Material.METAL).requiresTool().strength(5.0F).sounds(BlockSoundGroup.METAL).nonOpaque(), SoundEvents.BLOCK_IRON_TRAPDOOR_CLOSE, SoundEvents.BLOCK_IRON_TRAPDOOR_OPEN);
 
     //instruments
         public static final Block GUITAR = new DOMGuitarBlock(FabricBlockSettings.of(Material.WOOD, MapColor.BROWN).strength(2.0F, 3.0F).sounds(BlockSoundGroup.WOOD));
@@ -99,9 +103,11 @@ public class DOMBlocksRegistry {
         //lanterns
             registerBlock("netherite_lantern", NETHERITE_LANTERN);
             registerBlock("copper_lantern", COPPER_LANTERN);
-            System.out.println("DOM | DayOfMind successful added blocks to minecraft");
         //instruments
             registerBlock("guitar", GUITAR, (BlockItem) GUITAR_ITEM);
+        //trapdoor
+            registerBlock("decorative_iron_trapdoor", Decorative_Iron_Trapdoor);
+        System.out.println("DOM | DayOfMind successful added blocks to minecraft");
     }
 
     //for BlockItem registration
