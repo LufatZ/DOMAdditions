@@ -7,10 +7,7 @@ import de.dayofmind.additions.block.slabs.DOMCryingObsidianSlab;
 import de.dayofmind.additions.block.slabs.DOMGrassSlab;
 import de.dayofmind.additions.block.slabs.DOMMagmaSlab;
 import de.dayofmind.additions.block.slabs.DOMShortSlab;
-import de.dayofmind.additions.block.stairs.DOMGrassStair;
-import de.dayofmind.additions.block.stairs.DOMMagmaStair;
-import de.dayofmind.additions.block.stairs.DOMShortStairs;
-import de.dayofmind.additions.block.stairs.DOMStairs;
+import de.dayofmind.additions.block.stairs.*;
 import de.dayofmind.additions.block.trapdoors.DOMDecorativeIronTrapdoor;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.block.*;
@@ -49,7 +46,7 @@ public class DOMBlocksRegistry {
     //TODO rework of stairs... have to tag copy accacia stairs because of wierd block behavior
         public static final Block DIRT_STAIR = new DOMStairs(Blocks.ACACIA_STAIRS.getDefaultState(),FabricBlockSettings.of(Material.SOIL, MapColor.DIRT_BROWN).strength(0.5F).sounds(BlockSoundGroup.GRAVEL));
         public static final Block GRASS_STAIR = new DOMGrassStair(Blocks.ACACIA_STAIRS.getDefaultState(),FabricBlockSettings.of(Material.SOLID_ORGANIC).ticksRandomly().strength(0.6F).sounds(BlockSoundGroup.GRASS));
-        public static final Block DIRT_PATH_STAIR = new DOMShortStairs(Blocks.ACACIA_STAIRS.getDefaultState(),FabricBlockSettings.of(Material.SOIL).strength(0.65F).sounds(BlockSoundGroup.GRASS));
+        public static final Block DIRT_PATH_STAIR = new DOMDirtPathStair(Blocks.ACACIA_STAIRS.getDefaultState(),FabricBlockSettings.of(Material.SOIL).strength(0.65F).sounds(BlockSoundGroup.GRASS));
         public static final Block GOLD_STAIR = new DOMStairs(Blocks.ACACIA_STAIRS.getDefaultState(),FabricBlockSettings.of(Material.METAL, MapColor.GOLD).requiresTool().strength(3.0F, 6.0F).sounds(BlockSoundGroup.METAL));
         public static final Block IRON_STAIR = new DOMStairs(Blocks.ACACIA_STAIRS.getDefaultState(),FabricBlockSettings.of(Material.METAL, MapColor.IRON_GRAY).requiresTool().strength(5.0F, 6.0F).sounds(BlockSoundGroup.METAL));
         public static final Block DIAMOND_STAIR = new DOMStairs(Blocks.ACACIA_STAIRS.getDefaultState(),FabricBlockSettings.of(Material.METAL, MapColor.DIAMOND_BLUE).requiresTool().strength(5.0F, 6.0F).sounds(BlockSoundGroup.METAL));
