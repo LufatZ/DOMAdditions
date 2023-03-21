@@ -3,9 +3,8 @@ package de.dayofmind.additions.item;
 import de.dayofmind.additions.item.instruments.DOMGuitar;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.minecraft.item.Item;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.Registry;
 
 import static de.dayofmind.additions.Additions.MOD_ID;
 import static de.dayofmind.additions.block.DOMBlocksRegistry.GUITAR;
@@ -32,6 +31,6 @@ public class DOMItemsRegistry {
         System.out.println("DOM | DayOfMind successful added items to minecraft");
     }
     private static void registerItem(String name, Item item){
-        Registry.register(Registries.ITEM, new Identifier(MOD_ID, name), item);
+        Registry.register(Registry.ITEM, new Identifier(MOD_ID, name), item);
     }
 }

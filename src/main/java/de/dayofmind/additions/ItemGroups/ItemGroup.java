@@ -1,7 +1,7 @@
 package de.dayofmind.additions.ItemGroups;
 
 import de.dayofmind.additions.config.DOMConfig;
-import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
+import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 
@@ -11,70 +11,70 @@ import static de.dayofmind.additions.item.DOMItemsRegistry.*;
 
 public class ItemGroup {
     public static void DayOfMindBlocks(){
-        FabricItemGroup.builder(new Identifier(MOD_ID, "blocks"))
+        FabricItemGroupBuilder.create(new Identifier(MOD_ID, "blocks"))
                 .icon(() -> new ItemStack(COPPER_LANTERN))
-                .entries((enabledFeatures, entries, operatorEnabled) -> {
+                .appendItems((stacks) -> {
                     if (DOMConfig.Features.EnabledLantern){
-                        entries.add(NETHERITE_LANTERN);
-                        entries.add(COPPER_LANTERN);
+                        stacks.add(new ItemStack(NETHERITE_LANTERN));
+                        stacks.add(new ItemStack(COPPER_LANTERN));
                     }
                     if (DOMConfig.Features.EnabledDirt){
-                        entries.add(DIRT_STAIR);
-                        entries.add(DIRT_SLAB);
+                        stacks.add(new ItemStack(DIRT_STAIR));
+                        stacks.add(new ItemStack(DIRT_SLAB));
                     }
                     if (DOMConfig.Features.EnabledGrass){
-                        entries.add(GRASS_STAIR);
-                        entries.add(GRASS_SLAB);
+                        stacks.add(new ItemStack(GRASS_STAIR));
+                        stacks.add(new ItemStack(GRASS_SLAB));
                     }
                     if (DOMConfig.Features.EnabledDirtPath) {
-                        entries.add(DIRT_PATH_STAIR);
-                        entries.add(DIRT_PATH_SLAB);
+                        stacks.add(new ItemStack(DIRT_PATH_STAIR));
+                        stacks.add(new ItemStack(DIRT_PATH_SLAB));
                     }
                     if (DOMConfig.Features.EnabledGold) {
-                        entries.add(GOLD_STAIR);
-                        entries.add(GOLD_SLAB);
+                        stacks.add(new ItemStack(GOLD_STAIR));
+                        stacks.add(new ItemStack(GOLD_SLAB));
                     }
                     if (DOMConfig.Features.EnabledIron) {
-                        entries.add(IRON_STAIR);
-                        entries.add(IRON_SLAB);
+                        stacks.add(new ItemStack(IRON_STAIR));
+                        stacks.add(new ItemStack(IRON_SLAB));
                     }
                     if (DOMConfig.Features.EnabledDia) {
-                        entries.add(DIAMOND_STAIR);
-                        entries.add(DIAMOND_SLAB);
+                        stacks.add(new ItemStack(DIAMOND_STAIR));
+                        stacks.add(new ItemStack(DIAMOND_SLAB));
                     }
                     if (DOMConfig.Features.EnabledBasalt) {
-                        entries.add(SMOOTH_BASALT_STAIR);
-                        entries.add(SMOOTH_BASALT_SLAB);
+                        stacks.add(new ItemStack(SMOOTH_BASALT_STAIR));
+                        stacks.add(new ItemStack(SMOOTH_BASALT_SLAB));
 
-                        entries.add(POLISHED_BASALT_STAIR);
-                        entries.add(POLISHED_BASALT_SLAB);
+                        stacks.add(new ItemStack(POLISHED_BASALT_STAIR));
+                        stacks.add(new ItemStack(POLISHED_BASALT_SLAB));
                     }
                     if (DOMConfig.Features.EnabledMagma) {
-                        entries.add(MAGMA_STAIR);
-                        entries.add(MAGMA_SLAB);
+                        stacks.add(new ItemStack(MAGMA_STAIR));
+                        stacks.add(new ItemStack(MAGMA_SLAB));
                     }
                     if (DOMConfig.Features.EnabledObsidian) {
-                        entries.add(OBSIDIAN_STAIR);
-                        entries.add(OBSIDIAN_SLAB);
+                        stacks.add(new ItemStack(OBSIDIAN_STAIR));
+                        stacks.add(new ItemStack(OBSIDIAN_SLAB));
 
-                        entries.add(CRYING_OBSIDIAN_STAIR);
-                        entries.add(CRYING_OBSIDIAN_SLAB);
+                        stacks.add(new ItemStack(CRYING_OBSIDIAN_STAIR));
+                        stacks.add(new ItemStack(CRYING_OBSIDIAN_SLAB));
                     }
                     if (DOMConfig.Features.EnabledDecorativeTrapdoor) {
-                        entries.add(Decorative_Iron_Trapdoor);
+                        stacks.add(new ItemStack(Decorative_Iron_Trapdoor));
                     }
                     if (DOMConfig.ExperimentalSettings.EnabledGuitar) {
-                        entries.add(GUITAR_ITEM);
+                        stacks.add(new ItemStack(GUITAR_ITEM));
                     }
                 })
                 .build();
     };
     public static void DayOfMindItems(){
-        FabricItemGroup.builder(new Identifier(MOD_ID, "items"))
+        FabricItemGroupBuilder.create(new Identifier(MOD_ID, "items"))
                 .icon(() -> new ItemStack(COPPER_NUGGET))
-                .entries((enabledFeatures, entries, operatorEnabled) -> {
-                    entries.add(COPPER_NUGGET);
-                    entries.add(NETHERITE_NUGGET);
+                .appendItems((stacks) -> {
+                    stacks.add(new ItemStack(COPPER_NUGGET));
+                    stacks.add(new ItemStack(NETHERITE_NUGGET));
                 })
                 .build();
     }
