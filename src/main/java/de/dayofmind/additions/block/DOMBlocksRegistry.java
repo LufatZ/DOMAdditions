@@ -7,7 +7,10 @@ import de.dayofmind.additions.block.slabs.DOMCryingObsidianSlab;
 import de.dayofmind.additions.block.slabs.DOMGrassSlab;
 import de.dayofmind.additions.block.slabs.DOMMagmaSlab;
 import de.dayofmind.additions.block.slabs.DOMShortSlab;
-import de.dayofmind.additions.block.stairs.*;
+import de.dayofmind.additions.block.stairs.DOMDirtPathStair;
+import de.dayofmind.additions.block.stairs.DOMGrassStair;
+import de.dayofmind.additions.block.stairs.DOMMagmaStair;
+import de.dayofmind.additions.block.stairs.DOMStairs;
 import de.dayofmind.additions.block.trapdoors.DOMDecorativeIronTrapdoor;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.block.*;
@@ -16,7 +19,6 @@ import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.sound.BlockSoundGroup;
-import net.minecraft.sound.SoundEvents;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.Identifier;
 
@@ -65,7 +67,7 @@ public class DOMBlocksRegistry {
         // public static final Block REDSTONE_LANTERN = new DOMRedstoneLantern(FabricBlockSettings.copyOf(Blocks.LANTERN).luminance(createLightLevelFromLitBlockState(15)));
 
     //trapdoors
-        public static final Block Decorative_Iron_Trapdoor = new DOMDecorativeIronTrapdoor(FabricBlockSettings.of(Material.METAL).requiresTool().strength(5.0F).sounds(BlockSoundGroup.METAL).nonOpaque(), SoundEvents.BLOCK_IRON_TRAPDOOR_CLOSE, SoundEvents.BLOCK_IRON_TRAPDOOR_OPEN);
+        public static final Block Decorative_Iron_Trapdoor = new DOMDecorativeIronTrapdoor(FabricBlockSettings.of(Material.METAL).requiresTool().strength(5.0F).sounds(BlockSoundGroup.METAL).nonOpaque(), BlockSetType.IRON);
 
     //instruments
         public static final Block GUITAR = new DOMGuitarBlock(FabricBlockSettings.of(Material.WOOD, MapColor.BROWN).strength(2.0F, 3.0F).sounds(BlockSoundGroup.WOOD));

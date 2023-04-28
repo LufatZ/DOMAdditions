@@ -13,7 +13,7 @@ public class ItemGroup {
     public static void DayOfMindBlocks(){
         FabricItemGroup.builder(new Identifier(MOD_ID, "blocks"))
                 .icon(() -> new ItemStack(COPPER_LANTERN))
-                .entries((enabledFeatures, entries, operatorEnabled) -> {
+                .entries((displayContext, entries) -> {
                     if (DOMConfig.Features.EnabledLantern){
                         entries.add(NETHERITE_LANTERN);
                         entries.add(COPPER_LANTERN);
@@ -72,7 +72,7 @@ public class ItemGroup {
     public static void DayOfMindItems(){
         FabricItemGroup.builder(new Identifier(MOD_ID, "items"))
                 .icon(() -> new ItemStack(COPPER_NUGGET))
-                .entries((enabledFeatures, entries, operatorEnabled) -> {
+                .entries((displayContext, entries) -> {
                     entries.add(COPPER_NUGGET);
                     entries.add(NETHERITE_NUGGET);
                 })
