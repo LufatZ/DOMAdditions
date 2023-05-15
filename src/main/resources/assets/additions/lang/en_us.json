@@ -38,8 +38,8 @@
   "item.additions.copper_nugget": "Copper Nugget",
   "item.additions.netherite_nugget": "Netherite Nugget",
 
-  "config.additions.features": "Experimental Settings",
-  "config.additions.experimentalSettings": "Features",
+  "config.additions.features": "Features",
+  "config.additions.experimentalSettings": "Experimental Settings",
   "config.additions.modSettings": "Mod Settings",
 
   "config.additions.experimentalSettings.EnabledGuitar": "Add the experimental guitar to your game",
