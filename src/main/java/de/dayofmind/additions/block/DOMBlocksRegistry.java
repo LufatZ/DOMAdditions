@@ -4,6 +4,7 @@ import de.dayofmind.additions.block.instruments.DOMGuitarBlock;
 import de.dayofmind.additions.block.lanterns.DOMCopperLantern;
 import de.dayofmind.additions.block.lanterns.DOMNetheriteLantern;
 import de.dayofmind.additions.block.lanterns.DOMRedstoneChain;
+import de.dayofmind.additions.block.lanterns.DOMRedstoneLantern;
 import de.dayofmind.additions.block.slabs.DOMCryingObsidianSlab;
 import de.dayofmind.additions.block.slabs.DOMGrassSlab;
 import de.dayofmind.additions.block.slabs.DOMMagmaSlab;
@@ -63,9 +64,9 @@ public class DOMBlocksRegistry {
         public static final Block NETHERITE_LANTERN = new DOMNetheriteLantern(FabricBlockSettings.copyOf(Blocks.LANTERN));
         public static final Block COPPER_LANTERN = new DOMCopperLantern(FabricBlockSettings.copyOf(Blocks.LANTERN));
 
-        // public static final Block NETHERITE_REDSTONE_LANTERN = new DOMRedstoneLantern(FabricBlockSettings.copyOf(NETHERITE_LANTERN).luminance(createLightLevelFromLitBlockState(15)));
-        // public static final Block COPPER_REDSTONE_LANTERN = new DOMRedstoneLantern(FabricBlockSettings.copyOf(COPPER_LANTERN).luminance(createLightLevelFromLitBlockState(15)));
-        // public static final Block REDSTONE_LANTERN = new DOMRedstoneLantern(FabricBlockSettings.copyOf(Blocks.LANTERN).luminance(createLightLevelFromLitBlockState(15)));
+        public static final Block NETHERITE_REDSTONE_LANTERN = new DOMRedstoneLantern(FabricBlockSettings.copyOf(NETHERITE_LANTERN).luminance(createLightLevelFromLitBlockState(15)));
+        public static final Block COPPER_REDSTONE_LANTERN = new DOMRedstoneLantern(FabricBlockSettings.copyOf(COPPER_LANTERN).luminance(createLightLevelFromLitBlockState(15)));
+        public static final Block REDSTONE_LANTERN = new DOMRedstoneLantern(FabricBlockSettings.copyOf(Blocks.LANTERN).luminance(createLightLevelFromLitBlockState(15)));
 
     //trapdoors
         public static final Block Decorative_Iron_Trapdoor = new DOMDecorativeIronTrapdoor(FabricBlockSettings.of(Material.METAL).requiresTool().strength(5.0F).sounds(BlockSoundGroup.METAL).nonOpaque(), BlockSetType.IRON);
@@ -105,6 +106,9 @@ public class DOMBlocksRegistry {
         //lanterns
             registerBlock("netherite_lantern", NETHERITE_LANTERN);
             registerBlock("copper_lantern", COPPER_LANTERN);
+        registerBlock("netherite_redstone_lantern", NETHERITE_REDSTONE_LANTERN);
+        registerBlock("copper_redstone_lantern", COPPER_REDSTONE_LANTERN);
+        registerBlock("redstone_lantern", REDSTONE_LANTERN);
         //instruments
             registerBlock("guitar", GUITAR, (BlockItem) GUITAR_ITEM);
         //trapdoor

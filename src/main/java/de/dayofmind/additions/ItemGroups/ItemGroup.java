@@ -67,6 +67,9 @@ public class ItemGroup {
                         entries.add(GUITAR_ITEM);
                     }
                     entries.add(REDSTONE_CHAIN);
+                    entries.add(REDSTONE_LANTERN);
+                    entries.add(NETHERITE_REDSTONE_LANTERN);
+                    entries.add(COPPER_REDSTONE_LANTERN);
                 })
                 .build();
     };

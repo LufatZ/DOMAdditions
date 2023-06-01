@@ -28,6 +28,9 @@
 
   "block.additions.netherite_lantern": "Netherite Lantern",
   "block.additions.copper_lantern": "Copper Lantern",
+  "block.additions.netherite_redstone_lantern": "Netherite Redstone Lantern",
+  "block.additions.copper_redstone_lantern": "Copper Redstone Lantern",
+  "block.additions.redstone_lantern": "Redstone Lantern",
 
   "block.additions.decorative_iron_trapdoor": "Decorative Iron Trapdoor",
 
