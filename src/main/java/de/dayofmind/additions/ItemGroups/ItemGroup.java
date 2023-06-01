@@ -66,6 +66,7 @@ public class ItemGroup {
                     if (DOMConfig.ExperimentalSettings.EnabledGuitar) {
                         entries.add(GUITAR_ITEM);
                     }
+                    entries.add(REDSTONE_CHAIN);
                 })
                 .build();
     };

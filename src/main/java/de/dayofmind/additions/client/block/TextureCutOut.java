@@ -16,5 +16,7 @@ public class TextureCutOut {
         BlockRenderLayerMap.INSTANCE.putBlocks(RenderLayer.getCutout(), DOMBlocksRegistry.COPPER_LANTERN, DOMBlocksRegistry.NETHERITE_LANTERN);
         //trapdoors
         BlockRenderLayerMap.INSTANCE.putBlock(Decorative_Iron_Trapdoor, RenderLayer.getCutoutMipped());
+        //chain
+        BlockRenderLayerMap.INSTANCE.putBlock(REDSTONE_CHAIN, RenderLayer.getCutoutMipped());
     }
 }

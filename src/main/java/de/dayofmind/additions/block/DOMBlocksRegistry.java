@@ -3,6 +3,7 @@ package de.dayofmind.additions.block;
 import de.dayofmind.additions.block.instruments.DOMGuitarBlock;
 import de.dayofmind.additions.block.lanterns.DOMCopperLantern;
 import de.dayofmind.additions.block.lanterns.DOMNetheriteLantern;
+import de.dayofmind.additions.block.lanterns.DOMRedstoneChain;
 import de.dayofmind.additions.block.slabs.DOMCryingObsidianSlab;
 import de.dayofmind.additions.block.slabs.DOMGrassSlab;
 import de.dayofmind.additions.block.slabs.DOMMagmaSlab;
@@ -72,6 +73,8 @@ public class DOMBlocksRegistry {
     //instruments
         public static final Block GUITAR = new DOMGuitarBlock(FabricBlockSettings.of(Material.WOOD, MapColor.BROWN).strength(2.0F, 3.0F).sounds(BlockSoundGroup.WOOD));
 
+    //chain
+        public static final Block REDSTONE_CHAIN = new DOMRedstoneChain(FabricBlockSettings.copyOf(Blocks.CHAIN));
 
     public static void registerBlocks(){
         System.out.println("DOM | Adding blocks");
@@ -106,6 +109,8 @@ public class DOMBlocksRegistry {
             registerBlock("guitar", GUITAR, (BlockItem) GUITAR_ITEM);
         //trapdoor
             registerBlock("decorative_iron_trapdoor", Decorative_Iron_Trapdoor);
+        //chain
+            registerBlock("redstone_chain", REDSTONE_CHAIN);
         System.out.println("DOM | DayOfMind successful added blocks to minecraft");
     }
 
