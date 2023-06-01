@@ -31,19 +31,25 @@ public class DOMRedstoneChain extends ChainBlock {
     public int getWeakRedstonePower(BlockState state, BlockView world, BlockPos pos, Direction direction) {
         int maxPower = 0;
 
+        BlockPos neighborPos = pos.offset(direction);
+        BlockState neighborState = world.getBlockState(neighborPos);
+        int power = neighborState.getWeakRedstonePower(world, neighborPos, direction);
+        maxPower = Math.max(maxPower, power);
+
         for (Direction facing : Direction.values()) {
             if (facing == direction.getOpposite()) {
                 continue; // Überspringe die Richtung, aus der die Abfrage kommt
             }
 
-            BlockPos neighborPos = pos.offset(facing);
-            BlockState neighborState = world.getBlockState(neighborPos);
-            int power = neighborState.getWeakRedstonePower(world, neighborPos, facing);
-            maxPower = Math.max(maxPower, power);
+            BlockPos nextNeighborPos = neighborPos.offset(facing);
+            BlockState nextNeighborState = world.getBlockState(nextNeighborPos);
+            int nextPower = nextNeighborState.getWeakRedstonePower(world, nextNeighborPos, facing);
+            maxPower = Math.max(maxPower, nextPower);
         }
 
         return maxPower;
     }
+
 
     @Override
     public void randomDisplayTick(BlockState state, World world, BlockPos pos, Random random) {
