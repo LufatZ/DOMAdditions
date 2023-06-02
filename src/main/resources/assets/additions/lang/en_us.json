@@ -51,6 +51,8 @@
   "config.additions.experimentalSettings.EnabledGuitar.description":"This option adds an item and a block to the game. You can play music with the guitar.",
   "config.additions.features.EnabledLantern": "more lantern variants",
   "config.additions.features.EnabledLantern.description":"This option adds a selection of different lanterns made of different materials to the game. Each lantern has its own style.",
+  "config.additions.features.EnabledRedstoneLantern": "add redstone Lanterns",
+  "config.additions.features.EnabledRedstoneLantern.description":"This option adds redstone lanterns and the redstone chain, which allows you to send the redstone signal to the redstone lanterns.",
   "config.additions.features.EnabledDirt": "more dirt variants",
   "config.additions.features.EnabledDirt.description":"This option adds missing block variants (slabs, stairs, etc.) of this block.",
   "config.additions.features.EnabledGrass": "more grass block variants",

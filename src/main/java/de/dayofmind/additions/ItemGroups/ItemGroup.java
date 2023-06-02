@@ -18,6 +18,12 @@ public class ItemGroup {
                         entries.add(NETHERITE_LANTERN);
                         entries.add(COPPER_LANTERN);
                     }
+                    if (DOMConfig.Features.EnabledRedstoneLantern){
+                        entries.add(REDSTONE_CHAIN);
+                        entries.add(REDSTONE_LANTERN);
+                        entries.add(NETHERITE_REDSTONE_LANTERN);
+                        entries.add(COPPER_REDSTONE_LANTERN);
+                    }
                     if (DOMConfig.Features.EnabledDirt){
                         entries.add(DIRT_STAIR);
                         entries.add(DIRT_SLAB);
@@ -66,10 +72,6 @@ public class ItemGroup {
                     if (DOMConfig.ExperimentalSettings.EnabledGuitar) {
                         entries.add(GUITAR_ITEM);
                     }
-                    entries.add(REDSTONE_CHAIN);
-                    entries.add(REDSTONE_LANTERN);
-                    entries.add(NETHERITE_REDSTONE_LANTERN);
-                    entries.add(COPPER_REDSTONE_LANTERN);
                 })
                 .build();
     };
