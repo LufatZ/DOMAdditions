@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "iai",
+    "iIi",
+    "iii"
+  ],
+  "key": {
+    "I": {
+      "item": "minecraft:torch"
+    },
+    "i": {
+      "item": "additions:netherite_nugget"
+    },
+    "a": {
+      "item": "minecraft:redstone"
+    }
+  },
+  "result": {
+    "item": "additions:netherite_redstone_lantern"
+  }
+}

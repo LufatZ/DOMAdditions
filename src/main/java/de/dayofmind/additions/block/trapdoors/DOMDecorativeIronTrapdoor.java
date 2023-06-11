@@ -1,5 +1,6 @@
 package de.dayofmind.additions.block.trapdoors;
 
+import net.minecraft.block.BlockSetType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.TrapdoorBlock;
 import net.minecraft.entity.player.PlayerEntity;
@@ -12,9 +13,10 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public class DOMDecorativeIronTrapdoor extends TrapdoorBlock {
-    public DOMDecorativeIronTrapdoor(Settings settings, SoundEvent closeSound, SoundEvent openSound) {
-        super(settings, closeSound, openSound);
+    public DOMDecorativeIronTrapdoor(Settings settings, BlockSetType blockSetType) {
+        super(settings, blockSetType);
     }
+
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
         state = (BlockState)state.cycle(OPEN);

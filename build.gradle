@@ -11,7 +11,7 @@ buildscript {
     }
 }
 plugins {
-    id 'fabric-loom' version '1.0-SNAPSHOT'
+    id 'fabric-loom' version '1.2-SNAPSHOT'
     id 'maven-publish'
 }
 
@@ -88,7 +88,8 @@ dependencies {
     modImplementation("de.guntram.mcmod:crowdin-translate:${project.crowdin}")
     include "de.guntram.mcmod:crowdin-translate:${project.crowdin}"
     //emi
-    modImplementation "dev.emi:emi:${project.emi}"
+    modCompileOnly "dev.emi:emi-fabric:${project.emi}:api"
+    modLocalRuntime "dev.emi:emi-fabric:${project.emi}"
 }
 
 processResources {

@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "iai",
+    "iIi",
+    "iii"
+  ],
+  "key": {
+    "I": {
+      "tag": "minecraft:candles"
+    },
+    "i": {
+      "item": "additions:copper_nugget"
+    },
+    "a": {
+      "item": "minecraft:redstone"
+    }
+  },
+  "result": {
+    "item": "additions:copper_redstone_lantern"
+  }
+}

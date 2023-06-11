@@ -27,6 +27,8 @@ public class DOMConfig extends Config {
     public static class Features implements ConfigGroup {
         @ConfigEntry(comment = "This adds more lantern variants", requiresRestart = true)
         public static boolean EnabledLantern = true;
+        @ConfigEntry(comment = "This adds redstone lanterns and redstone chain", requiresRestart = true)
+        public static boolean EnabledRedstoneLantern = true;
         @ConfigEntry(comment = "This adds more dirt variants", requiresRestart = true)
         public static boolean EnabledDirt = true;
         @ConfigEntry(comment = "This adds more grass variants", requiresRestart = true)

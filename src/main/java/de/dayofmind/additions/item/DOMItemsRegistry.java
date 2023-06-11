@@ -16,7 +16,7 @@ public class DOMItemsRegistry {
 
     //material nuggets
         public static final Item NETHERITE_NUGGET = new Item((new FabricItemSettings()));
-        public static Item COPPER_NUGGET = new Item((new FabricItemSettings()));
+        public static final Item COPPER_NUGGET = new Item((new FabricItemSettings()));
     //instruments
         public static final Item GUITAR_ITEM = new DOMGuitar(GUITAR,(new Item.Settings()));
 

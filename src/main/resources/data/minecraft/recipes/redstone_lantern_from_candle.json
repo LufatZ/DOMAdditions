@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "#": {
+      "tag": "minecraft:candles"
+    },
+    "X": {
+      "item": "minecraft:iron_nugget"
+    },"a": {
+      "item": "minecraft:redstone"
+    }
+  },
+  "pattern": [
+    "XaX",
+    "X#X",
+    "XXX"
+  ],
+  "result": {
+    "item": "additions:redstone_lantern"
+  },
+  "show_notification": true
+}

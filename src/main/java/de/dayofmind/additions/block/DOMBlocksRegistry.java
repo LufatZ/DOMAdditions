@@ -3,13 +3,15 @@ package de.dayofmind.additions.block;
 import de.dayofmind.additions.block.instruments.DOMGuitarBlock;
 import de.dayofmind.additions.block.lanterns.DOMCopperLantern;
 import de.dayofmind.additions.block.lanterns.DOMNetheriteLantern;
+import de.dayofmind.additions.block.lanterns.DOMRedstoneChain;
+import de.dayofmind.additions.block.lanterns.DOMRedstoneLantern;
 import de.dayofmind.additions.block.slabs.DOMCryingObsidianSlab;
 import de.dayofmind.additions.block.slabs.DOMGrassSlab;
 import de.dayofmind.additions.block.slabs.DOMMagmaSlab;
 import de.dayofmind.additions.block.slabs.DOMShortSlab;
+import de.dayofmind.additions.block.stairs.DOMDirtPathStair;
 import de.dayofmind.additions.block.stairs.DOMGrassStair;
 import de.dayofmind.additions.block.stairs.DOMMagmaStair;
-import de.dayofmind.additions.block.stairs.DOMShortStairs;
 import de.dayofmind.additions.block.stairs.DOMStairs;
 import de.dayofmind.additions.block.trapdoors.DOMDecorativeIronTrapdoor;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
@@ -19,7 +21,6 @@ import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.sound.BlockSoundGroup;
-import net.minecraft.sound.SoundEvents;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.Identifier;
 
@@ -49,7 +50,7 @@ public class DOMBlocksRegistry {
     //TODO rework of stairs... have to tag copy accacia stairs because of wierd block behavior
         public static final Block DIRT_STAIR = new DOMStairs(Blocks.ACACIA_STAIRS.getDefaultState(),FabricBlockSettings.of(Material.SOIL, MapColor.DIRT_BROWN).strength(0.5F).sounds(BlockSoundGroup.GRAVEL));
         public static final Block GRASS_STAIR = new DOMGrassStair(Blocks.ACACIA_STAIRS.getDefaultState(),FabricBlockSettings.of(Material.SOLID_ORGANIC).ticksRandomly().strength(0.6F).sounds(BlockSoundGroup.GRASS));
-        public static final Block DIRT_PATH_STAIR = new DOMShortStairs(Blocks.ACACIA_STAIRS.getDefaultState(),FabricBlockSettings.of(Material.SOIL).strength(0.65F).sounds(BlockSoundGroup.GRASS));
+        public static final Block DIRT_PATH_STAIR = new DOMDirtPathStair(Blocks.ACACIA_STAIRS.getDefaultState(),FabricBlockSettings.of(Material.SOIL).strength(0.65F).sounds(BlockSoundGroup.GRASS));
         public static final Block GOLD_STAIR = new DOMStairs(Blocks.ACACIA_STAIRS.getDefaultState(),FabricBlockSettings.of(Material.METAL, MapColor.GOLD).requiresTool().strength(3.0F, 6.0F).sounds(BlockSoundGroup.METAL));
         public static final Block IRON_STAIR = new DOMStairs(Blocks.ACACIA_STAIRS.getDefaultState(),FabricBlockSettings.of(Material.METAL, MapColor.IRON_GRAY).requiresTool().strength(5.0F, 6.0F).sounds(BlockSoundGroup.METAL));
         public static final Block DIAMOND_STAIR = new DOMStairs(Blocks.ACACIA_STAIRS.getDefaultState(),FabricBlockSettings.of(Material.METAL, MapColor.DIAMOND_BLUE).requiresTool().strength(5.0F, 6.0F).sounds(BlockSoundGroup.METAL));
@@ -63,16 +64,18 @@ public class DOMBlocksRegistry {
         public static final Block NETHERITE_LANTERN = new DOMNetheriteLantern(FabricBlockSettings.copyOf(Blocks.LANTERN));
         public static final Block COPPER_LANTERN = new DOMCopperLantern(FabricBlockSettings.copyOf(Blocks.LANTERN));
 
-        // public static final Block NETHERITE_REDSTONE_LANTERN = new DOMRedstoneLantern(FabricBlockSettings.copyOf(NETHERITE_LANTERN).luminance(createLightLevelFromLitBlockState(15)));
-        // public static final Block COPPER_REDSTONE_LANTERN = new DOMRedstoneLantern(FabricBlockSettings.copyOf(COPPER_LANTERN).luminance(createLightLevelFromLitBlockState(15)));
-        // public static final Block REDSTONE_LANTERN = new DOMRedstoneLantern(FabricBlockSettings.copyOf(Blocks.LANTERN).luminance(createLightLevelFromLitBlockState(15)));
+        public static final Block NETHERITE_REDSTONE_LANTERN = new DOMRedstoneLantern(FabricBlockSettings.copyOf(NETHERITE_LANTERN).luminance(createLightLevelFromLitBlockState(15)));
+        public static final Block COPPER_REDSTONE_LANTERN = new DOMRedstoneLantern(FabricBlockSettings.copyOf(COPPER_LANTERN).luminance(createLightLevelFromLitBlockState(15)));
+        public static final Block REDSTONE_LANTERN = new DOMRedstoneLantern(FabricBlockSettings.copyOf(Blocks.LANTERN).luminance(createLightLevelFromLitBlockState(15)));
 
     //trapdoors
-        public static final Block Decorative_Iron_Trapdoor = new DOMDecorativeIronTrapdoor(FabricBlockSettings.of(Material.METAL).requiresTool().strength(5.0F).sounds(BlockSoundGroup.METAL).nonOpaque(), SoundEvents.BLOCK_IRON_TRAPDOOR_CLOSE, SoundEvents.BLOCK_IRON_TRAPDOOR_OPEN);
+        public static final Block Decorative_Iron_Trapdoor = new DOMDecorativeIronTrapdoor(FabricBlockSettings.of(Material.METAL).requiresTool().strength(5.0F).sounds(BlockSoundGroup.METAL).nonOpaque(), BlockSetType.IRON);
 
     //instruments
         public static final Block GUITAR = new DOMGuitarBlock(FabricBlockSettings.of(Material.WOOD, MapColor.BROWN).strength(2.0F, 3.0F).sounds(BlockSoundGroup.WOOD));
 
+    //chain
+        public static final Block REDSTONE_CHAIN = new DOMRedstoneChain(FabricBlockSettings.copyOf(Blocks.CHAIN));
 
     public static void registerBlocks(){
         System.out.println("DOM | Adding blocks");
@@ -103,10 +106,15 @@ public class DOMBlocksRegistry {
         //lanterns
             registerBlock("netherite_lantern", NETHERITE_LANTERN);
             registerBlock("copper_lantern", COPPER_LANTERN);
+        registerBlock("netherite_redstone_lantern", NETHERITE_REDSTONE_LANTERN);
+        registerBlock("copper_redstone_lantern", COPPER_REDSTONE_LANTERN);
+        registerBlock("redstone_lantern", REDSTONE_LANTERN);
         //instruments
             registerBlock("guitar", GUITAR, (BlockItem) GUITAR_ITEM);
         //trapdoor
             registerBlock("decorative_iron_trapdoor", Decorative_Iron_Trapdoor);
+        //chain
+            registerBlock("redstone_chain", REDSTONE_CHAIN);
         System.out.println("DOM | DayOfMind successful added blocks to minecraft");
     }
 

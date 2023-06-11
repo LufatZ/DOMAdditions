@@ -19,6 +19,10 @@
     "additions:crying_obsidian_stair",
     "additions:netherite_lantern",
     "additions:copper_lantern",
+    "additions:netherite_redstone_lantern",
+    "additions:copper_redstone_lantern",
+    "additions:redstone_lantern",
+    "additions:redstone_chain",
     "additions:decorative_iron_trapdoor"
   ]
 }
