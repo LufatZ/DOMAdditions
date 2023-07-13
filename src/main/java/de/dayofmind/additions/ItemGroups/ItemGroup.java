@@ -74,7 +74,7 @@ public class ItemGroup {
                     }
                 })
                 .build();
-    };
+    }
     public static void DayOfMindItems(){
         FabricItemGroup.builder(new Identifier(MOD_ID, "items"))
                 .icon(() -> new ItemStack(COPPER_NUGGET))
@@ -84,4 +84,5 @@ public class ItemGroup {
                 })
                 .build();
     }
+
 }

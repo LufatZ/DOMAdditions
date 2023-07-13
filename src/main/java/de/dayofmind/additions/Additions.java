@@ -29,5 +29,6 @@ public class Additions implements ModInitializer {
         //Register DOM ItemGroups
             ItemGroup.DayOfMindItems();
             ItemGroup.DayOfMindBlocks();
+            //ItemGroup.IcarusWings();
     }
 }

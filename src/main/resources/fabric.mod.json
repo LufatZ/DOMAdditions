@@ -30,5 +30,12 @@
     "fabric": "*",
     "minecraft": "*",
     "completeconfig-base": "*"
+  },
+  "overrides": {
+    "icarus": {
+      "-depends": {
+        "minecraft": "IGNORED"
+      }
+    }
   }
 }

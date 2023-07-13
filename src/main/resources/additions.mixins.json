@@ -4,8 +4,9 @@
   "package": "de.dayofmind.additions.mixins",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
+    "DOMBubbleColumnBlockMixin",
     "DOMShovelMixin",
-    "DOMBubbleColumnBlockMixin"
+    "icarusMixin"
   ],
   "client": [
   ],

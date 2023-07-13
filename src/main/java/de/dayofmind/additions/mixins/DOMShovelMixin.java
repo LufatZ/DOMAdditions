@@ -14,6 +14,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -26,6 +27,7 @@ import static net.minecraft.block.StairsBlock.WATERLOGGED;
 
 @Mixin(ShovelItem.class)
 public class DOMShovelMixin {
+    @Unique
     private static final Map<Block, BlockState> PATH_STATES2 = Maps.newHashMap(new ImmutableMap.Builder<Block, BlockState>().put(DIRT_SLAB, DIRT_PATH_SLAB.getDefaultState()).put(GRASS_SLAB, DIRT_PATH_SLAB.getDefaultState()).put(DIRT_STAIR, DIRT_PATH_STAIR.getDefaultState()).put(GRASS_STAIR, DIRT_PATH_STAIR.getDefaultState()).build());
 
     @Inject(at = @At("HEAD"), method = "useOnBlock")
