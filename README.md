@@ -45,4 +45,3 @@ To get a visual taste of DayOfMind, please check out the Gallery tab on Modrinth
 
 # Community Discord
 Join our community today and embark on an enhanced Minecraft experience with DayOfMind!
-<iframe src="https://discord.com/widget?id=827806106372931586&theme=dark" width="350" height="500" allowtransparency="true" frameborder="0" sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"></iframe>
