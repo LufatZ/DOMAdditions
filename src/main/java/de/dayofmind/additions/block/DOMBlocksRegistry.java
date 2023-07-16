@@ -1,5 +1,7 @@
 package de.dayofmind.additions.block;
 
+import de.dayofmind.additions.block.instruments.DOMDrumBlock;
+import de.dayofmind.additions.block.instruments.DOMFluteBlock;
 import de.dayofmind.additions.block.instruments.DOMGuitarBlock;
 import de.dayofmind.additions.block.lanterns.DOMCopperLantern;
 import de.dayofmind.additions.block.lanterns.DOMNetheriteLantern;
@@ -27,7 +29,7 @@ import net.minecraft.util.Identifier;
 import java.util.function.ToIntFunction;
 
 import static de.dayofmind.additions.Additions.MOD_ID;
-import static de.dayofmind.additions.item.DOMItemsRegistry.GUITAR_ITEM;
+import static de.dayofmind.additions.item.DOMItemsRegistry.*;
 
 public class DOMBlocksRegistry {
     //helpers
@@ -73,6 +75,8 @@ public class DOMBlocksRegistry {
 
     //instruments
         public static final Block GUITAR = new DOMGuitarBlock(FabricBlockSettings.of(Material.WOOD, MapColor.BROWN).strength(2.0F, 3.0F).sounds(BlockSoundGroup.WOOD));
+       public static final Block DRUM = new DOMDrumBlock(FabricBlockSettings.of(Material.WOOD, MapColor.BROWN).strength(2.0F, 3.0F).sounds(BlockSoundGroup.WOOD));
+        public static final Block FLUTE = new DOMFluteBlock(FabricBlockSettings.of(Material.WOOD, MapColor.GRAY).strength(2.0F, 3.0F).sounds(BlockSoundGroup.WOOD));
 
     //chain
         public static final Block REDSTONE_CHAIN = new DOMRedstoneChain(FabricBlockSettings.copyOf(Blocks.CHAIN));
@@ -106,11 +110,13 @@ public class DOMBlocksRegistry {
         //lanterns
             registerBlock("netherite_lantern", NETHERITE_LANTERN);
             registerBlock("copper_lantern", COPPER_LANTERN);
-        registerBlock("netherite_redstone_lantern", NETHERITE_REDSTONE_LANTERN);
-        registerBlock("copper_redstone_lantern", COPPER_REDSTONE_LANTERN);
-        registerBlock("redstone_lantern", REDSTONE_LANTERN);
+            registerBlock("netherite_redstone_lantern", NETHERITE_REDSTONE_LANTERN);
+            registerBlock("copper_redstone_lantern", COPPER_REDSTONE_LANTERN);
+            registerBlock("redstone_lantern", REDSTONE_LANTERN);
         //instruments
             registerBlock("guitar", GUITAR, (BlockItem) GUITAR_ITEM);
+            registerBlock("flute", FLUTE, (BlockItem) FLUTE_ITEM);
+            registerBlock("drum", DRUM, (BlockItem) DRUM_ITEM);
         //trapdoor
             registerBlock("decorative_iron_trapdoor", Decorative_Iron_Trapdoor);
         //chain
