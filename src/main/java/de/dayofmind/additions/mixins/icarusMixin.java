@@ -1,5 +1,6 @@
 package de.dayofmind.additions.mixins;
 
+import dev.cammiescorner.icarus.core.registry.ModItems;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
@@ -11,7 +12,8 @@ import org.spongepowered.asm.mixin.Overwrite;
 import static dev.cammiescorner.icarus.Icarus.MOD_ID;
 import static dev.cammiescorner.icarus.core.registry.ModItems.*;
 
-@Mixin(targets = "dev.cammiescorner.icarus.core.registry.ModItems", remap = false)
+@SuppressWarnings("MixinTargetIsPublic")
+@Mixin(value = ModItems.class, remap = false)
 public class icarusMixin {
     /**
      * @author lufatz
