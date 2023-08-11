@@ -73,8 +73,7 @@ dependencies {
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
     // Config
-    modImplementation "com.github.Lortseam.completeconfig:base:${project.complconfig}"
-    modImplementation "com.github.Lortseam.completeconfig:gui-yacl:${project.complconfig}"
+    modImplementation "dev.isxander.yacl:yet-another-config-lib-fabric:${project.yacl}"
 
     // ModMenu
     modImplementation "com.terraformersmc:modmenu:${project.modmenu}"
