@@ -1,7 +1,5 @@
 package de.dayofmind.additions.block;
 
-import de.dayofmind.additions.block.instruments.DOMDrumBlock;
-import de.dayofmind.additions.block.instruments.DOMFluteBlock;
 import de.dayofmind.additions.block.instruments.DOMGuitarBlock;
 import de.dayofmind.additions.block.lanterns.DOMCopperLantern;
 import de.dayofmind.additions.block.lanterns.DOMNetheriteLantern;
@@ -29,12 +27,12 @@ import net.minecraft.util.Identifier;
 import java.util.function.ToIntFunction;
 
 import static de.dayofmind.additions.Additions.MOD_ID;
-import static de.dayofmind.additions.item.DOMItemsRegistry.*;
+import static de.dayofmind.additions.item.DOMItemsRegistry.GUITAR_ITEM;
 
 public class DOMBlocksRegistry {
     //helpers
-    private static ToIntFunction<BlockState> createLightLevelFromLitBlockState(int litLevel) {
-        return (state) -> (Boolean)state.get(Properties.LIT) ? litLevel : 0;
+    private static ToIntFunction<BlockState> createLightLevelFromLitBlockState() {
+        return (state) -> (Boolean)state.get(Properties.LIT) ? 15 : 0;
     }
     //slabs
         public static final Block DIRT_SLAB = new SlabBlock(FabricBlockSettings.copyOf(Blocks.DIRT));
@@ -65,17 +63,17 @@ public class DOMBlocksRegistry {
         public static final Block NETHERITE_LANTERN = new DOMNetheriteLantern(FabricBlockSettings.copyOf(Blocks.LANTERN));
         public static final Block COPPER_LANTERN = new DOMCopperLantern(FabricBlockSettings.copyOf(Blocks.LANTERN));
 
-        public static final Block NETHERITE_REDSTONE_LANTERN = new DOMRedstoneLantern(FabricBlockSettings.copyOf(NETHERITE_LANTERN).luminance(createLightLevelFromLitBlockState(15)));
-        public static final Block COPPER_REDSTONE_LANTERN = new DOMRedstoneLantern(FabricBlockSettings.copyOf(COPPER_LANTERN).luminance(createLightLevelFromLitBlockState(15)));
-        public static final Block REDSTONE_LANTERN = new DOMRedstoneLantern(FabricBlockSettings.copyOf(Blocks.LANTERN).luminance(createLightLevelFromLitBlockState(15)));
+        public static final Block NETHERITE_REDSTONE_LANTERN = new DOMRedstoneLantern(FabricBlockSettings.copyOf(NETHERITE_LANTERN).luminance(createLightLevelFromLitBlockState()));
+        public static final Block COPPER_REDSTONE_LANTERN = new DOMRedstoneLantern(FabricBlockSettings.copyOf(COPPER_LANTERN).luminance(createLightLevelFromLitBlockState()));
+        public static final Block REDSTONE_LANTERN = new DOMRedstoneLantern(FabricBlockSettings.copyOf(Blocks.LANTERN).luminance(createLightLevelFromLitBlockState()));
 
     //trapdoors
         public static final Block Decorative_Iron_Trapdoor = new DOMDecorativeIronTrapdoor(FabricBlockSettings.create().requiresTool().strength(5.0F).sounds(BlockSoundGroup.METAL).mapColor(MapColor.IRON_GRAY).nonOpaque(), BlockSetType.IRON);
 
     //instruments
         public static final Block GUITAR = new DOMGuitarBlock(FabricBlockSettings.create().strength(2.0F, 3.0F).sounds(BlockSoundGroup.WOOD).mapColor(MapColor.BROWN));
-       public static final Block DRUM = new DOMDrumBlock(FabricBlockSettings.create().strength(2.0F, 3.0F).sounds(BlockSoundGroup.WOOD).mapColor(MapColor.BROWN));
-        public static final Block FLUTE = new DOMFluteBlock(FabricBlockSettings.create().strength(2.0F, 3.0F).sounds(BlockSoundGroup.WOOD).mapColor(MapColor.GRAY));
+        //public static final Block DRUM = new DOMDrumBlock(FabricBlockSettings.create().strength(2.0F, 3.0F).sounds(BlockSoundGroup.WOOD).mapColor(MapColor.BROWN));
+        //public static final Block FLUTE = new DOMFluteBlock(FabricBlockSettings.create().strength(2.0F, 3.0F).sounds(BlockSoundGroup.WOOD).mapColor(MapColor.GRAY));
 
     //chain
         public static final Block REDSTONE_CHAIN = new DOMRedstoneChain(FabricBlockSettings.copyOf(Blocks.CHAIN));
@@ -114,8 +112,8 @@ public class DOMBlocksRegistry {
             registerBlock("redstone_lantern", REDSTONE_LANTERN);
         //instruments
             registerBlock("guitar", GUITAR, (BlockItem) GUITAR_ITEM);
-            registerBlock("flute", FLUTE, (BlockItem) FLUTE_ITEM);
-            registerBlock("drum", DRUM, (BlockItem) DRUM_ITEM);
+            //registerBlock("flute", FLUTE, (BlockItem) FLUTE_ITEM);
+            //registerBlock("drum", DRUM, (BlockItem) DRUM_ITEM);
         //trapdoor
             registerBlock("decorative_iron_trapdoor", Decorative_Iron_Trapdoor);
         //chain

@@ -10,11 +10,11 @@ import net.fabricmc.api.Environment;
 
 @Environment(EnvType.CLIENT)
 public class AdditionsClient implements ClientModInitializer {
- @Override
+    @Override
     public void onInitializeClient() {
         //Config Screen(must be on client side)
         System.out.println("DOM | creating the config screen on the client");
-     	ConfigScreenBuilder screenBuilder = new YaclScreenBuilder();
+        ConfigScreenBuilder screenBuilder = new YaclScreenBuilder();
         //texture stuff
         System.out.println("DOM | Colors are added to blocks");
         TintBlocks.TintGrassBlocks();
