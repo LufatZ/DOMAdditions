@@ -74,11 +74,11 @@ public class DOMRedstoneChain extends ChainBlock {
             int power = world.getEmittedRedstonePower(neighborPos, facing);
             maxPower = Math.max(maxPower, power);
         }
-
+//TODO fix this shit
         int currentPower = state.get(POWER);
         if (maxPower != currentPower) {
             world.setBlockState(pos, state.with(POWER, maxPower), 3);
-            world.updateNeighborsExcept(pos, this, Direction.fromVector(fromPos.subtract(pos)));
+            //world.updateNeighborsExcept(pos, this, Direction.fromVector(fromPos.subtract(pos)));
         }
     }
 
