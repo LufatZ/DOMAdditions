@@ -2,7 +2,6 @@ package de.dayofmind.additions;
 
 import de.dayofmind.additions.ItemGroups.ItemGroup;
 import de.dayofmind.additions.block.DOMBlocksRegistry;
-import de.dayofmind.additions.config.DOMConfig;
 import de.dayofmind.additions.item.DOMItemsRegistry;
 import de.guntram.mcmod.crowdintranslate.CrowdinTranslate;
 import net.fabricmc.api.ModInitializer;
@@ -17,10 +16,10 @@ public class Additions implements ModInitializer {
         //config
 
         //crowdin
-        if (DOMConfig.ModSettings.EnabledTranslation) {
+        //if (DOMConfig.ModSettings.EnabledTranslation) {
             System.out.println("DOM | you have enabled automatic download of translation \n download translation from crowdin");
             CrowdinTranslate.downloadTranslations("dayofmind-additions", "additions", true);
-        }
+        //}
         //Register DoM blocks
             DOMBlocksRegistry.registerBlocks();
         //Register DoM items

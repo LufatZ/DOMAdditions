@@ -1,6 +1,5 @@
 package de.dayofmind.additions.ItemGroups;
 
-import de.dayofmind.additions.config.DOMConfig;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
@@ -22,64 +21,64 @@ public class ItemGroup {
             .icon(() -> new ItemStack(COPPER_LANTERN))
             .displayName(Text.translatable("itemGroup.additions.blocks"))
             .entries((displayContext, entries) -> {
-                if (DOMConfig.Features.EnabledLantern){
+                //if (DOMConfig.Features.EnabledLantern){
                     entries.add(NETHERITE_LANTERN);
                     entries.add(COPPER_LANTERN);
-                }
-                if (DOMConfig.Features.EnabledRedstoneLantern){
+                //}
+                //if (DOMConfig.Features.EnabledRedstoneLantern){
                     entries.add(REDSTONE_CHAIN);
                     entries.add(REDSTONE_LANTERN);
                     entries.add(NETHERITE_REDSTONE_LANTERN);
                     entries.add(COPPER_REDSTONE_LANTERN);
-                }
-                if (DOMConfig.Features.EnabledDirt){
+                //}
+                //if (DOMConfig.Features.EnabledDirt){
                     entries.add(DIRT_STAIR);
                     entries.add(DIRT_SLAB);
-                }
-                if (DOMConfig.Features.EnabledGrass){
+                //}
+                //if (DOMConfig.Features.EnabledGrass){
                     entries.add(GRASS_STAIR);
                     entries.add(GRASS_SLAB);
-                }
-                if (DOMConfig.Features.EnabledDirtPath) {
+                //}
+                //if (DOMConfig.Features.EnabledDirtPath) {
                     entries.add(DIRT_PATH_STAIR);
                     entries.add(DIRT_PATH_SLAB);
-                }
-                if (DOMConfig.Features.EnabledGold) {
+                //}
+                //if (DOMConfig.Features.EnabledGold) {
                     entries.add(GOLD_STAIR);
                     entries.add(GOLD_SLAB);
-                }
-                if (DOMConfig.Features.EnabledIron) {
+                //}
+                //if (DOMConfig.Features.EnabledIron) {
                     entries.add(IRON_STAIR);
                     entries.add(IRON_SLAB);
-                }
-                if (DOMConfig.Features.EnabledDia) {
+                //}
+                //if (DOMConfig.Features.EnabledDia) {
                     entries.add(DIAMOND_STAIR);
                     entries.add(DIAMOND_SLAB);
-                }
-                if (DOMConfig.Features.EnabledBasalt) {
+                //}
+                //if (DOMConfig.Features.EnabledBasalt) {
                     entries.add(SMOOTH_BASALT_STAIR);
                     entries.add(SMOOTH_BASALT_SLAB);
 
                     entries.add(POLISHED_BASALT_STAIR);
                     entries.add(POLISHED_BASALT_SLAB);
-                }
-                if (DOMConfig.Features.EnabledMagma) {
+                //}
+                //if (DOMConfig.Features.EnabledMagma) {
                     entries.add(MAGMA_STAIR);
                     entries.add(MAGMA_SLAB);
-                }
-                if (DOMConfig.Features.EnabledObsidian) {
+                //}
+                //if (DOMConfig.Features.EnabledObsidian) {
                     entries.add(OBSIDIAN_STAIR);
                     entries.add(OBSIDIAN_SLAB);
 
                     entries.add(CRYING_OBSIDIAN_STAIR);
                     entries.add(CRYING_OBSIDIAN_SLAB);
-                }
-                if (DOMConfig.Features.EnabledDecorativeTrapdoor) {
+                //}
+                //if (DOMConfig.Features.EnabledDecorativeTrapdoor) {
                     entries.add(Decorative_Iron_Trapdoor);
-                }
-                if (DOMConfig.ExperimentalSettings.EnabledGuitar) {
+                //}
+                //if (DOMConfig.ExperimentalSettings.EnabledGuitar) {
                     entries.add(GUITAR_ITEM);
-                }
+                //}
             })
             .build();
     private static final net.minecraft.item.ItemGroup DayOfMindItems = FabricItemGroup.builder()
