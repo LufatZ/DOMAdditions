@@ -57,15 +57,14 @@ repositories {
 dependencies {
     // Minecraft
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
-    mappings loom.layered() {
-        mappings("net.fabricmc:yarn:${project.yarn_mappings}:v2")
-    }
+    mappings("net.fabricmc:yarn:${project.yarn_mappings}:v2")
+
     // Fabric Loader and API
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
     // Config
-
+    modImplementation "maven.modrinth:midnightlib:${project.midnightlib}"
     // ModMenu
     modImplementation "com.terraformersmc:modmenu:${project.modmenu}"
 

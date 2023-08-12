@@ -28,6 +28,7 @@
   "depends": {
     "fabricloader": "*",
     "fabric": "*",
-    "minecraft": "*"
+    "minecraft": "*",
+    "midnightlib": "*"
   }
 }
