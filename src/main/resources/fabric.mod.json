@@ -29,6 +29,6 @@
     "fabricloader": "*",
     "fabric": "*",
     "minecraft": "*",
-    "completeconfig-base": "*"
+    "midnightlib": "*"
   }
 }

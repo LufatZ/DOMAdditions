@@ -31,8 +31,8 @@ import static de.dayofmind.additions.item.DOMItemsRegistry.GUITAR_ITEM;
 
 public class DOMBlocksRegistry {
     //helpers
-    private static ToIntFunction<BlockState> createLightLevelFromLitBlockState(int litLevel) {
-        return (state) -> (Boolean)state.get(Properties.LIT) ? litLevel : 0;
+    private static ToIntFunction<BlockState> createLightLevelFromLitBlockState() {
+        return (state) -> (Boolean)state.get(Properties.LIT) ? 15 : 0;
     }
     //slabs
         public static final Block DIRT_SLAB = new SlabBlock(FabricBlockSettings.copyOf(Blocks.DIRT));
@@ -47,32 +47,33 @@ public class DOMBlocksRegistry {
         public static final Block OBSIDIAN_SLAB = new SlabBlock(FabricBlockSettings.copyOf(Blocks.OBSIDIAN));
         public static final Block CRYING_OBSIDIAN_SLAB = new DOMCryingObsidianSlab(FabricBlockSettings.copyOf(Blocks.CRYING_OBSIDIAN));
     //stairs
-    //TODO rework of stairs... have to tag copy accacia stairs because of wierd block behavior
-        public static final Block DIRT_STAIR = new DOMStairs(Blocks.ACACIA_STAIRS.getDefaultState(),FabricBlockSettings.of(Material.SOIL, MapColor.DIRT_BROWN).strength(0.5F).sounds(BlockSoundGroup.GRAVEL));
-        public static final Block GRASS_STAIR = new DOMGrassStair(Blocks.ACACIA_STAIRS.getDefaultState(),FabricBlockSettings.of(Material.SOLID_ORGANIC).ticksRandomly().strength(0.6F).sounds(BlockSoundGroup.GRASS));
-        public static final Block DIRT_PATH_STAIR = new DOMDirtPathStair(Blocks.ACACIA_STAIRS.getDefaultState(),FabricBlockSettings.of(Material.SOIL).strength(0.65F).sounds(BlockSoundGroup.GRASS));
-        public static final Block GOLD_STAIR = new DOMStairs(Blocks.ACACIA_STAIRS.getDefaultState(),FabricBlockSettings.of(Material.METAL, MapColor.GOLD).requiresTool().strength(3.0F, 6.0F).sounds(BlockSoundGroup.METAL));
-        public static final Block IRON_STAIR = new DOMStairs(Blocks.ACACIA_STAIRS.getDefaultState(),FabricBlockSettings.of(Material.METAL, MapColor.IRON_GRAY).requiresTool().strength(5.0F, 6.0F).sounds(BlockSoundGroup.METAL));
-        public static final Block DIAMOND_STAIR = new DOMStairs(Blocks.ACACIA_STAIRS.getDefaultState(),FabricBlockSettings.of(Material.METAL, MapColor.DIAMOND_BLUE).requiresTool().strength(5.0F, 6.0F).sounds(BlockSoundGroup.METAL));
-        public static final Block SMOOTH_BASALT_STAIR = new DOMStairs(Blocks.ACACIA_STAIRS.getDefaultState(),FabricBlockSettings.of(Material.STONE, MapColor.BLACK).requiresTool().strength(1.25F, 4.2F).sounds(BlockSoundGroup.BASALT));
-        public static final Block POLISHED_BASALT_STAIR = new DOMStairs(Blocks.ACACIA_STAIRS.getDefaultState(),FabricBlockSettings.of(Material.STONE, MapColor.BLACK).requiresTool().strength(1.25F, 4.2F).sounds(BlockSoundGroup.BASALT));
+        public static final Block DIRT_STAIR = new DOMStairs(Blocks.ACACIA_STAIRS.getDefaultState(),FabricBlockSettings.create().strength(0.5F).sounds(BlockSoundGroup.GRAVEL).mapColor(MapColor.DIRT_BROWN));
+        public static final Block GRASS_STAIR = new DOMGrassStair(Blocks.ACACIA_STAIRS.getDefaultState(),FabricBlockSettings.create().ticksRandomly().strength(0.6F).sounds(BlockSoundGroup.GRASS).mapColor(MapColor.GREEN));
+        public static final Block DIRT_PATH_STAIR = new DOMDirtPathStair(Blocks.ACACIA_STAIRS.getDefaultState(),FabricBlockSettings.create().strength(0.65F).sounds(BlockSoundGroup.GRASS).mapColor(MapColor.DIRT_BROWN));
+        public static final Block GOLD_STAIR = new DOMStairs(Blocks.ACACIA_STAIRS.getDefaultState(),FabricBlockSettings.create().requiresTool().strength(3.0F, 6.0F).sounds(BlockSoundGroup.METAL).mapColor(MapColor.GOLD));
+        public static final Block IRON_STAIR = new DOMStairs(Blocks.ACACIA_STAIRS.getDefaultState(),FabricBlockSettings.create().requiresTool().strength(5.0F, 6.0F).sounds(BlockSoundGroup.METAL).mapColor(MapColor.IRON_GRAY));
+        public static final Block DIAMOND_STAIR = new DOMStairs(Blocks.ACACIA_STAIRS.getDefaultState(),FabricBlockSettings.create().requiresTool().strength(5.0F, 6.0F).sounds(BlockSoundGroup.METAL).mapColor(MapColor.DIAMOND_BLUE));
+        public static final Block SMOOTH_BASALT_STAIR = new DOMStairs(Blocks.ACACIA_STAIRS.getDefaultState(),FabricBlockSettings.create().requiresTool().strength(1.25F, 4.2F).sounds(BlockSoundGroup.BASALT).mapColor(MapColor.BLACK));
+        public static final Block POLISHED_BASALT_STAIR = new DOMStairs(Blocks.ACACIA_STAIRS.getDefaultState(),FabricBlockSettings.create().requiresTool().strength(1.25F, 4.2F).sounds(BlockSoundGroup.BASALT).mapColor(MapColor.BLACK));
         public static final Block MAGMA_STAIR = new DOMMagmaStair(Blocks.ACACIA_STAIRS.getDefaultState(),FabricBlockSettings.copyOf(Blocks.MAGMA_BLOCK));
-        public static final Block OBSIDIAN_STAIR = new DOMStairs(Blocks.ACACIA_STAIRS.getDefaultState(),FabricBlockSettings.of(Material.STONE, MapColor.BLACK).requiresTool().strength(50.0F, 1200.0F));
+        public static final Block OBSIDIAN_STAIR = new DOMStairs(Blocks.ACACIA_STAIRS.getDefaultState(),FabricBlockSettings.create().requiresTool().strength(50.0F, 1200.0F).mapColor(MapColor.BLACK));
         public static final Block CRYING_OBSIDIAN_STAIR = new DOMStairs(Blocks.ACACIA_STAIRS.getDefaultState(),FabricBlockSettings.copyOf(Blocks.CRYING_OBSIDIAN));
 
     //lanterns
         public static final Block NETHERITE_LANTERN = new DOMNetheriteLantern(FabricBlockSettings.copyOf(Blocks.LANTERN));
         public static final Block COPPER_LANTERN = new DOMCopperLantern(FabricBlockSettings.copyOf(Blocks.LANTERN));
 
-        public static final Block NETHERITE_REDSTONE_LANTERN = new DOMRedstoneLantern(FabricBlockSettings.copyOf(NETHERITE_LANTERN).luminance(createLightLevelFromLitBlockState(15)));
-        public static final Block COPPER_REDSTONE_LANTERN = new DOMRedstoneLantern(FabricBlockSettings.copyOf(COPPER_LANTERN).luminance(createLightLevelFromLitBlockState(15)));
-        public static final Block REDSTONE_LANTERN = new DOMRedstoneLantern(FabricBlockSettings.copyOf(Blocks.LANTERN).luminance(createLightLevelFromLitBlockState(15)));
+        public static final Block NETHERITE_REDSTONE_LANTERN = new DOMRedstoneLantern(FabricBlockSettings.copyOf(NETHERITE_LANTERN).luminance(createLightLevelFromLitBlockState()));
+        public static final Block COPPER_REDSTONE_LANTERN = new DOMRedstoneLantern(FabricBlockSettings.copyOf(COPPER_LANTERN).luminance(createLightLevelFromLitBlockState()));
+        public static final Block REDSTONE_LANTERN = new DOMRedstoneLantern(FabricBlockSettings.copyOf(Blocks.LANTERN).luminance(createLightLevelFromLitBlockState()));
 
     //trapdoors
-        public static final Block Decorative_Iron_Trapdoor = new DOMDecorativeIronTrapdoor(FabricBlockSettings.of(Material.METAL).requiresTool().strength(5.0F).sounds(BlockSoundGroup.METAL).nonOpaque(), BlockSetType.IRON);
+        public static final Block Decorative_Iron_Trapdoor = new DOMDecorativeIronTrapdoor(FabricBlockSettings.create().requiresTool().strength(5.0F).sounds(BlockSoundGroup.METAL).mapColor(MapColor.IRON_GRAY).nonOpaque(), BlockSetType.IRON);
 
     //instruments
-        public static final Block GUITAR = new DOMGuitarBlock(FabricBlockSettings.of(Material.WOOD, MapColor.BROWN).strength(2.0F, 3.0F).sounds(BlockSoundGroup.WOOD));
+        public static final Block GUITAR = new DOMGuitarBlock(FabricBlockSettings.create().strength(2.0F, 3.0F).sounds(BlockSoundGroup.WOOD).mapColor(MapColor.BROWN));
+        //public static final Block DRUM = new DOMDrumBlock(FabricBlockSettings.create().strength(2.0F, 3.0F).sounds(BlockSoundGroup.WOOD).mapColor(MapColor.BROWN));
+        //public static final Block FLUTE = new DOMFluteBlock(FabricBlockSettings.create().strength(2.0F, 3.0F).sounds(BlockSoundGroup.WOOD).mapColor(MapColor.GRAY));
 
     //chain
         public static final Block REDSTONE_CHAIN = new DOMRedstoneChain(FabricBlockSettings.copyOf(Blocks.CHAIN));
@@ -106,11 +107,13 @@ public class DOMBlocksRegistry {
         //lanterns
             registerBlock("netherite_lantern", NETHERITE_LANTERN);
             registerBlock("copper_lantern", COPPER_LANTERN);
-        registerBlock("netherite_redstone_lantern", NETHERITE_REDSTONE_LANTERN);
-        registerBlock("copper_redstone_lantern", COPPER_REDSTONE_LANTERN);
-        registerBlock("redstone_lantern", REDSTONE_LANTERN);
+            registerBlock("netherite_redstone_lantern", NETHERITE_REDSTONE_LANTERN);
+            registerBlock("copper_redstone_lantern", COPPER_REDSTONE_LANTERN);
+            registerBlock("redstone_lantern", REDSTONE_LANTERN);
         //instruments
             registerBlock("guitar", GUITAR, (BlockItem) GUITAR_ITEM);
+            //registerBlock("flute", FLUTE, (BlockItem) FLUTE_ITEM);
+            //registerBlock("drum", DRUM, (BlockItem) DRUM_ITEM);
         //trapdoor
             registerBlock("decorative_iron_trapdoor", Decorative_Iron_Trapdoor);
         //chain

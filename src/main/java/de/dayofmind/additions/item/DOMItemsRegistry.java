@@ -1,6 +1,6 @@
 package de.dayofmind.additions.item;
 
-import de.dayofmind.additions.item.instruments.DOMGuitar;
+import de.dayofmind.additions.item.instruments.DOMGuitarItem;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
@@ -18,7 +18,10 @@ public class DOMItemsRegistry {
         public static final Item NETHERITE_NUGGET = new Item((new FabricItemSettings()));
         public static final Item COPPER_NUGGET = new Item((new FabricItemSettings()));
     //instruments
-        public static final Item GUITAR_ITEM = new DOMGuitar(GUITAR,(new Item.Settings()));
+        public static final Item GUITAR_ITEM = new DOMGuitarItem(GUITAR,(new Item.Settings()));
+        //public static final Item DRUM_ITEM = new DOMDrumItem(DRUM,(new Item.Settings()));
+        //public static final Item FLUTE_ITEM = new DOMFluteItem(FLUTE,(new Item.Settings()));
+
 
     public static void registerItems(){
         System.out.println("DOM | Adding items");
