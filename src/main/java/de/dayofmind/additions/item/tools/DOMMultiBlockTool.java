@@ -12,10 +12,10 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 
 public class DOMMultiBlockTool extends MiningToolItem {
-
-
+    private final TagKey<Block> effectiveBlocks;
     public DOMMultiBlockTool(float attackDamage, float attackSpeed, ToolMaterial material, TagKey<Block> effectiveBlocks, Settings settings) {
         super(attackDamage, attackSpeed, material, effectiveBlocks, settings);
+        this.effectiveBlocks = effectiveBlocks;
     }
 
     @Override
@@ -39,7 +39,7 @@ public class DOMMultiBlockTool extends MiningToolItem {
                         }
                         BlockState targetState = world.getBlockState(targetPos);
 
-                        if (!world.isAir(targetPos) && targetState.getHardness(world, targetPos) >= 0) {
+                        if (!world.isAir(targetPos) && targetState.getHardness(world, targetPos) >= 0 && targetState.isIn(this.effectiveBlocks)) {
                             world.breakBlock(targetPos, true, miner);
                         }
                     }
