@@ -22,11 +22,10 @@ public class DOMMagmaStair extends DOMStairs {
     public DOMMagmaStair(BlockState baseBlockState, Settings settings) {
         super(baseBlockState, settings);
     }
-    private static final int SCHEDULED_TICK_DELAY = 20;
 
 
     public void onSteppedOn(World world, BlockPos pos, BlockState state, Entity entity) {
-        if (!entity.bypassesSteppingEffects() && entity instanceof LivingEntity && !EnchantmentHelper.hasFrostWalker((LivingEntity)entity)) {
+        if (!entity.bypassesSteppingEffects() && entity instanceof LivingEntity livingentity && !EnchantmentHelper.hasFrostWalker(livingentity)) {
             entity.damage(world.getDamageSources().hotFloor(), 1.0F);
         }
 
@@ -48,8 +47,8 @@ public class DOMMagmaStair extends DOMStairs {
     public void randomTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
         BlockPos blockPos = pos.up();
         if (world.getFluidState(pos).isIn(FluidTags.WATER)) {
-            world.playSound(null, pos, SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.BLOCKS, 0.5F, 2.6F + (world.random.nextFloat() - world.random.nextFloat()) * 0.8F);
-            world.spawnParticles(ParticleTypes.LARGE_SMOKE, (double)blockPos.getX() + 0.5, (double)blockPos.getY() + 0.25, (double)blockPos.getZ() + 0.5, 8, 0.5, 0.25, 0.5, 0.0);
+            world.playSound(null, pos, SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.BLOCKS, 0.5F, 2.6F + (world.random.nextFloat()) * 0.8F);
+            world.spawnParticles(ParticleTypes.LARGE_SMOKE, blockPos.getX() + 0.5, blockPos.getY() + 0.25, blockPos.getZ() + 0.5, 8, 0.5, 0.25, 0.5, 0.0);
         }
 
     }

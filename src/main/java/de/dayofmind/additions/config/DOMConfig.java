@@ -21,6 +21,8 @@ public class DOMConfig extends MidnightConfig {
     public static boolean EnabledTranslation = true;
     @MidnightConfig.Entry(category = "features")
     public static boolean EnabledDecorativeTrapdoor = true;
+    @MidnightConfig.Entry(category = "features")
+    public static boolean EnabledTools = true;
 
     @MidnightConfig.Comment(category = "experimentalSettings")
     public static MidnightConfig.Comment experimental;

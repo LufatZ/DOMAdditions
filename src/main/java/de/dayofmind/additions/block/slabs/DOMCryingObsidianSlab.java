@@ -21,18 +21,17 @@ public class DOMCryingObsidianSlab extends SlabBlock{
                 BlockPos blockPos = pos.offset(direction);
                 BlockState blockState = world.getBlockState(blockPos);
                 if (!state.isOpaque() || !blockState.isSideSolidFullSquare(world, blockPos, direction.getOpposite())) {
-                    double d = direction.getOffsetX() == 0 ? random.nextDouble() : 0.5 + (double) direction.getOffsetX() * 0.6;
-                    double e = direction.getOffsetY() == 0 ? random.nextDouble() : 0.5 + (double) direction.getOffsetY() * 0.6;
-                    double f = direction.getOffsetZ() == 0 ? random.nextDouble() : 0.5 + (double) direction.getOffsetZ() * 0.6;
+                    double d = direction.getOffsetX() == 0 ? random.nextDouble() : 0.5 + direction.getOffsetX() * 0.6;
+                    double e = direction.getOffsetY() == 0 ? random.nextDouble() : 0.5 + direction.getOffsetY() * 0.6;
+                    double f = direction.getOffsetZ() == 0 ? random.nextDouble() : 0.5 + direction.getOffsetZ() * 0.6;
 
-                    if (slabType == SlabType.DOUBLE){
-                        world.addParticle(ParticleTypes.DRIPPING_OBSIDIAN_TEAR, (double) pos.getX() + d, (double) pos.getY() + e, (double) pos.getZ() + f, 0.0, 0.0, 0.0);
-                    }
-                    else if (slabType == SlabType.BOTTOM){
-                        world.addParticle(ParticleTypes.DRIPPING_OBSIDIAN_TEAR, (double) pos.getX() + d, (double) pos.getY() + 0.3, (double) pos.getZ() + f, 0.0, 0.0, 0.0);
-                    }
-                    else if (slabType == SlabType.TOP){
-                        world.addParticle(ParticleTypes.DRIPPING_OBSIDIAN_TEAR, (double) pos.getX() + d, (double) pos.getY() + 0.8, (double) pos.getZ() + f, 0.0, 0.0, 0.0);
+                    switch (slabType) {
+                        case DOUBLE ->
+                                world.addParticle(ParticleTypes.DRIPPING_OBSIDIAN_TEAR, pos.getX() + d, pos.getY() + e, pos.getZ() + f, 0.0, 0.0, 0.0);
+                        case BOTTOM ->
+                                world.addParticle(ParticleTypes.DRIPPING_OBSIDIAN_TEAR, pos.getX() + d, pos.getY() + 0.3, pos.getZ() + f, 0.0, 0.0, 0.0);
+                        case TOP ->
+                                world.addParticle(ParticleTypes.DRIPPING_OBSIDIAN_TEAR, pos.getX() + d, pos.getY() + 0.8, pos.getZ() + f, 0.0, 0.0, 0.0);
                     }
                 }
             }

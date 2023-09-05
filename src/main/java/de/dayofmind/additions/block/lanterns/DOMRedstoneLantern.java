@@ -47,13 +47,13 @@ public class DOMRedstoneLantern extends LanternBlock {
     public void neighborUpdate(BlockState state, World world, BlockPos pos, Block block, BlockPos fromPos, boolean notify) {
         if (!world.isClient) {
             boolean powered = world.getReceivedRedstonePower(pos) > 0;
-            if (powered != state.get(LIT)) {
+            if (powered != Boolean.TRUE.equals(state.get(LIT))) {
                 world.setBlockState(pos, state.with(LIT, powered), Block.NOTIFY_LISTENERS);
             }
         }
     }
 
-
+    @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
         builder.add(HANGING, WATERLOGGED, LIT);
     }

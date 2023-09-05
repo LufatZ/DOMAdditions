@@ -10,7 +10,7 @@ import static de.dayofmind.additions.block.DOMBlocksRegistry.GRASS_STAIR;
 public class TintBlocks {
 
 
-    public static void TintGrassBlocks() {
+    public static void tintblocks() {
 
         //grass block variants
         ColorProviderRegistry.BLOCK.register((state, world, pos, tintIndex) -> world != null && pos != null ? BiomeColors.getGrassColor(world, pos) : GrassColors.getColor(0.5, 1.0), GRASS_SLAB, GRASS_STAIR);

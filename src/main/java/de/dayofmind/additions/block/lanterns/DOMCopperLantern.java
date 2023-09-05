@@ -18,7 +18,7 @@ public class DOMCopperLantern extends DOMLanterns {
     }
 
     public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
-        Boolean hanging = state.get(HANGING);
+        boolean hanging = state.get(HANGING);
         return hanging ? COPPER_HANGING_SHAPE : COPPER_STANDING_SHAPE;
     }
 

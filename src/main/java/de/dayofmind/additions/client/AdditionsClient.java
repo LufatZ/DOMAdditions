@@ -12,8 +12,8 @@ public class AdditionsClient implements ClientModInitializer {
     public void onInitializeClient() {
         //texture stuff
         System.out.println("DOM | Colors are added to blocks");
-        TintBlocks.TintGrassBlocks();
+        TintBlocks.tintblocks();
         System.out.println("DOM | blocks become transparent");
-        TextureCutOut.CutOut();
+        TextureCutOut.cutout();
     }
 }

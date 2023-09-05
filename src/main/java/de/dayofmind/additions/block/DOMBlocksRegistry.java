@@ -32,7 +32,7 @@ import static de.dayofmind.additions.item.DOMItemsRegistry.GUITAR_ITEM;
 public class DOMBlocksRegistry {
     //helpers
     private static ToIntFunction<BlockState> createLightLevelFromLitBlockState() {
-        return (state) -> (Boolean)state.get(Properties.LIT) ? 15 : 0;
+        return state -> Boolean.TRUE.equals(state.get(Properties.LIT)) ? 15 : 0;
     }
     //slabs
         public static final Block DIRT_SLAB = new SlabBlock(FabricBlockSettings.copyOf(Blocks.DIRT));

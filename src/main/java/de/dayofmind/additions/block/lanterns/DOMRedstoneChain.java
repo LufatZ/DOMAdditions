@@ -61,7 +61,7 @@ public class DOMRedstoneChain extends ChainBlock {
             float scale = 1.0f; // Partikelgröße
 
             DustParticleEffect particle = new DustParticleEffect(new Vector3f(red, green, blue), scale);
-            world.addParticle(particle, (double)pos.getX() + 0.5, (double)pos.getY() + 0.5, (double)pos.getZ() + 0.5, 0.0, 0.0, 0.0);
+            world.addParticle(particle, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 0.0, 0.0, 0.0);
         }
     }
 

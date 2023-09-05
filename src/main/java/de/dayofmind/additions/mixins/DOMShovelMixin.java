@@ -49,17 +49,15 @@ public class DOMShovelMixin {
         if (newState != null) {
             BlockState newBlockState;
 
-            if (newState instanceof StairsBlock) {
+            if (newState instanceof StairsBlock stairsBlock) {
                 // If the new block is a stairs block, copy the properties from the original block
-                StairsBlock stairsBlock = (StairsBlock) newState;
                 newBlockState = stairsBlock.getDefaultState()
                         .with(StairsBlock.FACING, blockState.get(StairsBlock.FACING))
                         .with(StairsBlock.HALF, blockState.get(StairsBlock.HALF))
                         .with(StairsBlock.SHAPE, blockState.get(StairsBlock.SHAPE))
                         .with(WATERLOGGED, blockState.get(WATERLOGGED));
-            } else if (newState instanceof SlabBlock) {
+            } else if (newState instanceof SlabBlock slabBlock) {
                 // If the new block is a slab block, copy the properties from the original block
-                SlabBlock slabBlock = (SlabBlock) newState;
                 newBlockState = slabBlock.getDefaultState()
                         .with(SlabBlock.TYPE, blockState.get(SlabBlock.TYPE))
                         .with(WATERLOGGED, blockState.get(WATERLOGGED));

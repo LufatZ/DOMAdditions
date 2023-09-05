@@ -7,7 +7,7 @@ import net.minecraft.client.render.RenderLayer;
 import static de.dayofmind.additions.block.DOMBlocksRegistry.*;
 
 public class TextureCutOut {
-    public static void CutOut() {
+    public static void cutout() {
         //slab
         BlockRenderLayerMap.INSTANCE.putBlock(GRASS_SLAB, RenderLayer.getCutoutMipped());
         //stair

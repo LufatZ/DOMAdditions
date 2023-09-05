@@ -18,7 +18,7 @@ public class DOMNetheriteLantern extends DOMLanterns {
     }
 
     public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
-    Boolean hanging = state.get(HANGING);
+    boolean hanging = state.get(HANGING);
     return hanging ? NETHERITE_HANGING_SHAPE : NETHERITE_STANDING_SHAPE;
     }
 

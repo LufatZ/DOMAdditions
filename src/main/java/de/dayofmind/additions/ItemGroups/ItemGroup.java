@@ -13,7 +13,7 @@ import static de.dayofmind.additions.config.DOMConfig.*;
 import static de.dayofmind.additions.item.DOMItemsRegistry.*;
 
 public class ItemGroup {
-    public static void ItemGroupRegister(){
+    public static void itemGroupRegister(){
         Registry.register(Registries.ITEM_GROUP, new Identifier(MOD_ID, "blocks"), DayOfMindBlocks);
         Registry.register(Registries.ITEM_GROUP, new Identifier(MOD_ID, "items"), DayOfMindItems);
     }
@@ -22,6 +22,9 @@ public class ItemGroup {
             .icon(() -> new ItemStack(COPPER_LANTERN))
             .displayName(Text.translatable("itemGroup.additions.blocks"))
             .entries((displayContext, entries) -> {
+                if (EnabledTools){
+                    entries.add(BIG_SHOVEL);
+                }
                 if (EnabledLantern){
                     entries.add(NETHERITE_LANTERN);
                     entries.add(COPPER_LANTERN);
