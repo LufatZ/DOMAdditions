@@ -24,6 +24,7 @@ public class ItemGroup {
             .entries((displayContext, entries) -> {
                 if (EnabledTools){
                     entries.add(BIG_SHOVEL);
+                    entries.add(HAMMER);
                 }
                 if (EnabledLantern){
                     entries.add(NETHERITE_LANTERN);

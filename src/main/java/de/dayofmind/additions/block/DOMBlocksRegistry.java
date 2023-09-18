@@ -1,10 +1,7 @@
 package de.dayofmind.additions.block;
 
 import de.dayofmind.additions.block.instruments.DOMGuitarBlock;
-import de.dayofmind.additions.block.lanterns.DOMCopperLantern;
-import de.dayofmind.additions.block.lanterns.DOMNetheriteLantern;
-import de.dayofmind.additions.block.lanterns.DOMRedstoneChain;
-import de.dayofmind.additions.block.lanterns.DOMRedstoneLantern;
+import de.dayofmind.additions.block.lanterns.*;
 import de.dayofmind.additions.block.slabs.DOMCryingObsidianSlab;
 import de.dayofmind.additions.block.slabs.DOMGrassSlab;
 import de.dayofmind.additions.block.slabs.DOMMagmaSlab;
@@ -63,8 +60,8 @@ public class DOMBlocksRegistry {
         public static final Block NETHERITE_LANTERN = new DOMNetheriteLantern(FabricBlockSettings.copyOf(Blocks.LANTERN));
         public static final Block COPPER_LANTERN = new DOMCopperLantern(FabricBlockSettings.copyOf(Blocks.LANTERN));
 
-        public static final Block NETHERITE_REDSTONE_LANTERN = new DOMRedstoneLantern(FabricBlockSettings.copyOf(NETHERITE_LANTERN).luminance(createLightLevelFromLitBlockState()));
-        public static final Block COPPER_REDSTONE_LANTERN = new DOMRedstoneLantern(FabricBlockSettings.copyOf(COPPER_LANTERN).luminance(createLightLevelFromLitBlockState()));
+        public static final Block NETHERITE_REDSTONE_LANTERN = new DOMNetheriteRedstoneLanter(FabricBlockSettings.copyOf(NETHERITE_LANTERN).luminance(createLightLevelFromLitBlockState()));
+        public static final Block COPPER_REDSTONE_LANTERN = new DOMCopperRedstoneLantern(FabricBlockSettings.copyOf(COPPER_LANTERN).luminance(createLightLevelFromLitBlockState()));
         public static final Block REDSTONE_LANTERN = new DOMRedstoneLantern(FabricBlockSettings.copyOf(Blocks.LANTERN).luminance(createLightLevelFromLitBlockState()));
 
     //trapdoors
