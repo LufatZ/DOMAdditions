@@ -1,20 +1,18 @@
 {
   "itemGroup.additions.items": "DayOfMind Items",
   "itemGroup.additions.blocks": "DayOfMind Blocks",
-
-  "block.additions.dirt_slab": "Dirt Slab",
+  "block.additions.dirt_slab": "Dalle en terre",
   "block.additions.dirt_path_slab": "Dirt Path Slab",
-  "block.additions.grass_slab": "Grass Slab",
-  "block.additions.gold_slab": "Gold Slab",
-  "block.additions.iron_slab": "Iron Slab",
-  "block.additions.diamond_slab": "Diamond Slab",
-  "block.additions.smooth_basalt_slab": "Smooth Basalt Slab",
-  "block.additions.polished_basalt_slab": "Polished Basalt Slab",
-  "block.additions.magma_slab": "Magma Slab",
-  "block.additions.obsidian_slab": "Obsidian Slab",
+  "block.additions.grass_slab": "Dalle d'herbe",
+  "block.additions.gold_slab": "Dalle d'or",
+  "block.additions.iron_slab": "Dalle de fer",
+  "block.additions.diamond_slab": "Dalle en diamant",
+  "block.additions.smooth_basalt_slab": "Dalle de basalte lisse",
+  "block.additions.polished_basalt_slab": "Dalle de basalte poli",
+  "block.additions.magma_slab": "Dalle de magma",
+  "block.additions.obsidian_slab": "Dalle d'obsidienne",
   "block.additions.crying_obsidian_slab": "Crying Obsidian Slab",
-
-  "block.additions.dirt_stair": "Dirt Stair",
+  "block.additions.dirt_stair": "Escalier de terre",
   "block.additions.dirt_path_stair": "Dirt Path Stair",
   "block.additions.grass_stair": "Grass Stair",
   "block.additions.gold_stair": "Gold Stair",
@@ -25,47 +23,36 @@
   "block.additions.magma_stair": "Magma Stair",
   "block.additions.obsidian_stair": "Obsidian Stair",
   "block.additions.crying_obsidian_stair": "Crying Obsidian Stair",
-
   "block.additions.netherite_lantern": "Netherite Lantern",
   "block.additions.copper_lantern": "Copper Lantern",
   "block.additions.netherite_redstone_lantern": "Netherite Redstone Lantern",
   "block.additions.copper_redstone_lantern": "Copper Redstone Lantern",
   "block.additions.redstone_lantern": "Redstone Lantern",
-
   "block.additions.decorative_iron_trapdoor": "Decorative Iron Trapdoor",
-
   "block.additions.redstone_chain": "Redstone Chain",
-
-  "block.additions.guitar": "Guitar",
-
+  "block.additions.guitar": "Guitare",
   "item.additions.wandering_musican_spawn_egg": "Wandering Musican Spawn Egg",
-
   "item.additions.copper_nugget": "Copper Nugget",
   "item.additions.netherite_nugget": "Netherite Nugget",
-
   "item.additions.multiblocktool.tooltip": "With this enchanted artifact in your possession,\nyou possess the power to shatter multiple blocks\nin a single mighty swing.",
   "item.additions.bigshovel": "Big Shovel",
   "item.additions.hammer": "Hammer",
   "item.additions.bigshovel.tooltip": "This power affects all blocks\nthat can be mined asunder by a shovel.",
   "item.additions.hammer.tooltip": "This power affects all blocks\nthat can be mined asunder by a pickaxe",
-
   "additions.midnightconfig.category.features": "Features",
   "additions.midnightconfig.category.experimentalSettings": "Experimental Settings",
   "additions.midnightconfig.category.about": "About",
-
   "additions.midnightconfig.configNote": "If you enable or disable items here, they will only be added or hidden in the Creative Inventory.",
   "additions.midnightconfig.DayOfMind": "DayOfMind",
   "additions.midnightconfig.aboutDayOfMind": "DayOfMind is a mod that adds new blocks, recipes and features. With unique lanterns, expanded block variations and clever features like switching grass and dirt paths with a shovel, DayOfMind offers exciting possibilities for your adventures.",
   "additions.midnightconfig.features": "The settings listed here are fully developed and can be used safely.",
   "additions.midnightconfig.experimental": "The settings listed here are not fully developed and can´t be used safely. Bugs are expected.",
-
-
   "additions.midnightconfig.EnabledGuitar": "Add the experimental guitar to your game",
-  "additions.midnightconfig.EnabledGuitar.tooltip":"This option adds an item and a block to the game. You can play music with the guitar.",
+  "additions.midnightconfig.EnabledGuitar.tooltip": "This option adds an item and a block to the game. You can play music with the guitar.",
   "additions.midnightconfig.EnabledLantern": "Add lantern variants",
-  "additions.midnightconfig.EnabledLantern.tooltip":"This option adds a selection of different lanterns made of different materials to the game. Each lantern has its own style.",
+  "additions.midnightconfig.EnabledLantern.tooltip": "This option adds a selection of different lanterns made of different materials to the game. Each lantern has its own style.",
   "additions.midnightconfig.EnabledRedstoneLantern": "Add redstone Lanterns",
-  "additions.midnightconfig.EnabledRedstoneLantern.tooltip":"This option adds redstone lanterns and the redstone chain, which allows you to send the redstone signal to the redstone lanterns.",
+  "additions.midnightconfig.EnabledRedstoneLantern.tooltip": "This option adds redstone lanterns and the redstone chain, which allows you to send the redstone signal to the redstone lanterns.",
   "additions.midnightconfig.EnabledTranslation": "Download of community translations",
   "additions.midnightconfig.EnabledTranslation.tooltip": "This enables the automatic download of additional or updated language files (crowdin).if you don´t want this, just disable this option and delete the <ModTranslations> folder in your game directory",
   "additions.midnightconfig.EnabledInstruments": "Add instruments",

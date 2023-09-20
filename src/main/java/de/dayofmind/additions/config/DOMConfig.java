@@ -8,6 +8,8 @@ public class DOMConfig extends MidnightConfig {
     public static MidnightConfig.Comment DayOfMind;
     @MidnightConfig.Comment(category = "about")
     public static MidnightConfig.Comment aboutDayOfMind;
+    @MidnightConfig.Comment(category = "about")
+    public static MidnightConfig.Comment configNote;
 
     @MidnightConfig.Comment(category = "features")
     public static MidnightConfig.Comment features;
