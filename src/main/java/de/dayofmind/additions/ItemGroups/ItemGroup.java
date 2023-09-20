@@ -1,6 +1,8 @@
 package de.dayofmind.additions.ItemGroups;
 
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
+import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
+import net.minecraft.item.ItemGroups;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
@@ -16,6 +18,75 @@ public class ItemGroup {
     public static void itemGroupRegister(){
         Registry.register(Registries.ITEM_GROUP, new Identifier(MOD_ID, "blocks"), DayOfMindBlocks);
         Registry.register(Registries.ITEM_GROUP, new Identifier(MOD_ID, "items"), DayOfMindItems);
+        //Items to be listed in their original item groups
+        if (OriginalItemGroup){
+            ItemGroupEvents.modifyEntriesEvent(ItemGroups.FUNCTIONAL).register(content -> {
+                if (EnabledLantern) {
+                    content.add(COPPER_LANTERN);
+                    content.add(NETHERITE_LANTERN);
+                }
+                if (EnabledDecorativeTrapdoor) {
+                    content.add(Decorative_Iron_Trapdoor);
+                }
+            });
+            ItemGroupEvents.modifyEntriesEvent(ItemGroups.REDSTONE).register(content -> {
+                if (EnabledRedstoneLantern) {
+                    content.add(COPPER_REDSTONE_LANTERN);
+                    content.add(NETHERITE_REDSTONE_LANTERN);
+                    content.add(REDSTONE_CHAIN);
+                    content.add(REDSTONE_LANTERN);
+                }
+            });
+            ItemGroupEvents.modifyEntriesEvent(ItemGroups.BUILDING_BLOCKS).register(content -> {
+                if (EnabledBlockVariants){
+                    content.add(DIRT_STAIR);
+                    content.add(DIRT_SLAB);
+
+                    content.add(GRASS_STAIR);
+                    content.add(GRASS_SLAB);
+
+                    content.add(DIRT_PATH_STAIR);
+                    content.add(DIRT_PATH_SLAB);
+
+                    content.add(GOLD_STAIR);
+                    content.add(GOLD_SLAB);
+
+                    content.add(IRON_STAIR);
+                    content.add(IRON_SLAB);
+
+                    content.add(DIAMOND_STAIR);
+                    content.add(DIAMOND_SLAB);
+
+                    content.add(SMOOTH_BASALT_STAIR);
+                    content.add(SMOOTH_BASALT_SLAB);
+
+                    content.add(POLISHED_BASALT_STAIR);
+                    content.add(POLISHED_BASALT_SLAB);
+
+                    content.add(MAGMA_STAIR);
+                    content.add(MAGMA_SLAB);
+
+                    content.add(OBSIDIAN_STAIR);
+                    content.add(OBSIDIAN_SLAB);
+
+                    content.add(CRYING_OBSIDIAN_STAIR);
+                    content.add(CRYING_OBSIDIAN_SLAB);
+                }
+            });
+            ItemGroupEvents.modifyEntriesEvent(ItemGroups.INGREDIENTS).register(content -> {
+                content.add(COPPER_NUGGET);
+                content.add(NETHERITE_NUGGET);
+            });
+            ItemGroupEvents.modifyEntriesEvent(ItemGroups.TOOLS).register(content -> {
+                if (EnabledTools){
+                    content.add(BIG_SHOVEL);
+                    content.add(HAMMER);
+                }
+                if (EnabledInstruments) {
+                    content.add(GUITAR_ITEM);
+                }
+            });
+        }
     }
 
     private static final net.minecraft.item.ItemGroup DayOfMindBlocks = FabricItemGroup.builder()

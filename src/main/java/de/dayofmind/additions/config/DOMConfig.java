@@ -26,6 +26,9 @@ public class DOMConfig extends MidnightConfig {
     @MidnightConfig.Entry(category = "features")
     public static boolean EnabledTools = true;
 
+    @MidnightConfig.Entry(category = "features")
+    public static boolean OriginalItemGroup = true;
+
     @MidnightConfig.Comment(category = "experimentalSettings")
     public static MidnightConfig.Comment experimental;
     @MidnightConfig.Entry(category = "experimentalSettings")
