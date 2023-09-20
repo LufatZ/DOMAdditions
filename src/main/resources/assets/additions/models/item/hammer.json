@@ -1,9 +1,8 @@
 {
 	"credit": "Made with Blockbench",
 	"textures": {
-		"2": "block/stone",
-		"3": "item/stick",
-		"particle": "block/stone"
+		"2": "block/diamond_block",
+		"3": "item/stick"
 	},
 	"elements": [
 		{

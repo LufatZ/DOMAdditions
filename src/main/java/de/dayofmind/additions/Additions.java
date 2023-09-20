@@ -17,12 +17,15 @@ public class Additions implements ModInitializer {
 
     @Override
     public void onInitialize() {
-        out.println("DOM | DayOfMind is loading \n Thanks for playing DayOfMind \n Please take a look on my Discord: https://discord.com/invite/uMs57SHZYn \n Please report bugs to LufatZ or MysticBanana");
+        out.println("DOM | DayOfMind is loading");
+        out.println("DOM | Thanks for playing DayOfMind");
+        out.println("DOM | Please take a look on my Discord: https://discord.com/invite/uMs57SHZYn");
+        out.println("DOM | report bugs to LufatZ or MysticBanana");
         //config
         MidnightConfig.init(MOD_ID, DOMConfig.class);
         //crowdin
         if (EnabledTranslation) {
-            out.println("DOM | you have enabled automatic download of translation \n download translation from crowdin");
+            out.println("DOM | you have enabled automatic download of translation => download translation from crowdin");
             CrowdinTranslate.downloadTranslations("dayofmind-additions", MOD_ID, true);
         }
         //Register DoM blocks

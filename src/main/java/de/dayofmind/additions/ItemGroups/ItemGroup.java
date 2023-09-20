@@ -22,10 +22,6 @@ public class ItemGroup {
             .icon(() -> new ItemStack(COPPER_LANTERN))
             .displayName(Text.translatable("itemGroup.additions.blocks"))
             .entries((displayContext, entries) -> {
-                if (EnabledTools){
-                    entries.add(BIG_SHOVEL);
-                    entries.add(HAMMER);
-                }
                 if (EnabledLantern){
                     entries.add(NETHERITE_LANTERN);
                     entries.add(COPPER_LANTERN);
@@ -79,11 +75,15 @@ public class ItemGroup {
             })
             .build();
     private static final net.minecraft.item.ItemGroup DayOfMindItems = FabricItemGroup.builder()
-            .icon(() -> new ItemStack(COPPER_NUGGET))
+            .icon(() -> new ItemStack(HAMMER))
             .displayName(Text.translatable("itemGroup.additions.items"))
             .entries((displayContext, entries) -> {
                 entries.add(COPPER_NUGGET);
                 entries.add(NETHERITE_NUGGET);
+                if (EnabledTools){
+                    entries.add(BIG_SHOVEL);
+                    entries.add(HAMMER);
+                }
     		})
             .build();
 

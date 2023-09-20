@@ -2,14 +2,21 @@ package de.dayofmind.additions.item.tools;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.MiningToolItem;
 import net.minecraft.item.ToolMaterial;
 import net.minecraft.registry.tag.TagKey;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
+
+import java.util.List;
+
+import static de.dayofmind.additions.item.DOMItemsRegistry.HAMMER;
 
 public class DOMMultiBlockTool extends MiningToolItem {
     private final TagKey<Block> effectiveBlocks;
@@ -47,5 +54,16 @@ public class DOMMultiBlockTool extends MiningToolItem {
 
         }
         return super.postMine(stack, world, state, pos, miner);
+    }
+
+    @Override
+    public void appendTooltip(ItemStack itemStack, World world, List<Text> tooltip, TooltipContext tooltipContext) {
+        // standardmäßiger weißer Text
+        tooltip.add(Text.translatable("item.additions.multiblocktool.tooltip") );
+        if (itemStack.getItem().equals(HAMMER)){
+            tooltip.add(Text.translatable("item.additions.hammer.tooltip").formatted(Formatting.RED) );
+        } else {
+            tooltip.add(Text.translatable("item.additions.bigshovel.tooltip").formatted(Formatting.RED) );
+        }
     }
 }
