@@ -1,6 +1,6 @@
 package de.dayofmind.additions;
 
-import de.dayofmind.additions.ItemGroups.ItemGroup;
+import de.dayofmind.additions.ItemGroups.ItemGroupManager;
 import de.dayofmind.additions.block.DOMBlocksRegistry;
 import de.dayofmind.additions.config.DOMConfig;
 import de.dayofmind.additions.item.DOMItemsRegistry;
@@ -34,6 +34,6 @@ public class Additions implements ModInitializer {
             DOMItemsRegistry.registerItems();
         //TODO Register DoM entities
         //Register DOM ItemGroups
-            ItemGroup.itemGroupRegister();
+            ItemGroupManager.ItemGroupRegister();
     }
 }

@@ -16,8 +16,8 @@ import static de.dayofmind.additions.block.DOMBlocksRegistry.GUITAR;
 public class DOMItemsRegistry {
 
     //Tools
-        public static final Item BIG_SHOVEL = new DOMMultiBlockTool(2,2, ToolMaterials.DIAMOND, BlockTags.SHOVEL_MINEABLE, new FabricItemSettings());
-        public static final Item HAMMER = new DOMMultiBlockTool(2,2, ToolMaterials.DIAMOND, BlockTags.PICKAXE_MINEABLE, new FabricItemSettings());
+        public static final Item BIG_SHOVEL = new DOMMultiBlockTool(5.5F,1F, ToolMaterials.IRON, BlockTags.SHOVEL_MINEABLE, new FabricItemSettings());
+        public static final Item HAMMER = new DOMMultiBlockTool(5F, 1.2F, ToolMaterials.IRON, BlockTags.PICKAXE_MINEABLE, new FabricItemSettings());
 
     //SpawnEgg of experimental Entities
 
@@ -33,7 +33,7 @@ public class DOMItemsRegistry {
     public static void registerItems(){
         System.out.println("DOM | Adding items");
         //Tools
-            registerItem("bigshovel", BIG_SHOVEL);
+            registerItem("big_shovel", BIG_SHOVEL);
             registerItem("hammer", HAMMER);
         //SpawnEgg of experimental Entities
 
