@@ -63,7 +63,7 @@ public class DOMMultiBlockTool extends MiningToolItem {
         if (itemStack.getItem().equals(HAMMER)){
             tooltip.add(Text.translatable("item.additions.hammer.tooltip").formatted(Formatting.RED) );
         } else {
-            tooltip.add(Text.translatable("item.additions.bigshovel.tooltip").formatted(Formatting.RED) );
+            tooltip.add(Text.translatable("item.additions.big_shovel.tooltip").formatted(Formatting.RED) );
         }
     }
 }

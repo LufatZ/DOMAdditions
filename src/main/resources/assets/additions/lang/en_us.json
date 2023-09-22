@@ -44,9 +44,9 @@
   "item.additions.netherite_nugget": "Netherite Nugget",
 
   "item.additions.multiblocktool.tooltip": "With this enchanted artifact in your possession,\nyou possess the power to shatter multiple blocks\nin a single mighty swing.",
-  "item.additions.bigshovel": "Big Shovel",
+  "item.additions.big_shovel": "Big Shovel",
   "item.additions.hammer": "Hammer",
-  "item.additions.bigshovel.tooltip": "This power affects all blocks\nthat can be mined asunder by a shovel.",
+  "item.additions.big_shovel.tooltip": "This power affects all blocks\nthat can be mined asunder by a shovel.",
   "item.additions.hammer.tooltip": "This power affects all blocks\nthat can be mined asunder by a pickaxe",
 
   "additions.midnightconfig.category.features": "Features",

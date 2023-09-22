@@ -79,8 +79,9 @@ dependencies {
     modImplementation "de.guntram.mcmod:crowdin-translate:${project.crowdin}"
     include "de.guntram.mcmod:crowdin-translate:${project.crowdin}"
 
-    // EMI
-    //modImplementation "maven.modrinth:emi:${project.emi}+fabric"
+    // EMI or REI
+    modImplementation "maven.modrinth:rei:${project.rei}+fabric"
+        //put dependencies of rei in mods folder
 
 }
 
