@@ -1,0 +1,65 @@
+{
+	"schemaVersion": 1,
+	"id": "additions",
+	"version": "${version}",
+	"name": "DayOfMind Additions",
+	"description": "DayOfMind Additions adds things that matches the vanilla gameplay and complete the DayOfMind-Modpack.",
+	"authors": [
+		"LufatZ",
+		"OxFaTech Team"
+	],
+	"contact": {
+		"homepage": "https://oxfatech.de",
+		"sources": "https://github.com/LufatZ/DOMAdditions/"
+	},
+	"license": "LGPL-3.0-only",
+	"icon": "assets/additions/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			{
+				"value": "de.additions.Additions",
+				"adapter": "kotlin"
+			}
+		],
+		"client": [
+			{
+				"value": "de.additions.AdditionsClient",
+				"adapter": "kotlin"
+			}
+		],
+		"fabric-datagen": [
+			{
+				"value": "de.additions.AdditionsDataGenerator",
+				"adapter": "kotlin"
+			}
+		]
+	},
+	"custom": {
+		"modmenu": {
+			"links": {
+				"modmenu.additions.discord": "https://discord.gg/yRkqCvFcmz",
+				"modmenu.additions.crowdin": "https://crowdin.com/project/dayofmind-additions"
+			},
+			"update_checker": true
+		},
+		"sss_translate": {
+			"crowdin_project_name": "dayofmind-additions",
+			"minecraft_project_name": "additions",
+			"verbose": true
+		}
+	},
+	"mixins": [
+		"additions.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.15.11",
+		"minecraft": "~1.21",
+		"java": ">=21",
+		"fabric-api": "*",
+		"fabric-language-kotlin": "*"
+	},
+	"suggests": {
+		"another-mod": "*"
+	}
+}
