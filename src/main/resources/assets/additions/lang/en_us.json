@@ -60,6 +60,8 @@
   "additions.midnightconfig.experimental": "The settings listed here are not fully developed and can´t be used safely. Bugs are expected.",
 
 
+  "additions.midnightconfig.EnabledShovelMixin": "Switch between dirt path and dirt with a shovel",
+  "additions.midnightconfig.EnabledShovelMixin.tooltip":"This is a mixin that adds the ability to switch between dirt path and dirt with a shovel. you can disable this if you get problems with this mixin enabled.",
   "additions.midnightconfig.EnabledGuitar": "Add the experimental guitar to your game",
   "additions.midnightconfig.EnabledGuitar.tooltip":"This option adds an item and a block to the game. You can play music with the guitar.",
   "additions.midnightconfig.EnabledLantern": "Add lantern variants",

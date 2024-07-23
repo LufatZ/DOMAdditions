@@ -27,9 +27,9 @@ object ItemGroups {
         )
     }
 
+    //register Item Groups here
     fun registerItemGroups(){
-        // Registrieren Sie eine neue Item-Gruppe
-        registerItemGroup(
+        registerItemGroup(  //all Blocks from DayOfMind
             name = "blocks",
             icon = ItemStack(Blocks.DIRT),
             items = listOf(
@@ -39,8 +39,7 @@ object ItemGroups {
             )
         )
 
-        // Registrieren Sie eine weitere Item-Gruppe
-        registerItemGroup(
+        registerItemGroup(  //all items from DayOfMind
             name = "items",
             icon = ItemStack(Items.DIAMOND_PICKAXE),
             items = listOf(

@@ -11,7 +11,6 @@ object Additions : ModInitializer {
 	const val MODID = "additions"
 
 	override fun onInitialize() {
-		// This code runs as soon as Minecraft is in a mod-load-ready state.
 		logger.info("Enjoy DayOfMind")
 		MidnightConfig.init(MODID, AdditionsConfig::class.java)				//config screen registration with midnightlib
 

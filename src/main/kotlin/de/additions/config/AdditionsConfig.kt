@@ -18,6 +18,10 @@ class AdditionsConfig : MidnightConfig() {
 
         @JvmField
         @Entry(category = "features")
+        var EnabledShovelMixin: Boolean = true
+
+        @JvmField
+        @Entry(category = "features")
         var EnabledBlockVariants: Boolean = true
 
         @JvmField
