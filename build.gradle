@@ -1,9 +1,9 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-	id 'fabric-loom' version '1.7-SNAPSHOT'
+	id 'fabric-loom' version '1.8-SNAPSHOT'
 	id 'maven-publish'
-	id "org.jetbrains.kotlin.jvm" version "2.0.0"
+	id "org.jetbrains.kotlin.jvm" version "2.0.21"
 }
 
 version = project.mod_version
@@ -31,9 +31,9 @@ dependencies {
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 	modImplementation "net.fabricmc:fabric-language-kotlin:${project.fabric_kotlin_version}"
 	modRuntimeOnly("com.terraformersmc:modmenu:${project.modmenu_version}")							//modmenu
-	include modRuntimeOnly("net.sssubtlety.sss_translate:mod:${project.crowdin}")					//crowdin
+	//include modRuntimeOnly("net.sssubtlety.sss_translate:mod:${project.crowdin}")					//crowdin
 	modRuntimeOnly "maven.modrinth:jade:${project.jade}+fabric"										//jade (waila)
-	modRuntimeOnly "maven.modrinth:emi:${project.emi}+${project.minecraft_version}+fabric"			//emi (item viewer)
+	//modRuntimeOnly "maven.modrinth:emi:${project.emi}+${project.minecraft_version}+fabric"			//emi (item viewer)
 	modImplementation "maven.modrinth:midnightlib:${project.midnightlib}-fabric"					//midnight(config)
 }
 

@@ -1,6 +1,8 @@
 package de.additions.itemGroups
 
 import de.additions.Additions.MODID
+import de.additions.blocks.BlockRegistry
+import de.additions.items.ItemRegistry
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup
 import net.minecraft.block.Blocks
 import net.minecraft.item.ItemStack
@@ -12,7 +14,7 @@ import net.minecraft.registry.RegistryKeys
 import net.minecraft.text.Text
 import net.minecraft.util.Identifier
 
-object ItemGroups {
+object ItemGroupRegistry {
 
     fun registerItemGroup(name: String, icon: ItemStack, items: List<ItemStack>) {
         val groupKey = RegistryKey.of(RegistryKeys.ITEM_GROUP, Identifier.of(MODID, name))
@@ -32,21 +34,13 @@ object ItemGroups {
         registerItemGroup(  //all Blocks from DayOfMind
             name = "blocks",
             icon = ItemStack(Blocks.DIRT),
-            items = listOf(
-                ItemStack(Blocks.DIRT),
-                ItemStack(Blocks.STONE),
-                ItemStack(Blocks.GRASS_BLOCK)
-            )
+            items = BlockRegistry.registeredBlocks.toList()
         )
 
         registerItemGroup(  //all items from DayOfMind
             name = "items",
             icon = ItemStack(Items.DIAMOND_PICKAXE),
-            items = listOf(
-                ItemStack(Items.WOODEN_PICKAXE),
-                ItemStack(Items.STONE_PICKAXE),
-                ItemStack(Items.IRON_PICKAXE)
-            )
+            items = ItemRegistry.registeredItems.toList()
         )
     }
 }

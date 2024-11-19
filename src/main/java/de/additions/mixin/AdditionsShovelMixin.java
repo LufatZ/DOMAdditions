@@ -67,7 +67,7 @@ public class AdditionsShovelMixin {
 				}
 				// Set modified blockstates
 				world.setBlockState(blockPos, blockState2, 11);
-				cir.setReturnValue(ActionResult.success(world.isClient));
+				cir.setReturnValue(ActionResult.SUCCESS);
 			}
 		}
 	}
