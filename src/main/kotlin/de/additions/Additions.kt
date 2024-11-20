@@ -9,7 +9,7 @@ import net.fabricmc.api.ModInitializer
 import org.slf4j.LoggerFactory
 
 object Additions : ModInitializer {
-    private val logger = LoggerFactory.getLogger("additions")
+    public val logger = LoggerFactory.getLogger("additions")
 	const val MODID = "additions"
 
 	override fun onInitialize() {
