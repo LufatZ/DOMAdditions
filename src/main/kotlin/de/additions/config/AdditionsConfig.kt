@@ -38,6 +38,10 @@ class AdditionsConfig : MidnightConfig() {
 
         @JvmField
         @Entry(category = "features")
+        var EnabledTrapdoor: Boolean = true
+
+        @JvmField
+        @Entry(category = "features")
         var EnabledDecorativeTrapdoor: Boolean = true
 
         @JvmField

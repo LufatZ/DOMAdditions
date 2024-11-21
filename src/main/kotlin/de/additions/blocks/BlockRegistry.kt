@@ -28,6 +28,7 @@ object BlockRegistry {
         logger.info("Initiating block registration process")
         registerBlockVariants()
         registerLanternVariants()
+        registerTrapdoorVariants()
         logger.info("Block registration completed. Total registered blocks: ${registeredBlocks.size}")
     }
 
@@ -167,5 +168,52 @@ object BlockRegistry {
         }
 
         logger.info("Lantern variant registration completed")
+    }
+    /**
+     * Registriert Falltür-Varianten für vorgegebene Basis-Blöcke.
+     */
+    fun registerTrapdoorVariants() {
+        logger.info("Starting trapdoor variant registration")
+
+        val trapdoorVariants: List<Block> = if (AdditionsConfig.EnabledTrapdoor)
+            listOf(
+                Blocks.NETHERITE_BLOCK, Blocks.DIAMOND_BLOCK, Blocks.STONE,
+                Blocks.COBBLESTONE, Blocks.MOSSY_COBBLESTONE, Blocks.SMOOTH_STONE,
+                Blocks.STONE_BRICKS, Blocks.CHISELED_STONE_BRICKS, Blocks.MOSSY_STONE_BRICKS,
+                Blocks.GRANITE, Blocks.POLISHED_GRANITE, Blocks.DIORITE,
+                Blocks.POLISHED_DIORITE, Blocks.ANDESITE, Blocks.POLISHED_ANDESITE,
+                Blocks.DEEPSLATE, Blocks.COBBLED_DEEPSLATE, Blocks.CHISELED_DEEPSLATE,
+                Blocks.POLISHED_DEEPSLATE, Blocks.DEEPSLATE_BRICKS, Blocks.DEEPSLATE_TILES,
+                Blocks.TUFF, Blocks.CHISELED_TUFF, Blocks.POLISHED_TUFF,
+                Blocks.TUFF_BRICKS, Blocks.CHISELED_TUFF_BRICKS, Blocks.BRICKS,
+                Blocks.MUD_BRICKS, Blocks.SANDSTONE, Blocks.CHISELED_SANDSTONE,
+                Blocks.SMOOTH_SANDSTONE, Blocks.RED_SANDSTONE, Blocks.CHISELED_RED_SANDSTONE,
+                Blocks.SMOOTH_RED_SANDSTONE, Blocks.PRISMARINE, Blocks.PRISMARINE_BRICKS,
+                Blocks.DARK_PRISMARINE, Blocks.NETHERRACK, Blocks.NETHER_BRICKS,
+                Blocks.RED_NETHER_BRICKS, Blocks.BASALT, Blocks.SMOOTH_BASALT,
+                Blocks.POLISHED_BASALT, Blocks.BLACKSTONE, Blocks.CHISELED_POLISHED_BLACKSTONE,
+                Blocks.POLISHED_BLACKSTONE, Blocks.POLISHED_BLACKSTONE_BRICKS, Blocks.END_STONE,
+                Blocks.END_STONE_BRICKS, Blocks.PURPUR_BLOCK, Blocks.GOLD_BLOCK,
+                Blocks.EMERALD_BLOCK, Blocks.QUARTZ_BLOCK, Blocks.CHISELED_QUARTZ_BLOCK,
+                Blocks.QUARTZ_BRICKS, Blocks.SMOOTH_QUARTZ, Blocks.AMETHYST_BLOCK
+            )
+        else {
+            logger.info("Trapdoor Variants disabled in configuration")
+            listOf()
+        }
+
+        trapdoorVariants.forEach { baseBlock ->
+            val baseName = Registries.BLOCK.getId(baseBlock).path.replace("_block", "")
+            val trapdoorSettings = AbstractBlock.Settings.copy(baseBlock)
+
+            logger.debug("Creating trapdoor variants for base block: $baseName")
+
+            // Falltür-Variante registrieren
+            register("${baseName}_trapdoor", TrapdoorBlock(
+                BlockSetType.OAK,trapdoorSettings.registryKey(keyOf("${baseName}_trapdoor"))
+            ))
+        }
+
+        logger.info("Trapdoor variant registration completed")
     }
 }
