@@ -42,7 +42,7 @@ object BlockRegistry {
      */
     private inline fun <reified T> keyOf(
         id: String,
-        vanilla: Boolean = false,
+        vanilla: Boolean = true,
         type: RegistryKey<Registry<T>> = RegistryKeys.BLOCK as RegistryKey<Registry<T>>
     ): RegistryKey<T> {
         val identifier = if (vanilla) {
