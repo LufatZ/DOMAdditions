@@ -22,6 +22,60 @@ import net.minecraft.util.Identifier
 object BlockRegistry {
     /** Speichert alle registrierten Blöcke als ItemStacks für spätere Verwendung */
     val registeredBlocks: MutableList<ItemStack> = mutableListOf()
+    val registeredStairs: MutableList<Block> = mutableListOf()
+    val registeredSlabs: MutableList<Block> = mutableListOf()
+    val registeredLanterns: MutableList<Block> = mutableListOf()
+    val registeredTrapdoors: MutableList<Block> = mutableListOf()
+    val registeredChains: MutableList<Block> = mutableListOf()
+
+
+    // Listen der Basis-Blöcke für Varianten
+    val blockVariantsParents: List<Block> = if (AdditionsConfig.EnabledBlockVariants)
+        listOf(
+            Blocks.DIRT, Blocks.DIRT_PATH, Blocks.PODZOL, Blocks.GRASS_BLOCK,
+            Blocks.COARSE_DIRT, Blocks.MYCELIUM, Blocks.ROOTED_DIRT,
+            Blocks.MOSS_BLOCK, Blocks.MUD, Blocks.MUDDY_MANGROVE_ROOTS,
+            Blocks.GOLD_BLOCK, Blocks.IRON_BLOCK, Blocks.DIAMOND_BLOCK,
+            Blocks.SMOOTH_BASALT, Blocks.POLISHED_BASALT,
+            Blocks.MAGMA_BLOCK, Blocks.OBSIDIAN, Blocks.CRYING_OBSIDIAN
+        )else {
+        logger.info("Block Variants disabled in configuration")
+        listOf()
+    }
+    val lanternVariantsParents: List<Block> = if (AdditionsConfig.EnabledLantern)
+        listOf(
+            Blocks.NETHERITE_BLOCK,
+            Blocks.COPPER_BLOCK,
+            Blocks.DIAMOND_BLOCK
+        )else {
+            logger.info("Lantern Variants disabled in configuration")
+            listOf()
+    }
+    val trapdoorVariantsParents: List<Block> = if (AdditionsConfig.EnabledTrapdoor)
+        listOf(
+            Blocks.NETHERITE_BLOCK, Blocks.DIAMOND_BLOCK, Blocks.STONE,
+            Blocks.COBBLESTONE, Blocks.MOSSY_COBBLESTONE, Blocks.SMOOTH_STONE,
+            Blocks.STONE_BRICKS, Blocks.CHISELED_STONE_BRICKS, Blocks.MOSSY_STONE_BRICKS,
+            Blocks.GRANITE, Blocks.POLISHED_GRANITE, Blocks.DIORITE,
+            Blocks.POLISHED_DIORITE, Blocks.ANDESITE, Blocks.POLISHED_ANDESITE,
+            Blocks.DEEPSLATE, Blocks.COBBLED_DEEPSLATE, Blocks.CHISELED_DEEPSLATE,
+            Blocks.POLISHED_DEEPSLATE, Blocks.DEEPSLATE_BRICKS, Blocks.DEEPSLATE_TILES,
+            Blocks.TUFF, Blocks.CHISELED_TUFF, Blocks.POLISHED_TUFF,
+            Blocks.TUFF_BRICKS, Blocks.CHISELED_TUFF_BRICKS, Blocks.BRICKS,
+            Blocks.MUD_BRICKS, Blocks.SANDSTONE, Blocks.CHISELED_SANDSTONE,
+            Blocks.SMOOTH_SANDSTONE, Blocks.RED_SANDSTONE, Blocks.CHISELED_RED_SANDSTONE,
+            Blocks.SMOOTH_RED_SANDSTONE, Blocks.PRISMARINE, Blocks.PRISMARINE_BRICKS,
+            Blocks.DARK_PRISMARINE, Blocks.NETHERRACK, Blocks.NETHER_BRICKS,
+            Blocks.RED_NETHER_BRICKS, Blocks.BASALT, Blocks.SMOOTH_BASALT,
+            Blocks.POLISHED_BASALT, Blocks.BLACKSTONE, Blocks.CHISELED_POLISHED_BLACKSTONE,
+            Blocks.POLISHED_BLACKSTONE, Blocks.POLISHED_BLACKSTONE_BRICKS, Blocks.END_STONE,
+            Blocks.END_STONE_BRICKS, Blocks.PURPUR_BLOCK, Blocks.GOLD_BLOCK,
+            Blocks.EMERALD_BLOCK, Blocks.QUARTZ_BLOCK, Blocks.CHISELED_QUARTZ_BLOCK,
+            Blocks.QUARTZ_BRICKS, Blocks.SMOOTH_QUARTZ, Blocks.AMETHYST_BLOCK
+        )else {
+        logger.info("Trapdoor Variants disabled in configuration")
+        listOf()
+    }
 
     /** Zentraler Registrierungsaufruf für alle Blocktypen */
     fun registerAllBlocks() {
@@ -88,38 +142,26 @@ object BlockRegistry {
     fun registerBlockVariants() {
         logger.info("Starting block variant registration")
 
-        // Liste der Basis-Blöcke für Varianten
-        val blockVariants: List<Block> = if (AdditionsConfig.EnabledBlockVariants)
-            listOf(
-                Blocks.DIRT, Blocks.DIRT_PATH, Blocks.PODZOL, Blocks.GRASS_BLOCK,
-                Blocks.COARSE_DIRT, Blocks.MYCELIUM, Blocks.ROOTED_DIRT,
-                Blocks.MOSS_BLOCK, Blocks.MUD, Blocks.MUDDY_MANGROVE_ROOTS,
-                Blocks.GOLD_BLOCK, Blocks.IRON_BLOCK, Blocks.DIAMOND_BLOCK,
-                Blocks.SMOOTH_BASALT, Blocks.POLISHED_BASALT,
-                Blocks.MAGMA_BLOCK, Blocks.OBSIDIAN, Blocks.CRYING_OBSIDIAN
-            )
-        else {
-            logger.info("Block Variants disabled in configuration")
-            listOf()
-        }
-
         // Varianten für jeden Basis-Block erstellen
-        blockVariants.forEach { baseBlock ->
+        blockVariantsParents.forEach { baseBlock ->
             val baseName = Registries.BLOCK.getId(baseBlock).path.replace("_block", "")
             val settings = AbstractBlock.Settings.copy(baseBlock)
 
             logger.debug("Creating variants for base block: $baseName")
 
             // Platten-Variante registrieren
-            register("${baseName}_slab", SlabBlock(
+            val slab = register("${baseName}_slab", SlabBlock(
                 settings.registryKey(keyOf("${baseName}_slab"))
             ))
 
             // Treppen-Variante registrieren
-            register("${baseName}_stairs", StairsBlock(
+            val stair = register("${baseName}_stairs", StairsBlock(
                 baseBlock.defaultState,
                 settings.registryKey(keyOf("${baseName}_stairs"))
             ))
+
+            registeredStairs.add(stair)
+            registeredSlabs.add(slab)
         }
 
         logger.info("Block variant registration completed")
@@ -131,18 +173,7 @@ object BlockRegistry {
     fun registerLanternVariants() {
         logger.info("Starting lantern variant registration")
 
-        val lanternVariants: List<Block> = if (AdditionsConfig.EnabledLantern)
-            listOf(
-                Blocks.NETHERITE_BLOCK,
-                Blocks.COPPER_BLOCK,
-                Blocks.DIAMOND_BLOCK
-            )
-        else {
-            logger.info("Lantern Variants disabled in configuration")
-            listOf()
-        }
-
-        lanternVariants.forEach { baseBlock ->
+        lanternVariantsParents.forEach { baseBlock ->
             val baseName = Registries.BLOCK.getId(baseBlock).path.replace("_block", "")
             val lanternSettings = AbstractBlock.Settings.copy(Blocks.LANTERN)
             val chainSettings = AbstractBlock.Settings.copy(Blocks.CHAIN)
@@ -150,12 +181,12 @@ object BlockRegistry {
             logger.debug("Creating lantern and chain variants for base block: $baseName")
 
             // Laternen-Variante registrieren
-            register("${baseName}_lantern", LanternBlock(
+            val lantern =register("${baseName}_lantern", LanternBlock(
                 lanternSettings.registryKey(keyOf("${baseName}_lantern"))
             ))
 
             // Ketten-Variante registrieren
-            register("${baseName}_chain", ChainBlock(
+            val chain = register("${baseName}_chain", ChainBlock(
                 chainSettings.registryKey(keyOf("${baseName}_chain"))
             ))
 
@@ -165,6 +196,9 @@ object BlockRegistry {
             } else {
                 logger.debug("Redstone Lanterns disabled for $baseName")
             }
+
+            registeredLanterns.add(lantern)
+            registeredChains.add(chain)
         }
 
         logger.info("Lantern variant registration completed")
@@ -175,43 +209,18 @@ object BlockRegistry {
     fun registerTrapdoorVariants() {
         logger.info("Starting trapdoor variant registration")
 
-        val trapdoorVariants: List<Block> = if (AdditionsConfig.EnabledTrapdoor)
-            listOf(
-                Blocks.NETHERITE_BLOCK, Blocks.DIAMOND_BLOCK, Blocks.STONE,
-                Blocks.COBBLESTONE, Blocks.MOSSY_COBBLESTONE, Blocks.SMOOTH_STONE,
-                Blocks.STONE_BRICKS, Blocks.CHISELED_STONE_BRICKS, Blocks.MOSSY_STONE_BRICKS,
-                Blocks.GRANITE, Blocks.POLISHED_GRANITE, Blocks.DIORITE,
-                Blocks.POLISHED_DIORITE, Blocks.ANDESITE, Blocks.POLISHED_ANDESITE,
-                Blocks.DEEPSLATE, Blocks.COBBLED_DEEPSLATE, Blocks.CHISELED_DEEPSLATE,
-                Blocks.POLISHED_DEEPSLATE, Blocks.DEEPSLATE_BRICKS, Blocks.DEEPSLATE_TILES,
-                Blocks.TUFF, Blocks.CHISELED_TUFF, Blocks.POLISHED_TUFF,
-                Blocks.TUFF_BRICKS, Blocks.CHISELED_TUFF_BRICKS, Blocks.BRICKS,
-                Blocks.MUD_BRICKS, Blocks.SANDSTONE, Blocks.CHISELED_SANDSTONE,
-                Blocks.SMOOTH_SANDSTONE, Blocks.RED_SANDSTONE, Blocks.CHISELED_RED_SANDSTONE,
-                Blocks.SMOOTH_RED_SANDSTONE, Blocks.PRISMARINE, Blocks.PRISMARINE_BRICKS,
-                Blocks.DARK_PRISMARINE, Blocks.NETHERRACK, Blocks.NETHER_BRICKS,
-                Blocks.RED_NETHER_BRICKS, Blocks.BASALT, Blocks.SMOOTH_BASALT,
-                Blocks.POLISHED_BASALT, Blocks.BLACKSTONE, Blocks.CHISELED_POLISHED_BLACKSTONE,
-                Blocks.POLISHED_BLACKSTONE, Blocks.POLISHED_BLACKSTONE_BRICKS, Blocks.END_STONE,
-                Blocks.END_STONE_BRICKS, Blocks.PURPUR_BLOCK, Blocks.GOLD_BLOCK,
-                Blocks.EMERALD_BLOCK, Blocks.QUARTZ_BLOCK, Blocks.CHISELED_QUARTZ_BLOCK,
-                Blocks.QUARTZ_BRICKS, Blocks.SMOOTH_QUARTZ, Blocks.AMETHYST_BLOCK
-            )
-        else {
-            logger.info("Trapdoor Variants disabled in configuration")
-            listOf()
-        }
-
-        trapdoorVariants.forEach { baseBlock ->
+        trapdoorVariantsParents.forEach { baseBlock ->
             val baseName = Registries.BLOCK.getId(baseBlock).path.replace("_block", "")
             val trapdoorSettings = AbstractBlock.Settings.copy(baseBlock)
 
             logger.debug("Creating trapdoor variants for base block: $baseName")
 
             // Falltür-Variante registrieren
-            register("${baseName}_trapdoor", TrapdoorBlock(
+            val trapdoor = register("${baseName}_trapdoor", TrapdoorBlock(
                 BlockSetType.OAK,trapdoorSettings.registryKey(keyOf("${baseName}_trapdoor"))
             ))
+
+            registeredTrapdoors.add(trapdoor)
         }
 
         logger.info("Trapdoor variant registration completed")
