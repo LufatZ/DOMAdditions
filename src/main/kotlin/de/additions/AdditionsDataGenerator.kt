@@ -57,6 +57,9 @@ object AdditionsDataGenerator : DataGeneratorEntrypoint {
 			BlockRegistry.registeredSlabs.forEach { slab ->
 				createSlabItemModel(slab, generator)
 			}
+			BlockRegistry.registeredStairs.forEach( {stair ->
+				createSlabItemModel(stair, generator)
+			})
 		}
 
 		/**
@@ -86,11 +89,72 @@ object AdditionsDataGenerator : DataGeneratorEntrypoint {
 		 * Processes all registered stairs.
 		 */
 		private fun BlockStateModelGenerator?.generateStairModels() {
-			BlockRegistry.registeredStairs.forEach { stair ->
-				// TODO: Implement stair registration
-				// this?.registerSimpleCubeAll(stair)
+			BlockRegistry.registeredStairs.forEachIndexed { index, stair ->
+				val parentBlock = BlockRegistry.blockVariantsParents[index]
+
+				// Skip custom model blocks
+				if (parentBlock in CUSTOM_MODEL_BLOCKS) return@forEachIndexed
+				when (parentBlock) {
+					in CUSTOM_MODEL_BLOCKS -> return@forEachIndexed
+					Blocks.PODZOL -> generateStairModel(this, stair, parentBlock, bottom = Blocks.DIRT)
+					Blocks.MYCELIUM -> generateStairModel(this, stair, parentBlock, bottom = Blocks.DIRT)
+					else -> generateStairModel(this, stair, parentBlock)
+				}
 			}
 		}
+
+		/**
+		 * Generates all necessary models and blockstates for a stair variant.
+		 */
+		private fun generateStairModel(
+			generator: BlockStateModelGenerator?,
+			stair: Block,
+			parent: Block,
+			top: Block = parent,
+			side: Block = parent,
+			bottom: Block = parent
+		) {
+			val textureMap = createTextureMap(
+				parent = parent,
+				top = top,
+				side = side,
+				bottom = bottom,
+				hasSideAndTop = parent in listOf<Block>(Blocks.PODZOL, Blocks.MYCELIUM, Blocks.POLISHED_BASALT, Blocks.MUDDY_MANGROVE_ROOTS),
+				removeBlock = parent == Blocks.MAGMA_BLOCK,
+				bottomSameAsTop = parent in listOf<Block>(Blocks.MUDDY_MANGROVE_ROOTS, Blocks.POLISHED_BASALT)
+			)
+
+			val innerModel = Models.STAIRS.upload(
+				stair,
+				"",
+				textureMap,
+				generator?.modelCollector
+			)
+
+			val outerModel = Models.OUTER_STAIRS.upload(
+				stair,
+				"",
+				textureMap,
+				generator?.modelCollector
+			)
+
+			val straightModel = Models.INNER_STAIRS.upload(
+				stair,
+				"",
+				textureMap,
+				generator?.modelCollector
+			)
+
+			generator?.blockStateCollector?.accept(
+				BlockStateModelGenerator.createStairsBlockState(
+					stair,
+					straightModel,
+					innerModel,
+					outerModel
+				)
+			)
+		}
+
 
 		/**
 		 * Processes all registered slabs with their parent blocks.
@@ -99,11 +163,12 @@ object AdditionsDataGenerator : DataGeneratorEntrypoint {
 			BlockRegistry.registeredSlabs.forEachIndexed { index, slab ->
 				val parentBlock = BlockRegistry.blockVariantsParents[index]
 
-				when {
-					parentBlock in CUSTOM_MODEL_BLOCKS -> return@forEachIndexed
-					parentBlock == Blocks.PODZOL -> generateSlabModel(this, slab, parentBlock, bottom = Blocks.DIRT)
-					else -> generateSlabModel(this, slab, parentBlock)
-				}
+                when (parentBlock) {
+                    in CUSTOM_MODEL_BLOCKS -> return@forEachIndexed
+                    Blocks.PODZOL -> generateSlabModel(this, slab, parentBlock, bottom = Blocks.DIRT)
+					Blocks.MYCELIUM -> generateSlabModel(this, slab, parentBlock, bottom = Blocks.DIRT)
+                    else -> generateSlabModel(this, slab, parentBlock)
+                }
 			}
 		}
 
@@ -199,7 +264,7 @@ object AdditionsDataGenerator : DataGeneratorEntrypoint {
 				bottom = bottom,
 				hasSideAndTop = parent in listOf<Block>(Blocks.PODZOL, Blocks.MYCELIUM, Blocks.POLISHED_BASALT, Blocks.MUDDY_MANGROVE_ROOTS),
 				removeBlock = parent == Blocks.MAGMA_BLOCK,
-				bottomSameAsTop = parent == Blocks.MUDDY_MANGROVE_ROOTS
+				bottomSameAsTop = parent in listOf<Block>(Blocks.MUDDY_MANGROVE_ROOTS, Blocks.POLISHED_BASALT)
 			)
 
 			val bottomModel = Models.SLAB.upload(
