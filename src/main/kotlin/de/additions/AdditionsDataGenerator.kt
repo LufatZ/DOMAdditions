@@ -11,6 +11,7 @@ import net.minecraft.block.Block
 import net.minecraft.block.Blocks
 import net.minecraft.data.client.*
 import net.minecraft.util.Identifier
+import kotlin.apply
 
 /**
  * Main DataGenerator entry point for the Additions mod.
@@ -55,24 +56,27 @@ object AdditionsDataGenerator : DataGeneratorEntrypoint {
 		 */
 		override fun generateItemModels(generator: ItemModelGenerator?) {
 			BlockRegistry.registeredSlabs.forEach { slab ->
-				createSlabItemModel(slab, generator)
+				createItemModel(slab, generator)
 			}
-			BlockRegistry.registeredStairs.forEach( {stair ->
-				createSlabItemModel(stair, generator)
-			})
-		}
+			BlockRegistry.registeredStairs.forEach { stair ->
+                createItemModel(stair, generator)
+            }
+			BlockRegistry.registeredTrapdoors.forEach { trapdoor ->
+				createItemModel(trapdoor, generator)
+			}
+        }
 
 		/**
 		 * Creates individual item models for slabs by referencing their block models.
 		 */
-		private fun createSlabItemModel(slab: Block, generator: ItemModelGenerator?) {
-			val modelPath = buildParentPath(slab)
-			val modelJson = createItemModelJson(modelPath)
+		private fun createItemModel(block: Block, generator: ItemModelGenerator?) {
+				val modelPath = buildParentPath(block)
+				val modelJson = createItemModelJson(modelPath)
 
-			generator?.writer?.accept(
-				ModelIds.getItemModelId(slab.asItem()),
-				Supplier { modelJson }
-			)
+				generator?.writer?.accept(
+					ModelIds.getItemModelId(block.asItem()),
+					Supplier { modelJson }
+				)
 		}
 
 		/**
@@ -82,6 +86,16 @@ object AdditionsDataGenerator : DataGeneratorEntrypoint {
 			BlockRegistry.registeredLanterns.forEach { lantern ->
 				// TODO: Implement lantern registration
 				// this?.registerLantern(lantern)
+			}
+		}
+
+		/**
+		 * Processes all registered chains.
+		 */
+		private fun BlockStateModelGenerator?.generateChainModels() {
+			BlockRegistry.registeredChains.forEach { chain ->
+				// TODO: Implement chain registration
+				// this?.registerSimpleCubeAll(chain)
 			}
 		}
 
@@ -104,59 +118,6 @@ object AdditionsDataGenerator : DataGeneratorEntrypoint {
 		}
 
 		/**
-		 * Generates all necessary models and blockstates for a stair variant.
-		 */
-		private fun generateStairModel(
-			generator: BlockStateModelGenerator?,
-			stair: Block,
-			parent: Block,
-			top: Block = parent,
-			side: Block = parent,
-			bottom: Block = parent
-		) {
-			val textureMap = createTextureMap(
-				parent = parent,
-				top = top,
-				side = side,
-				bottom = bottom,
-				hasSideAndTop = parent in listOf<Block>(Blocks.PODZOL, Blocks.MYCELIUM, Blocks.POLISHED_BASALT, Blocks.MUDDY_MANGROVE_ROOTS),
-				removeBlock = parent == Blocks.MAGMA_BLOCK,
-				bottomSameAsTop = parent in listOf<Block>(Blocks.MUDDY_MANGROVE_ROOTS, Blocks.POLISHED_BASALT)
-			)
-
-			val innerModel = Models.STAIRS.upload(
-				stair,
-				"",
-				textureMap,
-				generator?.modelCollector
-			)
-
-			val outerModel = Models.OUTER_STAIRS.upload(
-				stair,
-				"",
-				textureMap,
-				generator?.modelCollector
-			)
-
-			val straightModel = Models.INNER_STAIRS.upload(
-				stair,
-				"",
-				textureMap,
-				generator?.modelCollector
-			)
-
-			generator?.blockStateCollector?.accept(
-				BlockStateModelGenerator.createStairsBlockState(
-					stair,
-					straightModel,
-					innerModel,
-					outerModel
-				)
-			)
-		}
-
-
-		/**
 		 * Processes all registered slabs with their parent blocks.
 		 */
 		private fun BlockStateModelGenerator?.generateSlabModels() {
@@ -173,22 +134,16 @@ object AdditionsDataGenerator : DataGeneratorEntrypoint {
 		}
 
 		/**
-		 * Processes all registered chains.
-		 */
-		private fun BlockStateModelGenerator?.generateChainModels() {
-			BlockRegistry.registeredChains.forEach { chain ->
-				// TODO: Implement chain registration
-				// this?.registerSimpleCubeAll(chain)
-			}
-		}
-
-		/**
 		 * Processes all registered trapdoors.
 		 */
 		private fun BlockStateModelGenerator?.generateTrapdoorModels() {
 			BlockRegistry.registeredTrapdoors.forEachIndexed { index, trapdoor ->
-				// TODO: Implement trapdoor registration
-				// this?.registerParentedTrapdoor(BlockRegistry.trapdoorVariantsParents[index], trapdoor)
+				val parentBlock = BlockRegistry.trapdoorVariantsParents[index]
+
+				when (parentBlock) {
+					in CUSTOM_MODEL_BLOCKS -> return@forEachIndexed
+					else -> generateTrapdoorModel(this, trapdoor, parentBlock)
+				}
 			}
 		}
 
@@ -247,6 +202,101 @@ object AdditionsDataGenerator : DataGeneratorEntrypoint {
 		}
 
 		/**
+		 * Generates all necessary models and blockstates for a stair variant.
+		 */
+		private fun generateStairModel(
+			generator: BlockStateModelGenerator?,
+			stair: Block,
+			parent: Block,
+			top: Block = parent,
+			side: Block = parent,
+			bottom: Block = parent
+		) {
+			val textureMap = createTextureMap(
+				parent = parent,
+				top = top,
+				side = side,
+				bottom = bottom,
+				hasSideAndTop = parent in listOf<Block>(Blocks.PODZOL, Blocks.MYCELIUM, Blocks.POLISHED_BASALT, Blocks.MUDDY_MANGROVE_ROOTS),
+				removeBlock = parent == Blocks.MAGMA_BLOCK,
+				bottomSameAsTop = parent in listOf<Block>(Blocks.MUDDY_MANGROVE_ROOTS, Blocks.POLISHED_BASALT)
+			)
+
+			val innerModel = Models.STAIRS.upload(
+				stair,
+				"",
+				textureMap,
+				generator?.modelCollector
+			)
+
+			val outerModel = Models.OUTER_STAIRS.upload(
+				stair,
+				"",
+				textureMap,
+				generator?.modelCollector
+			)
+
+			val straightModel = Models.INNER_STAIRS.upload(
+				stair,
+				"",
+				textureMap,
+				generator?.modelCollector
+			)
+
+			generator?.blockStateCollector?.accept(
+				BlockStateModelGenerator.createStairsBlockState(
+					stair,
+					straightModel,
+					innerModel,
+					outerModel
+				)
+			)
+		}
+
+		/**
+		 * Generates all necessary models and blockstates for a stair variant.
+		 */
+		private fun generateTrapdoorModel(
+			generator: BlockStateModelGenerator?,
+			trapdoor: Block,
+			parent: Block
+		) {
+			val newTextureMap: TextureMap = TextureMap().apply {
+				put(TextureKey.TEXTURE, getIdentifier(parent))
+			}
+
+			val bottomModel = Models.TEMPLATE_TRAPDOOR_BOTTOM.upload(
+				trapdoor,
+				"",
+				newTextureMap,
+				generator?.modelCollector
+			)
+
+			val topModel = Models.TEMPLATE_TRAPDOOR_TOP.upload(
+				trapdoor,
+				"",
+				newTextureMap,
+				generator?.modelCollector
+			)
+
+			val openModel = Models.TEMPLATE_TRAPDOOR_OPEN.upload(
+				trapdoor,
+				"",
+				newTextureMap,
+				generator?.modelCollector
+			)
+
+			generator?.blockStateCollector?.accept(
+				BlockStateModelGenerator.createTrapdoorBlockState(
+					trapdoor,
+					topModel,
+					bottomModel,
+					openModel
+				)
+			)
+		}
+
+		/**
 		 * Generates all necessary models and blockstates for a slab variant.
 		 */
 		private fun generateSlabModel(
@@ -297,9 +347,11 @@ object AdditionsDataGenerator : DataGeneratorEntrypoint {
 		 * Creates the parent path for item models.
 		 */
 		private fun buildParentPath(block: Block): String {
-			val idParts = block.defaultState.registryEntry.idAsString.split(":")
-			return "${idParts[0]}:block/${idParts[1]}"
+			val (namespace, path) = block.defaultState.registryEntry.idAsString.split(":")
+			val suffix = if (block in BlockRegistry.registeredTrapdoors) "_bottom" else ""
+			return "$namespace:block/${path}$suffix"
 		}
+
 
 		/**
 		 * Creates a JSON object for item models.
