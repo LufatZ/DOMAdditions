@@ -1,17 +1,22 @@
 package de.additions
 
-import com.google.common.base.Supplier
 import com.google.gson.JsonObject
 import de.additions.Additions.MODID
 import de.additions.blocks.BlockRegistry
+import net.fabricmc.fabric.api.client.datagen.v1.provider.FabricModelProvider
 import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
-import net.fabricmc.fabric.api.datagen.v1.provider.FabricModelProvider
 import net.minecraft.block.Block
 import net.minecraft.block.Blocks
-import net.minecraft.data.client.*
-import net.minecraft.data.client.BlockStateModelGenerator.createBooleanModelMap
+import net.minecraft.client.data.BlockStateModelGenerator
+import net.minecraft.client.data.BlockStateModelGenerator.createBooleanModelMap
+import net.minecraft.client.data.ItemModelGenerator
+import net.minecraft.client.data.Model
+import net.minecraft.client.data.Models
+import net.minecraft.client.data.TextureKey
+import net.minecraft.client.data.TextureMap
+import net.minecraft.client.data.VariantsBlockStateSupplier
 import net.minecraft.state.property.Properties
 import net.minecraft.util.Identifier
 import java.util.Optional
@@ -48,7 +53,6 @@ object AdditionsDataGenerator : DataGeneratorEntrypoint {
 				// Generate models for registered blocks
 				generateStairModels()
 				generateSlabModels()
-				generateChainModels()
 				generateTrapdoorModels()
 				generateLanternModels()
 			}
@@ -74,25 +78,22 @@ object AdditionsDataGenerator : DataGeneratorEntrypoint {
         }
 
 		/**
-		 * Creates individual item models for slabs by referencing their block models.
+		 * Creates individual item models for blocks by referencing their block models.
+		 * This method ensures that item models are generated with the correct parent block model.
 		 */
 		private fun createItemModel(block: Block, generator: ItemModelGenerator?) {
-				val modelPath = buildParentPath(block)
-				val modelJson = createItemModelJson(modelPath)
+			generator?.let {
+				// Build the parent path for the item model
+				val parentPath = buildParentPath(block)
 
-				generator?.writer?.accept(
-					ModelIds.getItemModelId(block.asItem()),
-					Supplier { modelJson }
+				// Create a Model with the parent path
+				val model = Model(
+					Optional.of(Identifier.of(parentPath)),
+					Optional.empty()
 				)
-		}
 
-		/**
-		 * Processes all registered chains.
-		 */
-		private fun BlockStateModelGenerator?.generateChainModels() {
-			BlockRegistry.registeredChains.forEach { chain ->
-				// TODO: Implement chain registration
-				// this?.registerSimpleCubeAll(chain)
+				// Upload the model and register it
+				it.register(block.asItem(), model)
 			}
 		}
 
