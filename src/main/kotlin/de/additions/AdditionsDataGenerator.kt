@@ -2,6 +2,7 @@ package de.additions
 
 import com.google.common.base.Supplier
 import com.google.gson.JsonObject
+import de.additions.Additions.MODID
 import de.additions.blocks.BlockRegistry
 import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator
@@ -10,7 +11,10 @@ import net.fabricmc.fabric.api.datagen.v1.provider.FabricModelProvider
 import net.minecraft.block.Block
 import net.minecraft.block.Blocks
 import net.minecraft.data.client.*
+import net.minecraft.data.client.BlockStateModelGenerator.createBooleanModelMap
+import net.minecraft.state.property.Properties
 import net.minecraft.util.Identifier
+import java.util.Optional
 import kotlin.apply
 
 /**
@@ -42,11 +46,11 @@ object AdditionsDataGenerator : DataGeneratorEntrypoint {
 		override fun generateBlockStateModels(generator: BlockStateModelGenerator?) {
 			with(generator) {
 				// Generate models for registered blocks
-				generateLanternModels()
 				generateStairModels()
 				generateSlabModels()
 				generateChainModels()
 				generateTrapdoorModels()
+				generateLanternModels()
 			}
 		}
 
@@ -64,6 +68,9 @@ object AdditionsDataGenerator : DataGeneratorEntrypoint {
 			BlockRegistry.registeredTrapdoors.forEach { trapdoor ->
 				createItemModel(trapdoor, generator)
 			}
+			BlockRegistry.registeredLanterns.forEach { lantern ->
+				createItemModel(lantern, generator)
+			}
         }
 
 		/**
@@ -77,16 +84,6 @@ object AdditionsDataGenerator : DataGeneratorEntrypoint {
 					ModelIds.getItemModelId(block.asItem()),
 					Supplier { modelJson }
 				)
-		}
-
-		/**
-		 * Processes all registered lanterns.
-		 */
-		private fun BlockStateModelGenerator?.generateLanternModels() {
-			BlockRegistry.registeredLanterns.forEach { lantern ->
-				// TODO: Implement lantern registration
-				// this?.registerLantern(lantern)
-			}
 		}
 
 		/**
@@ -130,6 +127,20 @@ object AdditionsDataGenerator : DataGeneratorEntrypoint {
 					Blocks.MYCELIUM -> generateSlabModel(this, slab, parentBlock, bottom = Blocks.DIRT)
                     else -> generateSlabModel(this, slab, parentBlock)
                 }
+			}
+		}
+
+		/**
+		 * Processes all registered lanterns.
+		 */
+		private fun BlockStateModelGenerator?.generateLanternModels() {
+			BlockRegistry.registeredLanterns.forEachIndexed { index, lantern ->
+				val parentBlock = BlockRegistry.lanternVariantsParents[index]
+
+				when (parentBlock) {
+					in CUSTOM_MODEL_BLOCKS -> return@forEachIndexed
+					else -> generateLanternModel(this, lantern, parentBlock)
+				}
 			}
 		}
 
@@ -295,6 +306,48 @@ object AdditionsDataGenerator : DataGeneratorEntrypoint {
 				)
 			)
 		}
+		/**
+		 * Generates all necessary models and blockstates for a lantern variant.
+		 */
+		private fun generateLanternModel(
+			generator: BlockStateModelGenerator?,
+			lantern: Block,
+			parent: Block
+		) {
+			val textureMap = TextureMap().apply {
+				put(TextureKey.TEXTURE, Identifier.of("block/${getId(parent)}"))
+				put(TextureKey.PARTICLE, Identifier.of("block/lantern"))
+			}
+
+			val lanternModelStanding = Model(
+				Optional.of(Identifier.of("${MODID}:block/template_lantern_standing")),
+				Optional.empty(),
+				TextureKey.TEXTURE,
+				TextureKey.PARTICLE
+			).upload(
+				lantern,
+				"",
+				textureMap,
+				generator?.modelCollector
+			)
+			val lanternModelhanging = Model(
+				Optional.of(Identifier.of("${MODID}:block/template_lantern_hanging")),
+				Optional.empty(),
+				TextureKey.TEXTURE,
+				TextureKey.PARTICLE
+			).upload(
+				lantern,
+				"_hanging",
+				textureMap,
+				generator?.modelCollector
+			)
+
+			generator?.blockStateCollector?.accept(
+				VariantsBlockStateSupplier.create(lantern)
+					.coordinate(createBooleanModelMap(Properties.HANGING, lanternModelhanging, lanternModelStanding))
+			)
+		}
+
 
 		/**
 		 * Generates all necessary models and blockstates for a slab variant.

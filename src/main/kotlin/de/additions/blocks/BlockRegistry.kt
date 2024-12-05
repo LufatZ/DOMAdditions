@@ -176,18 +176,12 @@ object BlockRegistry {
         lanternVariantsParents.forEach { baseBlock ->
             val baseName = Registries.BLOCK.getId(baseBlock).path.replace("_block", "")
             val lanternSettings = AbstractBlock.Settings.copy(Blocks.LANTERN)
-            val chainSettings = AbstractBlock.Settings.copy(Blocks.CHAIN)
 
             logger.debug("Creating lantern and chain variants for base block: $baseName")
 
             // Laternen-Variante registrieren
             val lantern =register("${baseName}_lantern", LanternBlock(
                 lanternSettings.registryKey(keyOf("${baseName}_lantern"))
-            ))
-
-            // Ketten-Variante registrieren
-            val chain = register("${baseName}_chain", ChainBlock(
-                chainSettings.registryKey(keyOf("${baseName}_chain"))
             ))
 
             // Redstone-Varianten Logging
@@ -198,7 +192,6 @@ object BlockRegistry {
             }
 
             registeredLanterns.add(lantern)
-            registeredChains.add(chain)
         }
 
         logger.info("Lantern variant registration completed")
@@ -222,7 +215,6 @@ object BlockRegistry {
 
             registeredTrapdoors.add(trapdoor)
         }
-
         logger.info("Trapdoor variant registration completed")
     }
 }
