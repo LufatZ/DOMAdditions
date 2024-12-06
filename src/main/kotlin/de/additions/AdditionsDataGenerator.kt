@@ -22,30 +22,98 @@ import java.util.Optional
 import kotlin.apply
 
 /**
- * Main DataGenerator entry point for the Additions mod.
- * Handles the generation of block models, states, and textures.
+ * Comprehensive Data Generation System for the Additions Minecraft Mod
+ *
+ * Purpose:
+ * This object serves as the primary data generator for the Additions mod,
+ * responsible for automatically generating block models, item models,
+ * block states, and associated textures during the mod's build process.
+ *
+ * Key Responsibilities:
+ * - Automatically generate models for custom block variants (stairs, slabs, trapdoors, lanterns)
+ * - Create appropriate item models for registered blocks
+ * - Handle texture mapping for different block types
+ * - Support special cases for texture generation (e.g., blocks with side and top textures)
+ *
+ * Design Considerations:
+ * - Uses Fabric Mod's data generation API for seamless integration
+ * - Provides flexible texture and model generation for various block types
+ * - Supports custom block variant generation with parent block references
+ *
+ * @see BlockRegistry for registered block collections
+ * @see FabricDataGenerator for data generation framework
  */
 object AdditionsDataGenerator : DataGeneratorEntrypoint {
+	/**
+	 * Entry point for initializing the data generator.
+	 *
+	 * This method sets up the data generation process by creating a data pack
+	 * and adding the ModelGenerator as a provider.
+	 *
+	 * @param generator The Fabric data generator responsible for creating mod resources
+	 */
 	override fun onInitializeDataGenerator(generator: FabricDataGenerator) {
 		generator.createPack().apply {
+			// Add the custom ModelGenerator to handle model and texture generation
 			addProvider(::ModelGenerator)
 		}
 	}
 
 	/**
-	 * Main model generator class handling both block and item model generation.
+	 * Comprehensive Model Generation Class
+	 *
+	 * Handles the intricate process of generating models and textures for various block types.
+	 * Supports complex scenarios like different textures for block sides, special block variants,
+	 * and custom texture mappings.
+	 *
+	 * Key Features:
+	 * - Dynamic model generation for stairs, slabs, trapdoors, and lanterns
+	 * - Intelligent texture mapping based on parent block characteristics
+	 * - Flexible handling of block-specific model generation rules
+	 *
+	 * @param generator The FabricDataOutput used for generating mod resources
 	 */
 	private class ModelGenerator(generator: FabricDataOutput) : FabricModelProvider(generator) {
-		private val hasSideAndTop = listOf<Block>(Blocks.PODZOL, Blocks.MYCELIUM, Blocks.POLISHED_BASALT, Blocks.MUDDY_MANGROVE_ROOTS, Blocks.SMOOTH_RED_SANDSTONE,
-			Blocks.QUARTZ_BLOCK,Blocks.BASALT,Blocks.SMOOTH_SANDSTONE)
-		private val hasNoTexture = mapOf<Block, Block>(Blocks.SMOOTH_RED_SANDSTONE to Blocks.RED_SANDSTONE, Blocks.SMOOTH_QUARTZ to Blocks.QUARTZ_BLOCK,
-			Blocks.SMOOTH_SANDSTONE to Blocks.SANDSTONE)
+		/**
+		 * Configuration Lists for Special Block Texture Handling
+		 *
+		 * These lists and maps define special rules for texture generation for specific block types.
+		 * They help manage unique cases where block textures differ from standard generation methods.
+		 */
+		private val hasSideAndTop = listOf<Block>(
+			Blocks.PODZOL, Blocks.MYCELIUM, Blocks.POLISHED_BASALT,
+			Blocks.MUDDY_MANGROVE_ROOTS, Blocks.SMOOTH_RED_SANDSTONE,
+			Blocks.QUARTZ_BLOCK, Blocks.BASALT, Blocks.SMOOTH_SANDSTONE
+		)
+
+		/**
+		 * Mapping for blocks with alternative texture sources
+		 *
+		 * Used when a block's texture should be derived from another block,
+		 * typically for smoothed or processed variants.
+		 */
+		private val hasNoTexture = mapOf<Block, Block>(
+			Blocks.SMOOTH_RED_SANDSTONE to Blocks.RED_SANDSTONE,
+			Blocks.SMOOTH_QUARTZ to Blocks.QUARTZ_BLOCK,
+			Blocks.SMOOTH_SANDSTONE to Blocks.SANDSTONE
+		)
+
+		/**
+		 * Blocks to be excluded from standard texture generation
+		 */
 		private val removeBlock = listOf<Block>(Blocks.MAGMA_BLOCK)
+
+		/**
+		 * Blocks where bottom texture should match top texture
+		 */
 		private val bottomAllSide = listOf<Block>(Blocks.SMOOTH_QUARTZ)
 
 		companion object {
 			/**
-			 * List of blocks that have custom model generation logic and should be skipped
+			 * Special blocks that require completely custom model generation
+			 *
+			 * These blocks are skipped by the standard generation process
+			 * and would need manual model generation logic.
 			 */
 			private val CUSTOM_MODEL_BLOCKS = setOf(
 				Blocks.GRASS_BLOCK,
@@ -53,6 +121,17 @@ object AdditionsDataGenerator : DataGeneratorEntrypoint {
 			)
 		}
 
+		/**
+		 * Generates block state models for all registered block variants.
+		 *
+		 * Calls specific generation methods for different block types:
+		 * - Stairs
+		 * - Slabs
+		 * - Trapdoors
+		 * - Lanterns
+		 *
+		 * @param generator The BlockStateModelGenerator used for creating block state models
+		 */
 		override fun generateBlockStateModels(generator: BlockStateModelGenerator?) {
 			with(generator) {
 				// Generate models for registered blocks
@@ -64,27 +143,39 @@ object AdditionsDataGenerator : DataGeneratorEntrypoint {
 		}
 
 		/**
-		 * Generates item models for all registered slabs.
-		 * Creates a simple parent reference to the block model.
+		 * Generates item models for all registered block variants.
+		 *
+		 * Creates simple item models that reference their corresponding block models:
+		 * - Slabs
+		 * - Stairs
+		 * - Trapdoors
+		 * - Lanterns
+		 *
+		 * @param generator The ItemModelGenerator used for creating item models
 		 */
 		override fun generateItemModels(generator: ItemModelGenerator?) {
 			BlockRegistry.registeredSlabs.forEach { slab ->
 				createItemModel(slab, generator)
 			}
 			BlockRegistry.registeredStairs.forEach { stair ->
-                createItemModel(stair, generator)
-            }
+				createItemModel(stair, generator)
+			}
 			BlockRegistry.registeredTrapdoors.forEach { trapdoor ->
 				createItemModel(trapdoor, generator)
 			}
 			BlockRegistry.registeredLanterns.forEach { lantern ->
 				createItemModel(lantern, generator)
 			}
-        }
+		}
 
 		/**
-		 * Creates individual item models for blocks by referencing their block models.
-		 * This method ensures that item models are generated with the correct parent block model.
+		 * Creates an individual item model for a given block.
+		 *
+		 * Generates an item model that references the block's model with appropriate parent path.
+		 * Handles special cases like trapdoors that need a specific model suffix.
+		 *
+		 * @param block The block for which to create an item model
+		 * @param generator The ItemModelGenerator used for model creation
 		 */
 		private fun createItemModel(block: Block, generator: ItemModelGenerator?) {
 			generator?.let {
@@ -103,7 +194,10 @@ object AdditionsDataGenerator : DataGeneratorEntrypoint {
 		}
 
 		/**
-		 * Processes all registered stairs.
+		 * Processes and generates models for all registered stairs.
+		 *
+		 * Handles special cases for certain parent blocks like Podzol and Mycelium,
+		 * which require custom bottom texture handling.
 		 */
 		private fun BlockStateModelGenerator?.generateStairModels() {
 			BlockRegistry.registeredStairs.forEachIndexed { index, stair ->
@@ -119,23 +213,29 @@ object AdditionsDataGenerator : DataGeneratorEntrypoint {
 		}
 
 		/**
-		 * Processes all registered slabs with their parent blocks.
+		 * Processes and generates models for all registered slabs.
+		 *
+		 * Similar to stair generation, handles special cases for parent blocks
+		 * that require custom texture mapping.
 		 */
 		private fun BlockStateModelGenerator?.generateSlabModels() {
 			BlockRegistry.registeredSlabs.forEachIndexed { index, slab ->
 				val parentBlock = BlockRegistry.blockVariantsParents[index]
 
-                when (parentBlock) {
-                    in CUSTOM_MODEL_BLOCKS -> return@forEachIndexed
-                    Blocks.PODZOL -> generateSlabModel(this, slab, parentBlock, bottom = Blocks.DIRT)
+				when (parentBlock) {
+					in CUSTOM_MODEL_BLOCKS -> return@forEachIndexed
+					Blocks.PODZOL -> generateSlabModel(this, slab, parentBlock, bottom = Blocks.DIRT)
 					Blocks.MYCELIUM -> generateSlabModel(this, slab, parentBlock, bottom = Blocks.DIRT)
-                    else -> generateSlabModel(this, slab, parentBlock)
-                }
+					else -> generateSlabModel(this, slab, parentBlock)
+				}
 			}
 		}
 
 		/**
-		 * Processes all registered lanterns.
+		 * Processes and generates models for all registered lanterns.
+		 *
+		 * Creates standing and hanging variants for each registered lantern,
+		 * using the parent block's texture as a base.
 		 */
 		private fun BlockStateModelGenerator?.generateLanternModels() {
 			BlockRegistry.registeredLanterns.forEachIndexed { index, lantern ->
@@ -149,7 +249,10 @@ object AdditionsDataGenerator : DataGeneratorEntrypoint {
 		}
 
 		/**
-		 * Processes all registered trapdoors.
+		 * Processes and generates models for all registered trapdoors.
+		 *
+		 * Creates bottom, top, and open variants for each registered trapdoor,
+		 * using the parent block's texture.
 		 */
 		private fun BlockStateModelGenerator?.generateTrapdoorModels() {
 			BlockRegistry.registeredTrapdoors.forEachIndexed { index, trapdoor ->
@@ -163,7 +266,13 @@ object AdditionsDataGenerator : DataGeneratorEntrypoint {
 		}
 
 		/**
-		 * Extracts clean block ID without namespace and optionally removes "_block" suffix.
+		 * Extracts a clean block ID from a block's registry entry.
+		 *
+		 * Removes the namespace and optionally removes the "_block" suffix.
+		 *
+		 * @param block The block to extract ID from
+		 * @param removeBlock Whether to remove the "_block" suffix
+		 * @return Cleaned block identifier
 		 */
 		private fun getId(block: Block, removeBlock: Boolean = false): String =
 			block.defaultState.registryEntry.idAsString
@@ -171,11 +280,16 @@ object AdditionsDataGenerator : DataGeneratorEntrypoint {
 				.let { if (removeBlock) it.replace("_block", "") else it }
 
 		/**
-		 * Builds the full identifier for a block texture.
+		 * Builds a full texture identifier for a block.
+		 *
+		 * Supports generating identifiers with various suffixes like "_side", "_top", etc.
+		 *
 		 * @param block The source block
 		 * @param side Whether to append "_side" suffix
 		 * @param top Whether to append "_top" suffix
 		 * @param removeBlock Whether to remove "_block" from the identifier
+		 * @param bottom Whether to append "_bottom" suffix
+		 * @return Full texture identifier
 		 */
 		private fun getIdentifier(
 			block: Block,
@@ -192,7 +306,21 @@ object AdditionsDataGenerator : DataGeneratorEntrypoint {
 		}.let { Identifier.of(it) }
 
 		/**
-		 * Creates a TextureMap for a block with optional different textures for top, side, and bottom.
+		 * Creates a TextureMap for a block with flexible texture configuration.
+		 *
+		 * Supports complex texture mapping scenarios like:
+		 * - Different textures for top, side, and bottom
+		 * - Handling blocks with special texture rules
+		 *
+		 * @param parent The primary block for texture reference
+		 * @param top Block used for top texture (defaults to parent)
+		 * @param side Block used for side texture (defaults to parent)
+		 * @param bottom Block used for bottom texture (defaults to parent)
+		 * @param hasSideAndTop Whether the block has distinct side and top textures
+		 * @param removeBlock Whether to remove "_block" from texture paths
+		 * @param bottomSameAsTop Whether bottom texture should match top texture
+		 * @param textureKey Specific texture key to use (defaults to ALL)
+		 * @return Configured TextureMap for model generation
 		 */
 		private fun createTextureMap(
 			parent: Block,
@@ -204,7 +332,6 @@ object AdditionsDataGenerator : DataGeneratorEntrypoint {
 			bottomSameAsTop: Boolean = false,
 			textureKey: TextureKey = TextureKey.ALL
 		): TextureMap = TextureMap().apply {
-
 			val topIdentifier = getIdentifier(
 				block = top,
 				top = hasSideAndTop,
@@ -234,6 +361,20 @@ object AdditionsDataGenerator : DataGeneratorEntrypoint {
 					put(TextureKey.BOTTOM, bottomIdentifier)
 				}
 			}
+		}
+
+		/**
+		 * Builds the parent path for item models.
+		 *
+		 * Handles special cases like adding a "_bottom" suffix for trapdoors.
+		 *
+		 * @param block The block for which to build the parent path
+		 * @return Full parent path for the item model
+		 */
+		private fun buildParentPath(block: Block): String {
+			val (namespace, path) = block.defaultState.registryEntry.idAsString.split(":")
+			val suffix = if (block in BlockRegistry.registeredTrapdoors) "_bottom" else ""
+			return "$namespace:block/${path}$suffix"
 		}
 
 		/**
@@ -422,15 +563,6 @@ object AdditionsDataGenerator : DataGeneratorEntrypoint {
 					fullBlockId
 				)
 			)
-		}
-
-		/**
-		 * Creates the parent path for item models.
-		 */
-		private fun buildParentPath(block: Block): String {
-			val (namespace, path) = block.defaultState.registryEntry.idAsString.split(":")
-			val suffix = if (block in BlockRegistry.registeredTrapdoors) "_bottom" else ""
-			return "$namespace:block/${path}$suffix"
 		}
 	}
 }
