@@ -1,6 +1,5 @@
 package de.additions
 
-import com.google.gson.JsonObject
 import de.additions.Additions.MODID
 import de.additions.blocks.BlockRegistry
 import net.fabricmc.fabric.api.client.datagen.v1.provider.FabricModelProvider
@@ -37,6 +36,12 @@ object AdditionsDataGenerator : DataGeneratorEntrypoint {
 	 * Main model generator class handling both block and item model generation.
 	 */
 	private class ModelGenerator(generator: FabricDataOutput) : FabricModelProvider(generator) {
+		private val hasSideAndTop = listOf<Block>(Blocks.PODZOL, Blocks.MYCELIUM, Blocks.POLISHED_BASALT, Blocks.MUDDY_MANGROVE_ROOTS, Blocks.SMOOTH_RED_SANDSTONE,
+			Blocks.QUARTZ_BLOCK,Blocks.BASALT,Blocks.SMOOTH_SANDSTONE)
+		private val hasNoTexture = mapOf<Block, Block>(Blocks.SMOOTH_RED_SANDSTONE to Blocks.RED_SANDSTONE, Blocks.SMOOTH_QUARTZ to Blocks.QUARTZ_BLOCK,
+			Blocks.SMOOTH_SANDSTONE to Blocks.SANDSTONE)
+		private val removeBlock = listOf<Block>(Blocks.MAGMA_BLOCK)
+		private val bottomAllSide = listOf<Block>(Blocks.SMOOTH_QUARTZ)
 
 		companion object {
 			/**
@@ -104,8 +109,6 @@ object AdditionsDataGenerator : DataGeneratorEntrypoint {
 			BlockRegistry.registeredStairs.forEachIndexed { index, stair ->
 				val parentBlock = BlockRegistry.blockVariantsParents[index]
 
-				// Skip custom model blocks
-				if (parentBlock in CUSTOM_MODEL_BLOCKS) return@forEachIndexed
 				when (parentBlock) {
 					in CUSTOM_MODEL_BLOCKS -> return@forEachIndexed
 					Blocks.PODZOL -> generateStairModel(this, stair, parentBlock, bottom = Blocks.DIRT)
@@ -178,12 +181,14 @@ object AdditionsDataGenerator : DataGeneratorEntrypoint {
 			block: Block,
 			side: Boolean = false,
 			top: Boolean = false,
-			removeBlock: Boolean = false
+			removeBlock: Boolean = false,
+			bottom: Boolean = false
 		): Identifier = buildString {
 			append("block/")
 			append(getId(block, removeBlock))
 			if (top) append("_top")
 			if (side) append("_side")
+			if (bottom) append("_bottom")
 		}.let { Identifier.of(it) }
 
 		/**
@@ -196,20 +201,38 @@ object AdditionsDataGenerator : DataGeneratorEntrypoint {
 			bottom: Block = parent,
 			hasSideAndTop: Boolean = false,
 			removeBlock: Boolean = false,
-			bottomSameAsTop: Boolean = false
+			bottomSameAsTop: Boolean = false,
+			textureKey: TextureKey = TextureKey.ALL
 		): TextureMap = TextureMap().apply {
-			if (!hasSideAndTop) {
-				put(TextureKey.TOP, getIdentifier(top,removeBlock=removeBlock))
-				put(TextureKey.SIDE, getIdentifier(side,removeBlock=removeBlock))
-			} else {
-				put(TextureKey.TOP, getIdentifier(top, top = true,removeBlock=removeBlock))
-				put(TextureKey.SIDE, getIdentifier(side, side = true,removeBlock=removeBlock))
-			}
-			if (bottomSameAsTop){
-				put(TextureKey.BOTTOM, getIdentifier(bottom, top = true, removeBlock = removeBlock))
-			}
-			else {
-				put(TextureKey.BOTTOM, getIdentifier(bottom, removeBlock = removeBlock))
+
+			val topIdentifier = getIdentifier(
+				block = top,
+				top = hasSideAndTop,
+				removeBlock = removeBlock,
+				bottom = parent in bottomAllSide
+			)
+
+			val sideIdentifier = getIdentifier(
+				block = side,
+				side = hasSideAndTop,
+				removeBlock = removeBlock
+			)
+
+			val bottomIdentifier = getIdentifier(
+				block = bottom,
+				top = bottomSameAsTop,
+				removeBlock = removeBlock
+			)
+
+			when (textureKey){
+				TextureKey.TEXTURE -> {
+					put(TextureKey.TEXTURE, topIdentifier)
+				}
+				else -> {
+					put(TextureKey.TOP, topIdentifier)
+					put(TextureKey.SIDE, sideIdentifier)
+					put(TextureKey.BOTTOM, bottomIdentifier)
+				}
 			}
 		}
 
@@ -229,8 +252,8 @@ object AdditionsDataGenerator : DataGeneratorEntrypoint {
 				top = top,
 				side = side,
 				bottom = bottom,
-				hasSideAndTop = parent in listOf<Block>(Blocks.PODZOL, Blocks.MYCELIUM, Blocks.POLISHED_BASALT, Blocks.MUDDY_MANGROVE_ROOTS),
-				removeBlock = parent == Blocks.MAGMA_BLOCK,
+				hasSideAndTop = parent in hasSideAndTop,
+				removeBlock = parent in removeBlock,
 				bottomSameAsTop = parent in listOf<Block>(Blocks.MUDDY_MANGROVE_ROOTS, Blocks.POLISHED_BASALT)
 			)
 
@@ -273,28 +296,32 @@ object AdditionsDataGenerator : DataGeneratorEntrypoint {
 			trapdoor: Block,
 			parent: Block
 		) {
-			val newTextureMap: TextureMap = TextureMap().apply {
-				put(TextureKey.TEXTURE, getIdentifier(parent))
-			}
+			val textureMap = createTextureMap(
+				parent = parent,
+				hasSideAndTop = parent in hasSideAndTop,
+				removeBlock = parent in removeBlock,
+				textureKey = TextureKey.TEXTURE,
+				top = (if (parent in hasNoTexture) hasNoTexture[parent] else parent)!!
+			)
 
 			val bottomModel = Models.TEMPLATE_TRAPDOOR_BOTTOM.upload(
 				trapdoor,
 				"",
-				newTextureMap,
+				textureMap,
 				generator?.modelCollector
 			)
 
 			val topModel = Models.TEMPLATE_TRAPDOOR_TOP.upload(
 				trapdoor,
 				"",
-				newTextureMap,
+				textureMap,
 				generator?.modelCollector
 			)
 
 			val openModel = Models.TEMPLATE_TRAPDOOR_OPEN.upload(
 				trapdoor,
 				"",
-				newTextureMap,
+				textureMap,
 				generator?.modelCollector
 			)
 
@@ -366,8 +393,8 @@ object AdditionsDataGenerator : DataGeneratorEntrypoint {
 				top = top,
 				side = side,
 				bottom = bottom,
-				hasSideAndTop = parent in listOf<Block>(Blocks.PODZOL, Blocks.MYCELIUM, Blocks.POLISHED_BASALT, Blocks.MUDDY_MANGROVE_ROOTS),
-				removeBlock = parent == Blocks.MAGMA_BLOCK,
+				hasSideAndTop = parent in hasSideAndTop,
+				removeBlock = parent in removeBlock,
 				bottomSameAsTop = parent in listOf<Block>(Blocks.MUDDY_MANGROVE_ROOTS, Blocks.POLISHED_BASALT)
 			)
 
@@ -405,14 +432,5 @@ object AdditionsDataGenerator : DataGeneratorEntrypoint {
 			val suffix = if (block in BlockRegistry.registeredTrapdoors) "_bottom" else ""
 			return "$namespace:block/${path}$suffix"
 		}
-
-
-		/**
-		 * Creates a JSON object for item models.
-		 */
-		private fun createItemModelJson(parentPath: String): JsonObject =
-			JsonObject().apply {
-				addProperty("parent", parentPath)
-			}
 	}
 }
