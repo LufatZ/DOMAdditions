@@ -1,5 +1,6 @@
 package de.additions.datagen
 
+import de.additions.Additions.logger
 import de.additions.blocks.BlockRegistry
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider
@@ -36,6 +37,10 @@ class BlockTagGenerator(
      * - Trapdoors (based on parent block type)
      * - Stairs and slabs (based on parent block type)
      *
+     * Note: Originally, there was an intention to directly use the original block tags
+     * of the parent blocks. However, due to implementation challenges, a custom
+     * approach using sound group characteristics was developed instead.
+     *
      * @param wrapper Registry wrapper providing block lookup capabilities
      */
     override fun configure(wrapper: RegistryWrapper.WrapperLookup) {
@@ -68,12 +73,71 @@ class BlockTagGenerator(
             val parentBlock = parentList[index]
 
             // Dynamically select mining tool based on parent block's sound group
-            val tagMethod = when (parentBlock.defaultState.soundGroup) {
-                BlockSoundGroup.WOOD -> ::mineableByAxe
-                BlockSoundGroup.GRASS -> ::mineableByShovel
-                BlockSoundGroup.ROOTED_DIRT -> ::mineableByShovel
+            val tagMethod = when(parentBlock.defaultState.soundGroup) {
+                // Stone-like groups (Pickaxe)
+                BlockSoundGroup.STONE -> ::mineableByPickaxe
+                BlockSoundGroup.BASALT -> ::mineableByPickaxe
+                BlockSoundGroup.DEEPSLATE -> ::mineableByPickaxe
+                BlockSoundGroup.DEEPSLATE_BRICKS -> ::mineableByPickaxe
+                BlockSoundGroup.DEEPSLATE_TILES -> ::mineableByPickaxe
+                BlockSoundGroup.POLISHED_DEEPSLATE -> ::mineableByPickaxe
+                BlockSoundGroup.TUFF -> ::mineableByPickaxe
+                BlockSoundGroup.POLISHED_TUFF -> ::mineableByPickaxe
+                BlockSoundGroup.TUFF_BRICKS -> ::mineableByPickaxe
+                BlockSoundGroup.NETHER_BRICKS -> ::mineableByPickaxe
                 BlockSoundGroup.AMETHYST_BLOCK -> ::mineableByPickaxe
+                BlockSoundGroup.DRIPSTONE_BLOCK -> ::mineableByPickaxe
+                BlockSoundGroup.COPPER -> ::mineableByPickaxe
+                BlockSoundGroup.METAL -> ::mineableByPickaxe
+                BlockSoundGroup.NETHERITE -> ::mineableByPickaxe
+                BlockSoundGroup.ANVIL -> ::mineableByPickaxe
+                BlockSoundGroup.LODESTONE -> ::mineableByPickaxe
+                BlockSoundGroup.CHAIN -> ::mineableByPickaxe
+                BlockSoundGroup.NETHER_ORE -> ::mineableByPickaxe
+                BlockSoundGroup.NETHERRACK -> ::mineableByPickaxe
+                BlockSoundGroup.SCULK -> ::mineableByPickaxe
+
+                // Wood-like groups (Axe)
+                BlockSoundGroup.WOOD -> ::mineableByAxe
+                BlockSoundGroup.MANGROVE_ROOTS -> ::mineableByAxe
+                BlockSoundGroup.CHERRY_WOOD -> ::mineableByAxe
+                BlockSoundGroup.BAMBOO_WOOD -> ::mineableByAxe
+                BlockSoundGroup.NETHER_WOOD -> ::mineableByAxe
+                BlockSoundGroup.AZALEA -> ::mineableByAxe
+                BlockSoundGroup.AZALEA_LEAVES -> ::mineableByAxe
+                BlockSoundGroup.CHERRY_LEAVES -> ::mineableByAxe
+                BlockSoundGroup.STEM -> ::mineableByAxe
+                BlockSoundGroup.HANGING_SIGN -> ::mineableByAxe
+                BlockSoundGroup.NETHER_WOOD_HANGING_SIGN -> ::mineableByAxe
+                BlockSoundGroup.CHERRY_WOOD_HANGING_SIGN -> ::mineableByAxe
+
+                // Dirt/Sand-like groups (Shovel)
+                BlockSoundGroup.GRASS -> ::mineableByShovel
+                BlockSoundGroup.MOSS_BLOCK -> ::mineableByShovel
+                BlockSoundGroup.MOSS_CARPET -> ::mineableByShovel
+                BlockSoundGroup.ROOTED_DIRT -> ::mineableByShovel
+                BlockSoundGroup.GRAVEL -> ::mineableByShovel
+                BlockSoundGroup.SAND -> ::mineableByShovel
+                BlockSoundGroup.MUD -> ::mineableByShovel
+                BlockSoundGroup.MUD_BRICKS -> ::mineableByShovel
+                BlockSoundGroup.PACKED_MUD -> ::mineableByShovel
+                BlockSoundGroup.SNOW -> ::mineableByShovel
+                BlockSoundGroup.SOUL_SAND -> ::mineableByShovel
+                BlockSoundGroup.SOUL_SOIL -> ::mineableByShovel
+                BlockSoundGroup.WET_GRASS -> ::mineableByShovel
+                BlockSoundGroup.MUDDY_MANGROVE_ROOTS -> ::mineableByAxe
+
                 else -> {
+                    logger.warn("""
+                    Unhandled Sound Group for Block Tagging
+                    =====================================
+                    Block: $block
+                    Parent Block: $parentBlock
+                   
+                    Recommendation: 
+                    - Update BlockTagGenerator to handle this specific sound group
+                    - Add a new case in the when statement for this block type
+                """)
                     defaultTag
                 }
             }
