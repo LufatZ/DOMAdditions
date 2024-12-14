@@ -1,6 +1,7 @@
 package de.additions
 
 import de.additions.blocks.BlockRegistry
+import de.additions.datagen.AdditionsRecipeGenerator
 import de.additions.datagen.BlockTagGenerator
 import de.additions.datagen.LootGenerator
 import de.additions.datagen.ModelGenerator
@@ -45,7 +46,10 @@ object AdditionsDataGenerator : DataGeneratorEntrypoint {
 			addProvider(::ModelGenerator)
 			// Add the custom LootGenerator to handle loot table generation
 			addProvider(::LootGenerator)
+			// Add the custom BlockTagGenerator to handle block tag generation (e.g. mine able by...)
 			addProvider(::BlockTagGenerator)
+			// Add the custom RecipeGenerator to handle recipe generation for crafting
+			addProvider(::AdditionsRecipeGenerator)
 		}
 	}
 }

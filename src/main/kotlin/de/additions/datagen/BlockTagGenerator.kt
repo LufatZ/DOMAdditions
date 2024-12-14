@@ -125,7 +125,7 @@ class BlockTagGenerator(
                 BlockSoundGroup.SOUL_SAND -> ::mineableByShovel
                 BlockSoundGroup.SOUL_SOIL -> ::mineableByShovel
                 BlockSoundGroup.WET_GRASS -> ::mineableByShovel
-                BlockSoundGroup.MUDDY_MANGROVE_ROOTS -> ::mineableByAxe
+                BlockSoundGroup.MUDDY_MANGROVE_ROOTS -> ::mineableByShovel
 
                 else -> {
                     logger.warn("""
