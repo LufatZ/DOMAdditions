@@ -1,32 +1,30 @@
 {
 	"parent": "block/block",
 	"textures": {
-		"texture": "#placeholder_texture",
-		"particle": "#placeholder_texture",
-		"lantern": "minecraft:block/lantern"
+		"particle": "#particle"
 	},
 	"elements": [
 		{
 			"from": [5, 1, 5],
 			"to": [11, 6, 11],
 			"faces": {
-				"north": {"uv": [0, 3, 6, 8], "texture": "#lantern"},
-				"east": {"uv": [0, 3, 6, 8], "texture": "#lantern"},
-				"south": {"uv": [0, 3, 6, 8], "texture": "#lantern"},
-				"west": {"uv": [0, 3, 6, 8], "texture": "#lantern"},
-				"up": {"uv": [0, 9, 6, 15], "texture": "#missing"},
-				"down": {"uv": [0, 9, 6, 15], "texture": "#missing", "cullface": "down"}
+				"north": {"uv": [0, 3, 6, 8], "texture": "#particle"},
+				"east": {"uv": [0, 3, 6, 8], "texture": "#particle"},
+				"south": {"uv": [0, 3, 6, 8], "texture": "#particle"},
+				"west": {"uv": [0, 3, 6, 8], "texture": "#particle"},
+				"up": {"uv": [0, 9, 6, 15], "texture": "#particle"},
+				"down": {"uv": [0, 9, 6, 15], "texture": "#particle", "cullface": "down"}
 			}
 		},
 		{
 			"from": [6, 7, 6],
 			"to": [10, 8, 10],
 			"faces": {
-				"north": {"uv": [1, 1, 5, 2], "texture": "#lantern"},
-				"east": {"uv": [1, 1, 5, 2], "texture": "#lantern"},
-				"south": {"uv": [1, 1, 5, 2], "texture": "#lantern"},
-				"west": {"uv": [1, 1, 5, 2], "texture": "#lantern"},
-				"up": {"uv": [1, 10, 5, 14], "texture": "#missing"}
+				"north": {"uv": [1, 1, 5, 2], "texture": "#particle"},
+				"east": {"uv": [1, 1, 5, 2], "texture": "#particle"},
+				"south": {"uv": [1, 1, 5, 2], "texture": "#particle"},
+				"west": {"uv": [1, 1, 5, 2], "texture": "#particle"},
+				"up": {"uv": [1, 10, 5, 14], "texture": "#particle"}
 			}
 		},
 		{
@@ -35,8 +33,8 @@
 			"shade": false,
 			"rotation": {"angle": 45, "axis": "y", "origin": [8, 8, 8]},
 			"faces": {
-				"north": {"uv": [14, 1, 11, 3], "texture": "#lantern"},
-				"south": {"uv": [11, 1, 14, 3], "texture": "#lantern"}
+				"north": {"uv": [14, 1, 11, 3], "texture": "#particle"},
+				"south": {"uv": [11, 1, 14, 3], "texture": "#particle"}
 			}
 		},
 		{
@@ -45,8 +43,8 @@
 			"shade": false,
 			"rotation": {"angle": 45, "axis": "y", "origin": [8, 8, 8]},
 			"faces": {
-				"east": {"uv": [11, 10, 14, 12], "texture": "#lantern"},
-				"west": {"uv": [14, 10, 11, 12], "texture": "#lantern"}
+				"east": {"uv": [11, 10, 14, 12], "texture": "#particle"},
+				"west": {"uv": [14, 10, 11, 12], "texture": "#particle"}
 			}
 		},
 		{

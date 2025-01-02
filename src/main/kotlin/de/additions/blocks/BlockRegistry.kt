@@ -27,6 +27,8 @@ object BlockRegistry {
     val registeredLanterns: MutableList<Block> = mutableListOf()
     val registeredTrapdoors: MutableList<Block> = mutableListOf()
     val registeredChains: MutableList<Block> = mutableListOf()
+    val registeredGrassBlocks: MutableList<Block> = mutableListOf()
+    val registeredDirtBlockVariants: MutableList<Block> = mutableListOf()
 
 
     // Listen der Basis-Blöcke für Varianten
@@ -98,8 +100,15 @@ object BlockRegistry {
     private inline fun <reified T> keyOf(
         id: String,
         vanilla: Boolean = true,
-        type: RegistryKey<Registry<T>> = RegistryKeys.BLOCK as RegistryKey<Registry<T>>
+        type: RegistryKey<Registry<T>>? = null
     ): RegistryKey<T> {
+        @Suppress("UNCHECKED_CAST")
+        val resolvedType = type ?: when (T::class) {
+            Block::class -> RegistryKeys.BLOCK as RegistryKey<Registry<T>>
+            Item::class -> RegistryKeys.ITEM as RegistryKey<Registry<T>>
+            else -> throw IllegalArgumentException("Unsupported type: ${T::class}")
+        }
+
         val identifier = if (vanilla) {
             logger.debug("Creating Vanilla registry key for: $id")
             Identifier.ofVanilla(id)
@@ -108,7 +117,7 @@ object BlockRegistry {
             Identifier.of(MODID, id)
         }
 
-        return RegistryKey.of(type, identifier)
+        return RegistryKey.of(resolvedType, identifier)
     }
 
     /**
@@ -143,23 +152,39 @@ object BlockRegistry {
         logger.info("Starting block variant registration")
 
         // Varianten für jeden Basis-Block erstellen
-        blockVariantsParents.forEach { baseBlock ->
-            val baseName = Registries.BLOCK.getId(baseBlock).path.replace("_block", "")
-            val settings = AbstractBlock.Settings.copy(baseBlock)
+        blockVariantsParents.forEach { parent ->
+            val baseName = Registries.BLOCK.getId(parent).path.replace("_block", "")
+            val settings = AbstractBlock.Settings.copy(parent)
 
             logger.debug("Creating variants for base block: $baseName")
 
             // Platten-Variante registrieren
-            val slab = register("${baseName}_slab", SlabBlock(
-                settings.registryKey(keyOf("${baseName}_slab"))
-            ))
+            val slab = when(parent) {
+                is GrassBlock -> {
+                    register("${baseName}_slab", SnowySlabBlock(
+                        settings.registryKey(keyOf("${baseName}_slab"))
+                    )).also { registeredGrassBlocks.add(it) }
+                }
+                else -> {
+                    register("${baseName}_slab", SlabBlock(
+                        settings.registryKey(keyOf("${baseName}_slab"))
+                    )).also { if (parent == Blocks.DIRT) registeredDirtBlockVariants.add(it) }
+                }
+            }
 
             // Treppen-Variante registrieren
-            val stair = register("${baseName}_stairs", StairsBlock(
-                baseBlock.defaultState,
-                settings.registryKey(keyOf("${baseName}_stairs"))
-            ))
+            val stair = when(parent){
+                is GrassBlock -> register("${baseName}_stairs", SnowyStairsBlock(
+                    parent.defaultState,
+                    settings.registryKey(keyOf("${baseName}_stairs"))
+                )).also { registeredGrassBlocks.add(it) }
 
+                else -> register("${baseName}_stairs", StairsBlock(
+                    parent.defaultState,
+                    settings.registryKey(keyOf("${baseName}_stairs"))
+                )).also { if (parent == Blocks.DIRT) registeredDirtBlockVariants.add(it) }
+
+            }
             registeredStairs.add(stair)
             registeredSlabs.add(slab)
         }

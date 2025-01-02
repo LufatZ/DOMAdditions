@@ -6,16 +6,29 @@ import net.fabricmc.fabric.api.client.datagen.v1.provider.FabricModelProvider
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.minecraft.block.Block
 import net.minecraft.block.Blocks
+import net.minecraft.block.GrassBlock
+import net.minecraft.block.SnowBlock
+import net.minecraft.block.enums.BlockHalf
+import net.minecraft.block.enums.SlabType
+import net.minecraft.block.enums.StairShape
 import net.minecraft.client.data.BlockStateModelGenerator
 import net.minecraft.client.data.BlockStateModelGenerator.createBooleanModelMap
+import net.minecraft.client.data.BlockStateModelGenerator.createStairsBlockState
+import net.minecraft.client.data.BlockStateSupplier
+import net.minecraft.client.data.BlockStateVariant
+import net.minecraft.client.data.BlockStateVariantMap
 import net.minecraft.client.data.ItemModelGenerator
+import net.minecraft.client.data.ItemModels
 import net.minecraft.client.data.Model
 import net.minecraft.client.data.Models
 import net.minecraft.client.data.TextureKey
 import net.minecraft.client.data.TextureMap
+import net.minecraft.client.data.VariantSettings
 import net.minecraft.client.data.VariantsBlockStateSupplier
+import net.minecraft.client.render.item.tint.TintSource
 import net.minecraft.state.property.Properties
 import net.minecraft.util.Identifier
+import net.minecraft.util.math.Direction
 import java.util.Optional
 
 /**
@@ -42,7 +55,8 @@ class ModelGenerator(generator: FabricDataOutput) : FabricModelProvider(generato
     private val hasSideAndTop = listOf<Block>(
         Blocks.PODZOL, Blocks.MYCELIUM, Blocks.POLISHED_BASALT,
         Blocks.MUDDY_MANGROVE_ROOTS, Blocks.SMOOTH_RED_SANDSTONE,
-        Blocks.QUARTZ_BLOCK, Blocks.BASALT, Blocks.SMOOTH_SANDSTONE
+        Blocks.QUARTZ_BLOCK, Blocks.BASALT, Blocks.SMOOTH_SANDSTONE,
+        Blocks.DIRT_PATH, Blocks.GRASS_BLOCK
     )
 
     /**
@@ -58,7 +72,7 @@ class ModelGenerator(generator: FabricDataOutput) : FabricModelProvider(generato
     )
 
     /**
-     * Blocks to be excluded from standard texture generation
+     * Blocks where "_block" should be removed
      */
     private val removeBlock = listOf<Block>(Blocks.MAGMA_BLOCK)
 
@@ -66,19 +80,6 @@ class ModelGenerator(generator: FabricDataOutput) : FabricModelProvider(generato
      * Blocks where bottom texture should match top texture
      */
     private val bottomAllSide = listOf<Block>(Blocks.SMOOTH_QUARTZ)
-
-    companion object {
-        /**
-         * Special blocks that require completely custom model generation
-         *
-         * These blocks are skipped by the standard generation process
-         * and would need manual model generation logic.
-         */
-        private val CUSTOM_MODEL_BLOCKS = setOf(
-            Blocks.GRASS_BLOCK,
-            Blocks.DIRT_PATH
-        )
-    }
 
     /**
      * Generates block state models for all registered block variants.
@@ -101,54 +102,31 @@ class ModelGenerator(generator: FabricDataOutput) : FabricModelProvider(generato
         }
     }
 
-    /**
-     * Generates item models for all registered block variants.
-     *
-     * Creates simple item models that reference their corresponding block models:
-     * - Slabs
-     * - Stairs
-     * - Trapdoors
-     * - Lanterns
-     *
-     * @param generator The ItemModelGenerator used for creating item models
-     */
-    override fun generateItemModels(generator: ItemModelGenerator?) {
-        BlockRegistry.registeredSlabs.forEach { slab ->
-            createItemModel(slab, generator)
-        }
-        BlockRegistry.registeredStairs.forEach { stair ->
-            createItemModel(stair, generator)
-        }
-        BlockRegistry.registeredTrapdoors.forEach { trapdoor ->
-            createItemModel(trapdoor, generator)
-        }
-        BlockRegistry.registeredLanterns.forEach { lantern ->
-            createItemModel(lantern, generator)
-        }
+    override fun generateItemModels(itemModelGenerator: ItemModelGenerator?) {
+        //actually not needed
     }
 
     /**
-     * Creates an individual item model for a given block.
+     * Generates an item model for the given block.
+     * Depending on the type of the parent block, the item model may be tinted.
      *
-     * Generates an item model that references the block's model with appropriate parent path.
-     * Handles special cases like trapdoors that need a specific model suffix.
-     *
-     * @param block The block for which to create an item model
-     * @param generator The ItemModelGenerator used for model creation
+     * @param block The block for which the item model is to be generated.
+     * @param parentBlock The parent block (e.g., if `block` is a DirtSlab, the `parentBlock` is Dirt).
+     *                    Determines whether the model should be tinted.
+     * @param model The identifier of the model to associate with the item.
+     * @param generator The BlockStateModelGenerator responsible for registering block state models.
+     *                  If null, no model will be registered.
      */
-    private fun createItemModel(block: Block, generator: ItemModelGenerator?) {
-        generator?.let {
-            // Build the parent path for the item model
-            val parentPath = buildParentPath(block)
-
-            // Create a Model with the parent path
-            val model = Model(
-                Optional.of(Identifier.of(parentPath)),
-                Optional.empty()
-            )
-
-            // Upload the model and register it
-            it.register(block.asItem(), model)
+    private fun generateBlockItemModel(
+        block: Block,
+        parentBlock: Block,
+        model: Identifier,
+        generator: BlockStateModelGenerator?
+    ) {
+        val grassColor: TintSource = ItemModels.constantTintSource(0x91BD59)
+        when (parentBlock) {
+            is GrassBlock -> generator?.registerTintedItemModel(block, model, grassColor)
+            else -> generator?.registerParentedItemModel(block, model)
         }
     }
 
@@ -163,9 +141,10 @@ class ModelGenerator(generator: FabricDataOutput) : FabricModelProvider(generato
             val parentBlock = BlockRegistry.blockVariantsParents[index]
 
             when (parentBlock) {
-                in CUSTOM_MODEL_BLOCKS -> return@forEachIndexed
                 Blocks.PODZOL -> generateStairModel(this, stair, parentBlock, bottom = Blocks.DIRT)
                 Blocks.MYCELIUM -> generateStairModel(this, stair, parentBlock, bottom = Blocks.DIRT)
+                Blocks.DIRT_PATH -> generateStairModel(this, stair, parentBlock, bottom = Blocks.DIRT)
+                Blocks.GRASS_BLOCK -> generateStairModel(this, stair, parentBlock, bottom = Blocks.DIRT)
                 else -> generateStairModel(this, stair, parentBlock)
             }
         }
@@ -182,9 +161,10 @@ class ModelGenerator(generator: FabricDataOutput) : FabricModelProvider(generato
             val parentBlock = BlockRegistry.blockVariantsParents[index]
 
             when (parentBlock) {
-                in CUSTOM_MODEL_BLOCKS -> return@forEachIndexed
                 Blocks.PODZOL -> generateSlabModel(this, slab, parentBlock, bottom = Blocks.DIRT)
                 Blocks.MYCELIUM -> generateSlabModel(this, slab, parentBlock, bottom = Blocks.DIRT)
+                Blocks.DIRT_PATH -> generateSlabModel(this, slab, parentBlock, bottom = Blocks.DIRT)
+                Blocks.GRASS_BLOCK -> generateSlabModel(this, slab, parentBlock, bottom = Blocks.DIRT)
                 else -> generateSlabModel(this, slab, parentBlock)
             }
         }
@@ -201,7 +181,6 @@ class ModelGenerator(generator: FabricDataOutput) : FabricModelProvider(generato
             val parentBlock = BlockRegistry.lanternVariantsParents[index]
 
             when (parentBlock) {
-                in CUSTOM_MODEL_BLOCKS -> return@forEachIndexed
                 else -> generateLanternModel(this, lantern, parentBlock)
             }
         }
@@ -218,7 +197,6 @@ class ModelGenerator(generator: FabricDataOutput) : FabricModelProvider(generato
             val parentBlock = BlockRegistry.trapdoorVariantsParents[index]
 
             when (parentBlock) {
-                in CUSTOM_MODEL_BLOCKS -> return@forEachIndexed
                 else -> generateTrapdoorModel(this, trapdoor, parentBlock)
             }
         }
@@ -233,7 +211,7 @@ class ModelGenerator(generator: FabricDataOutput) : FabricModelProvider(generato
      * @param removeBlock Whether to remove the "_block" suffix
      * @return Cleaned block identifier
      */
-    private fun getId(block: Block, removeBlock: Boolean = false): String =
+    private fun extractCleanBlockIdentifier(block: Block, removeBlock: Boolean = false): String =
         block.defaultState.registryEntry.idAsString
             .replace("minecraft:", "")
             .let { if (removeBlock) it.replace("_block", "") else it }
@@ -250,18 +228,22 @@ class ModelGenerator(generator: FabricDataOutput) : FabricModelProvider(generato
      * @param bottom Whether to append "_bottom" suffix
      * @return Full texture identifier
      */
-    private fun getIdentifier(
+    private fun buildTextureIdentifier(
         block: Block,
         side: Boolean = false,
         top: Boolean = false,
         removeBlock: Boolean = false,
-        bottom: Boolean = false
+        bottom: Boolean = false,
+        overlay: Boolean = false,
+        snow: Boolean = false
     ): Identifier = buildString {
         append("block/")
-        append(getId(block, removeBlock))
+        append(extractCleanBlockIdentifier(block, removeBlock))
         if (top) append("_top")
         if (side) append("_side")
         if (bottom) append("_bottom")
+        if (overlay) append("_overlay")
+        if (snow) append("_snow")
     }.let { Identifier.of(it) }
 
     /**
@@ -281,7 +263,7 @@ class ModelGenerator(generator: FabricDataOutput) : FabricModelProvider(generato
      * @param textureKey Specific texture key to use (defaults to ALL)
      * @return Configured TextureMap for model generation
      */
-    private fun createTextureMap(
+    private fun configureBlockTextureMapping(
         parent: Block,
         top: Block = parent,
         side: Block = parent,
@@ -289,51 +271,52 @@ class ModelGenerator(generator: FabricDataOutput) : FabricModelProvider(generato
         hasSideAndTop: Boolean = false,
         removeBlock: Boolean = false,
         bottomSameAsTop: Boolean = false,
-        textureKey: TextureKey = TextureKey.ALL
+        textureKey: String = "default"
     ): TextureMap = TextureMap().apply {
-        val topIdentifier = getIdentifier(
+        val topIdentifier = buildTextureIdentifier(
             block = top,
-            top = hasSideAndTop,
+            top = hasSideAndTop && top !is SnowBlock,
             removeBlock = removeBlock,
             bottom = parent in bottomAllSide
         )
 
-        val sideIdentifier = getIdentifier(
+        val sideIdentifier = buildTextureIdentifier(
             block = side,
-            side = hasSideAndTop,
-            removeBlock = removeBlock
+            side = hasSideAndTop && top !is SnowBlock,
+            removeBlock = removeBlock,
+            snow = top is SnowBlock && parent !is SnowBlock
         )
 
-        val bottomIdentifier = getIdentifier(
+        val bottomIdentifier = buildTextureIdentifier(
             block = bottom,
             top = bottomSameAsTop,
             removeBlock = removeBlock
         )
 
-        when (textureKey){
-            TextureKey.TEXTURE -> {
+        val overlayIdentifier = buildTextureIdentifier(
+            block = parent,
+            side = hasSideAndTop,
+            overlay = true
+        )
+
+        when (textureKey) {
+            "texture" -> {
                 put(TextureKey.TEXTURE, topIdentifier)
             }
+
+            "overlay" -> {
+                put(TextureKey.TOP, topIdentifier)
+                put(TextureKey.SIDE, sideIdentifier)
+                put(TextureKey.BOTTOM, bottomIdentifier)
+                put(TextureKey.LAYER0, overlayIdentifier)
+            }
+
             else -> {
                 put(TextureKey.TOP, topIdentifier)
                 put(TextureKey.SIDE, sideIdentifier)
                 put(TextureKey.BOTTOM, bottomIdentifier)
             }
         }
-    }
-
-    /**
-     * Builds the parent path for item models.
-     *
-     * Handles special cases like adding a "_bottom" suffix for trapdoors.
-     *
-     * @param block The block for which to build the parent path
-     * @return Full parent path for the item model
-     */
-    private fun buildParentPath(block: Block): String {
-        val (namespace, path) = block.defaultState.registryEntry.idAsString.split(":")
-        val suffix = if (block in BlockRegistry.registeredTrapdoors) "_bottom" else ""
-        return "$namespace:block/${path}$suffix"
     }
 
     /**
@@ -347,60 +330,222 @@ class ModelGenerator(generator: FabricDataOutput) : FabricModelProvider(generato
         side: Block = parent,
         bottom: Block = parent
     ) {
-        val textureMap = createTextureMap(
+        val textureMap = configureBlockTextureMapping(
             parent = parent,
             top = top,
             side = side,
             bottom = bottom,
             hasSideAndTop = parent in hasSideAndTop,
             removeBlock = parent in removeBlock,
-            bottomSameAsTop = parent in listOf<Block>(Blocks.MUDDY_MANGROVE_ROOTS, Blocks.POLISHED_BASALT)
+            bottomSameAsTop = parent in listOf<Block>(Blocks.MUDDY_MANGROVE_ROOTS, Blocks.POLISHED_BASALT),
+            textureKey = if (parent is GrassBlock) "overlay" else ""
         )
 
-        val innerModel = Models.STAIRS.upload(
-            stair,
-            "",
-            textureMap,
-            generator?.modelCollector
+        val snowyTextureMap = configureBlockTextureMapping(
+            parent = parent,
+            top = Blocks.SNOW,
+            side = side,
+            bottom = bottom,
+            hasSideAndTop = parent in hasSideAndTop,
+            removeBlock = parent in removeBlock,
+            bottomSameAsTop = parent in listOf<Block>(Blocks.MUDDY_MANGROVE_ROOTS, Blocks.POLISHED_BASALT),
+            textureKey = ""
         )
 
-        val outerModel = Models.OUTER_STAIRS.upload(
-            stair,
-            "",
-            textureMap,
-            generator?.modelCollector
-        )
+        // Regular models
+        val defaultModel = when (parent) {
+            is GrassBlock -> Model(
+                Optional.of(Identifier.of("${MODID}:block/template_grass_stair")),
+                Optional.empty(),
+                TextureKey.TOP,
+                TextureKey.SIDE,
+                TextureKey.BOTTOM,
+                TextureKey.LAYER0
+            ).upload(stair, "", textureMap, generator?.modelCollector)
 
-        val straightModel = Models.INNER_STAIRS.upload(
-            stair,
-            "",
-            textureMap,
-            generator?.modelCollector
-        )
+            else -> Models.STAIRS.upload(stair, "", textureMap, generator?.modelCollector)
+        }
+
+        val defaultModelRotated = when (parent) {
+            is GrassBlock -> Model(
+                Optional.of(Identifier.of("${MODID}:block/template_grass_stair_rotated")),
+                Optional.empty(),
+                TextureKey.TOP,
+                TextureKey.SIDE,
+                TextureKey.BOTTOM,
+                TextureKey.LAYER0
+            ).upload(stair, "_rotated", textureMap, generator?.modelCollector)
+
+            else -> Models.STAIRS.upload(stair, "_rotated", textureMap, generator?.modelCollector)
+        }
+
+        val outerModel = when (parent) {
+            is GrassBlock -> Model(
+                Optional.of(Identifier.of("${MODID}:block/template_grass_stair_outer")),
+                Optional.empty(),
+                TextureKey.TOP,
+                TextureKey.SIDE,
+                TextureKey.BOTTOM,
+                TextureKey.LAYER0
+            ).upload(stair, "_outer", textureMap, generator?.modelCollector)
+
+            else -> Models.OUTER_STAIRS.upload(stair, "", textureMap, generator?.modelCollector)
+        }
+
+        val outerModelRotated = when (parent) {
+            is GrassBlock -> Model(
+                Optional.of(Identifier.of("${MODID}:block/template_grass_stair_outer_rotated")),
+                Optional.empty(),
+                TextureKey.TOP,
+                TextureKey.SIDE,
+                TextureKey.BOTTOM,
+                TextureKey.LAYER0
+            ).upload(stair, "_outer_rotated", textureMap, generator?.modelCollector)
+
+            else -> Models.OUTER_STAIRS.upload(stair, "_rotated", textureMap, generator?.modelCollector)
+        }
+
+        val innerModel = when (parent) {
+            is GrassBlock -> Model(
+                Optional.of(Identifier.of("${MODID}:block/template_grass_stair_inner")),
+                Optional.empty(),
+                TextureKey.TOP,
+                TextureKey.SIDE,
+                TextureKey.BOTTOM,
+                TextureKey.LAYER0
+            ).upload(stair, "_inner", textureMap, generator?.modelCollector)
+
+            else -> Models.INNER_STAIRS.upload(stair, "", textureMap, generator?.modelCollector)
+        }
+
+        val innerModelRotated = when (parent) {
+            is GrassBlock -> Model(
+                Optional.of(Identifier.of("${MODID}:block/template_grass_stair_inner_rotated")),
+                Optional.empty(),
+                TextureKey.TOP,
+                TextureKey.SIDE,
+                TextureKey.BOTTOM,
+                TextureKey.LAYER0
+            ).upload(stair, "_inner_rotated", textureMap, generator?.modelCollector)
+
+            else -> Models.INNER_STAIRS.upload(stair, "_rotated", textureMap, generator?.modelCollector)
+        }
+
+        // Snowy models for grass blocks
+        val snowyDefaultModel = when (parent) {
+            is GrassBlock -> Model(
+                Optional.of(Identifier.of("${MODID}:block/template_grass_stair_snowy")),
+                Optional.empty(),
+                TextureKey.TOP,
+                TextureKey.SIDE,
+                TextureKey.BOTTOM
+            ).upload(stair, "_snowy", snowyTextureMap, generator?.modelCollector)
+
+            else -> null
+        }
+
+        val snowyDefaultModelRotated = when (parent) {
+            is GrassBlock -> Model(
+                Optional.of(Identifier.of("${MODID}:block/template_grass_stair_snowy_rotated")),
+                Optional.empty(),
+                TextureKey.TOP,
+                TextureKey.SIDE,
+                TextureKey.BOTTOM
+            ).upload(stair, "_snowy_rotated", snowyTextureMap, generator?.modelCollector)
+
+            else -> null
+        }
+
+        val snowyOuterModel = when (parent) {
+            is GrassBlock -> Model(
+                Optional.of(Identifier.of("${MODID}:block/template_grass_stair_outer_snowy")),
+                Optional.empty(),
+                TextureKey.TOP,
+                TextureKey.SIDE,
+                TextureKey.BOTTOM
+            ).upload(stair, "_snowy_outer", snowyTextureMap, generator?.modelCollector)
+
+            else -> null
+        }
+
+        val snowyOuterModelRotated = when (parent) {
+            is GrassBlock -> Model(
+                Optional.of(Identifier.of("${MODID}:block/template_grass_stair_outer_snowy_rotated")),
+                Optional.empty(),
+                TextureKey.TOP,
+                TextureKey.SIDE,
+                TextureKey.BOTTOM
+            ).upload(stair, "_snowy_outer_rotated", snowyTextureMap, generator?.modelCollector)
+
+            else -> null
+        }
+
+        val snowyInnerModel = when (parent) {
+            is GrassBlock -> Model(
+                Optional.of(Identifier.of("${MODID}:block/template_grass_stair_inner_snowy")),
+                Optional.empty(),
+                TextureKey.TOP,
+                TextureKey.SIDE,
+                TextureKey.BOTTOM
+            ).upload(stair, "_snowy_inner", snowyTextureMap, generator?.modelCollector)
+
+            else -> null
+        }
+
+        val snowyInnerModelRotated = when (parent) {
+            is GrassBlock -> Model(
+                Optional.of(Identifier.of("${MODID}:block/template_grass_stair_inner_snowy_rotated")),
+                Optional.empty(),
+                TextureKey.TOP,
+                TextureKey.SIDE,
+                TextureKey.BOTTOM
+            ).upload(stair, "_snowy_inner_rotated", snowyTextureMap, generator?.modelCollector)
+
+            else -> null
+        }
+
+        generateBlockItemModel(stair, parent, defaultModel, generator)
 
         generator?.blockStateCollector?.accept(
-            BlockStateModelGenerator.createStairsBlockState(
-                stair,
-                straightModel,
-                innerModel,
-                outerModel
-            )
+            when (parent) {
+                !is GrassBlock -> createStairsBlockState(
+                    stair,
+                    innerModel,
+                    defaultModel,
+                    outerModel
+                )
+                else -> createSnowyStairsBlockState(
+                    stair,
+                    innerModel,
+                    defaultModel,
+                    outerModel,
+                    innerModelRotated,
+                    defaultModelRotated,
+                    outerModelRotated,
+                    snowyInnerModel,
+                    snowyDefaultModel,
+                    snowyOuterModel,
+                    snowyInnerModelRotated,
+                    snowyDefaultModelRotated,
+                    snowyOuterModelRotated
+                )
+            }
         )
     }
 
     /**
-     * Generates all necessary models and blockstates for a stair variant.
+     * Generates all necessary models and blockstates for a trapdoor variant.
      */
     private fun generateTrapdoorModel(
         generator: BlockStateModelGenerator?,
         trapdoor: Block,
         parent: Block
     ) {
-        val textureMap = createTextureMap(
+        val textureMap = configureBlockTextureMapping(
             parent = parent,
             hasSideAndTop = parent in hasSideAndTop,
             removeBlock = parent in removeBlock,
-            textureKey = TextureKey.TEXTURE,
+            textureKey = "texture",
             top = (if (parent in hasNoTexture) hasNoTexture[parent] else parent)!!
         )
 
@@ -425,6 +570,8 @@ class ModelGenerator(generator: FabricDataOutput) : FabricModelProvider(generato
             generator?.modelCollector
         )
 
+        generateBlockItemModel(trapdoor, parent, bottomModel, generator)
+
         generator?.blockStateCollector?.accept(
             BlockStateModelGenerator.createTrapdoorBlockState(
                 trapdoor,
@@ -434,6 +581,7 @@ class ModelGenerator(generator: FabricDataOutput) : FabricModelProvider(generato
             )
         )
     }
+
     /**
      * Generates all necessary models and blockstates for a lantern variant.
      */
@@ -443,7 +591,7 @@ class ModelGenerator(generator: FabricDataOutput) : FabricModelProvider(generato
         parent: Block
     ) {
         val textureMap = TextureMap().apply {
-            put(TextureKey.TEXTURE, Identifier.of("block/${getId(parent)}"))
+            put(TextureKey.TEXTURE, Identifier.of("block/${extractCleanBlockIdentifier(parent)}"))
             put(TextureKey.PARTICLE, Identifier.of("block/lantern"))
         }
 
@@ -470,6 +618,8 @@ class ModelGenerator(generator: FabricDataOutput) : FabricModelProvider(generato
             generator?.modelCollector
         )
 
+        generateBlockItemModel(lantern, parent, lanternModelStanding, generator)
+
         generator?.blockStateCollector?.accept(
             VariantsBlockStateSupplier.create(lantern)
                 .coordinate(createBooleanModelMap(Properties.HANGING, lanternModelhanging, lanternModelStanding))
@@ -488,39 +638,312 @@ class ModelGenerator(generator: FabricDataOutput) : FabricModelProvider(generato
         side: Block = parent,
         bottom: Block = parent
     ) {
-        val textureMap = createTextureMap(
+        val textureMap = configureBlockTextureMapping(
             parent = parent,
             top = top,
             side = side,
             bottom = bottom,
             hasSideAndTop = parent in hasSideAndTop,
             removeBlock = parent in removeBlock,
-            bottomSameAsTop = parent in listOf<Block>(Blocks.MUDDY_MANGROVE_ROOTS, Blocks.POLISHED_BASALT)
+            bottomSameAsTop = parent in listOf<Block>(Blocks.MUDDY_MANGROVE_ROOTS, Blocks.POLISHED_BASALT),
+            textureKey = if (parent is GrassBlock) {
+                "overlay"
+            } else ""
         )
 
-        val bottomModel = Models.SLAB.upload(
-            slab,
-            "",
-            textureMap,
-            generator?.modelCollector
+        val snowyTextureMap = configureBlockTextureMapping(
+            parent = parent,
+            top = Blocks.SNOW,
+            side = side,
+            bottom = bottom,
+            hasSideAndTop = parent in hasSideAndTop,
+            removeBlock = parent in removeBlock,
+            bottomSameAsTop = parent in listOf<Block>(Blocks.MUDDY_MANGROVE_ROOTS, Blocks.POLISHED_BASALT),
+            textureKey = ""
         )
 
-        val topModel = Models.SLAB_TOP.upload(
-            slab,
-            "",
-            textureMap,
-            generator?.modelCollector
-        )
+        val bottomModel = when (parent) {
+            is GrassBlock -> Model(
+                Optional.of(Identifier.of("${MODID}:block/template_grass_slab_bottom")),
+                Optional.empty(),
+                TextureKey.TOP,
+                TextureKey.SIDE,
+                TextureKey.BOTTOM,
+                TextureKey.LAYER0
+            ).upload(
+                slab,
+                "",
+                textureMap,
+                generator?.modelCollector
+            )
 
-        val fullBlockId = Identifier.of("block/${getId(parent)}")
+            else -> Models.SLAB.upload(
+                slab,
+                "",
+                textureMap,
+                generator?.modelCollector
+            )
+        }
+
+        val snowyBottomModel = when (parent) {
+            is GrassBlock -> Model(
+                Optional.of(Identifier.of("${MODID}:block/template_snowy_grass_slab_bottom")),
+                Optional.empty(),
+                TextureKey.TOP,
+                TextureKey.SIDE,
+                TextureKey.BOTTOM
+            ).upload(
+                slab,
+                "_snow",
+                snowyTextureMap,
+                generator?.modelCollector
+            )
+
+            else -> null
+        }
+
+        val topModel = when (parent) {
+            is GrassBlock -> Model(
+                Optional.of(Identifier.of("${MODID}:block/template_grass_slab_top")),
+                Optional.empty(),
+                TextureKey.TOP,
+                TextureKey.SIDE,
+                TextureKey.BOTTOM,
+                TextureKey.LAYER0
+            ).upload(
+                slab,
+                "_top",
+                textureMap,
+                generator?.modelCollector
+            )
+
+            else -> Models.SLAB_TOP.upload(
+                slab,
+                "",
+                textureMap,
+                generator?.modelCollector
+            )
+        }
+
+
+        val snowyTopModel = when (parent) {
+            is GrassBlock -> Models.SLAB_TOP.upload(
+                slab,
+                "_snow_top",
+                snowyTextureMap,
+                generator?.modelCollector
+            )
+
+            else -> null
+        }
+
+        val fullBlockModel = Identifier.of("block/${extractCleanBlockIdentifier(parent)}")
+
+        val snowyFullBlockModel =when (parent){is GrassBlock ->  Identifier.of("block/${extractCleanBlockIdentifier(parent)}_snow") else -> null}
+
+        generateBlockItemModel(slab, parent, bottomModel, generator)
 
         generator?.blockStateCollector?.accept(
-            BlockStateModelGenerator.createSlabBlockState(
-                slab,
-                bottomModel,
-                topModel,
-                fullBlockId
-            )
+            if (parent is GrassBlock) {
+                createSnowySlabBlockState(
+                    slab,
+                    bottomModel,
+                    topModel,
+                    fullBlockModel,
+                    snowyBottomModel,
+                    snowyTopModel,
+                    snowyFullBlockModel
+                )
+            }else {
+                BlockStateModelGenerator.createSlabBlockState(
+                    slab,
+                    bottomModel,
+                    topModel,
+                    fullBlockModel
+                )
+            }
         )
+    }
+    /**
+     * Creates a BlockStateSupplier for snowy stairs blocks with all possible variants.
+     *
+     * This function generates all possible blockstate variants for a stairs block that can be covered in snow.
+     * It handles different stair shapes (straight, inner, outer), positions (top/bottom), and directions (N/S/E/W).
+     *
+     * @param stairsBlock The stairs block to create variants for
+     * @param innerModelId Model for inner corner variant
+     * @param regularModelId Model for straight variant
+     * @param outerModelId Model for outer corner variant
+     * @param innerModelRotated Model for rotated inner corner variant (top half)
+     * @param defaultModelRotated Model for rotated straight variant (top half)
+     * @param outerModelRotated Model for rotated outer corner variant (top half)
+     * @param snowyInnerModel Model for snowy inner corner variant
+     * @param snowyDefaultModel Model for snowy straight variant
+     * @param snowyOuterModel Model for snowy outer corner variant
+     * @param snowyInnerModelRotated Model for snowy rotated inner corner variant (top half)
+     * @param snowyDefaultModelRotated Model for snowy rotated straight variant (top half)
+     * @param snowyOuterModelRotated Model for snowy rotated outer corner variant (top half)
+     * @return BlockStateSupplier containing all possible variants
+     */
+    fun createSnowyStairsBlockState(
+        stairsBlock: Block,
+        innerModelId: Identifier,
+        regularModelId: Identifier,
+        outerModelId: Identifier,
+        innerModelRotated: Identifier?,
+        defaultModelRotated: Identifier?,
+        outerModelRotated: Identifier?,
+        snowyInnerModel: Identifier?,
+        snowyDefaultModel: Identifier?,
+        snowyOuterModel: Identifier?,
+        snowyInnerModelRotated: Identifier?,
+        snowyDefaultModelRotated: Identifier?,
+        snowyOuterModelRotated: Identifier?
+    ): BlockStateSupplier {
+
+        data class VariantConfig(
+            val direction: Direction,
+            val half: BlockHalf,
+            val shape: StairShape,
+            val snowy: Boolean,
+            val modelId: Identifier?,
+            val yRot: VariantSettings.Rotation? = null,
+            val xRot: VariantSettings.Rotation? = null
+        )
+
+        fun createVariant(config: VariantConfig): BlockStateVariant =
+            BlockStateVariant.create().apply {
+                put(VariantSettings.MODEL, config.modelId)
+                config.yRot?.let { put(VariantSettings.Y, it) }
+                config.xRot?.let { put(VariantSettings.X, it) }
+                put(VariantSettings.UVLOCK, true)
+            }
+
+        fun getYRotation(direction: Direction, shape: StairShape): VariantSettings.Rotation? =
+            when (shape) {
+                StairShape.STRAIGHT -> when (direction) {
+                    Direction.WEST -> VariantSettings.Rotation.R180
+                    Direction.SOUTH -> VariantSettings.Rotation.R90
+                    Direction.NORTH -> VariantSettings.Rotation.R270
+                    else -> null
+                }
+                StairShape.OUTER_LEFT -> when (direction) {
+                    Direction.EAST -> VariantSettings.Rotation.R270
+                    Direction.WEST -> VariantSettings.Rotation.R90
+                    Direction.NORTH -> VariantSettings.Rotation.R180
+                    else -> null
+                }
+                StairShape.OUTER_RIGHT -> when (direction) {
+                    Direction.EAST -> null
+                    Direction.WEST -> VariantSettings.Rotation.R180
+                    Direction.SOUTH -> VariantSettings.Rotation.R90
+                    Direction.NORTH -> VariantSettings.Rotation.R270
+                    else -> null
+                }
+                StairShape.INNER_LEFT -> when (direction) {
+                    Direction.EAST -> VariantSettings.Rotation.R270
+                    Direction.WEST -> VariantSettings.Rotation.R90
+                    Direction.NORTH -> VariantSettings.Rotation.R180
+                    else -> null
+                }
+                StairShape.INNER_RIGHT -> when (direction) {
+                    Direction.EAST -> null
+                    Direction.WEST -> VariantSettings.Rotation.R180
+                    Direction.SOUTH -> VariantSettings.Rotation.R90
+                    Direction.NORTH -> VariantSettings.Rotation.R270
+                    else -> null
+                }
+            }
+
+        fun generateVariants(): List<VariantConfig> {
+            val variants = mutableListOf<VariantConfig>()
+
+            fun getModel(shape: StairShape, isTop: Boolean, snowy: Boolean): Identifier? =
+                when {
+                    isTop -> when (shape) {
+                        StairShape.STRAIGHT -> if (snowy) snowyDefaultModelRotated else defaultModelRotated
+                        StairShape.INNER_LEFT, StairShape.INNER_RIGHT -> if (snowy) snowyInnerModelRotated else innerModelRotated
+                        StairShape.OUTER_LEFT, StairShape.OUTER_RIGHT -> if (snowy) snowyOuterModelRotated else outerModelRotated
+                    }
+                    else -> when (shape) {
+                        StairShape.STRAIGHT -> if (snowy) snowyDefaultModel else regularModelId
+                        StairShape.INNER_LEFT, StairShape.INNER_RIGHT -> if (snowy) snowyInnerModel else innerModelId
+                        StairShape.OUTER_LEFT, StairShape.OUTER_RIGHT -> if (snowy) snowyOuterModel else outerModelId
+                    }
+                }
+
+            listOf(false, true).forEach { snowy ->
+                BlockHalf.entries.forEach { half ->
+                    Direction.entries.filter { it.axis.isHorizontal }.forEach { direction ->
+                        StairShape.entries.forEach { shape ->
+                            val isTop = half == BlockHalf.TOP
+                            val model = getModel(shape, isTop, snowy)
+
+                            val yRot = getYRotation(direction, shape)
+                            val xRot = if (isTop) VariantSettings.Rotation.R180 else null
+
+                            variants.add(VariantConfig(direction, half, shape, snowy, model, yRot, xRot))
+                        }
+                    }
+                }
+            }
+
+            return variants
+        }
+
+        return VariantsBlockStateSupplier.create(stairsBlock)
+            .coordinate(BlockStateVariantMap.create(
+                Properties.HORIZONTAL_FACING,
+                Properties.BLOCK_HALF,
+                Properties.STAIR_SHAPE,
+                Properties.SNOWY
+            ).apply {
+                generateVariants().forEach { config ->
+                    register(
+                        config.direction,
+                        config.half,
+                        config.shape,
+                        config.snowy,
+                        createVariant(config)
+                    )
+                }
+            })
+    }
+    /**
+     * Creates a BlockStateSupplier for snowy slab blocks with all possible variants.
+     *
+     * This function generates all possible blockstate variants for a slab block that can be covered in snow.
+     * It handles different slab properties (slabtype, snowy).
+     *
+     * @param slabBlock The slab block to create variants for
+     * @param bottomModel Model bottom variant
+     * @param topModel Model for top variant
+     * @param fullModel Model for full block variant
+     * @param snowyBottomModel Model for snowy bottom variant
+     * @param snowyTopModel Model for snowy top variant
+     * @param snowyFullModel Model for snowy full block variant
+     * @return BlockStateSupplier containing all possible variants
+     */
+    fun createSnowySlabBlockState(
+        slabBlock: Block,
+        bottomModel: Identifier,
+        topModel: Identifier,
+        fullModel: Identifier?,
+        snowyBottomModel: Identifier?,
+        snowyTopModel: Identifier?,
+        snowyFullModel: Identifier?
+    ): BlockStateSupplier {
+        return VariantsBlockStateSupplier.create(slabBlock)
+            .coordinate(
+                BlockStateVariantMap.create(Properties.SLAB_TYPE, Properties.SNOWY)
+                    //non snowy
+                    .register(SlabType.BOTTOM, false, BlockStateVariant.create().put(VariantSettings.MODEL, bottomModel))
+                    .register(SlabType.TOP, false, BlockStateVariant.create().put(VariantSettings.MODEL, topModel))
+                    .register(SlabType.DOUBLE, false, BlockStateVariant.create().put(VariantSettings.MODEL, fullModel))
+                    //snowy
+                    .register(SlabType.BOTTOM, true, BlockStateVariant.create().put(VariantSettings.MODEL, snowyBottomModel))
+                    .register(SlabType.TOP, true, BlockStateVariant.create().put(VariantSettings.MODEL, snowyTopModel))
+                    .register(SlabType.DOUBLE, true, BlockStateVariant.create().put(VariantSettings.MODEL, snowyFullModel))
+            )
     }
 }
