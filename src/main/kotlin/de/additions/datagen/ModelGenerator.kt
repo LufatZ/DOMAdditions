@@ -819,39 +819,72 @@ class ModelGenerator(generator: FabricDataOutput) : FabricModelProvider(generato
                 put(VariantSettings.UVLOCK, true)
             }
 
-        fun getYRotation(direction: Direction, shape: StairShape): VariantSettings.Rotation? =
-            when (shape) {
-                StairShape.STRAIGHT -> when (direction) {
-                    Direction.WEST -> VariantSettings.Rotation.R180
-                    Direction.SOUTH -> VariantSettings.Rotation.R90
-                    Direction.NORTH -> VariantSettings.Rotation.R270
-                    else -> null
+        fun getYRotation(direction: Direction, shape: StairShape, isTop: Boolean): VariantSettings.Rotation? =
+            if (isTop) {
+                when (shape) {
+                    StairShape.STRAIGHT -> when (direction) {
+                        Direction.WEST -> VariantSettings.Rotation.R180
+                        Direction.SOUTH -> VariantSettings.Rotation.R90
+                        Direction.NORTH -> VariantSettings.Rotation.R270
+                        else -> null
+                    }
+                    StairShape.OUTER_RIGHT -> when (direction) {
+                        Direction.EAST -> VariantSettings.Rotation.R90
+                        Direction.WEST -> VariantSettings.Rotation.R270
+                        Direction.SOUTH -> VariantSettings.Rotation.R180
+                        else -> null
+                    }
+                    StairShape.OUTER_LEFT -> when (direction) {
+                        Direction.WEST -> VariantSettings.Rotation.R180
+                        Direction.SOUTH -> VariantSettings.Rotation.R90
+                        Direction.NORTH -> VariantSettings.Rotation.R270
+                        else -> null
+                    }
+                    StairShape.INNER_RIGHT -> when (direction) {
+                        Direction.EAST -> VariantSettings.Rotation.R90
+                        Direction.WEST -> VariantSettings.Rotation.R270
+                        Direction.SOUTH -> VariantSettings.Rotation.R180
+                        else -> null
+                    }
+                    StairShape.INNER_LEFT -> when (direction) {
+                        Direction.WEST -> VariantSettings.Rotation.R180
+                        Direction.SOUTH -> VariantSettings.Rotation.R90
+                        Direction.NORTH -> VariantSettings.Rotation.R270
+                        else -> null
+                    }
                 }
-                StairShape.OUTER_LEFT -> when (direction) {
-                    Direction.EAST -> VariantSettings.Rotation.R270
-                    Direction.WEST -> VariantSettings.Rotation.R90
-                    Direction.NORTH -> VariantSettings.Rotation.R180
-                    else -> null
-                }
-                StairShape.OUTER_RIGHT -> when (direction) {
-                    Direction.EAST -> null
-                    Direction.WEST -> VariantSettings.Rotation.R180
-                    Direction.SOUTH -> VariantSettings.Rotation.R90
-                    Direction.NORTH -> VariantSettings.Rotation.R270
-                    else -> null
-                }
-                StairShape.INNER_LEFT -> when (direction) {
-                    Direction.EAST -> VariantSettings.Rotation.R270
-                    Direction.WEST -> VariantSettings.Rotation.R90
-                    Direction.NORTH -> VariantSettings.Rotation.R180
-                    else -> null
-                }
-                StairShape.INNER_RIGHT -> when (direction) {
-                    Direction.EAST -> null
-                    Direction.WEST -> VariantSettings.Rotation.R180
-                    Direction.SOUTH -> VariantSettings.Rotation.R90
-                    Direction.NORTH -> VariantSettings.Rotation.R270
-                    else -> null
+            } else {
+                when (shape) {
+                    StairShape.STRAIGHT -> when (direction) {
+                        Direction.WEST -> VariantSettings.Rotation.R180
+                        Direction.SOUTH -> VariantSettings.Rotation.R90
+                        Direction.NORTH -> VariantSettings.Rotation.R270
+                        else -> null
+                    }
+                    StairShape.OUTER_LEFT -> when (direction) {
+                        Direction.EAST -> VariantSettings.Rotation.R270
+                        Direction.WEST -> VariantSettings.Rotation.R90
+                        Direction.NORTH -> VariantSettings.Rotation.R180
+                        else -> null
+                    }
+                    StairShape.OUTER_RIGHT -> when (direction) {
+                        Direction.WEST -> VariantSettings.Rotation.R180
+                        Direction.SOUTH -> VariantSettings.Rotation.R90
+                        Direction.NORTH -> VariantSettings.Rotation.R270
+                        else -> null
+                    }
+                    StairShape.INNER_LEFT -> when (direction) {
+                        Direction.EAST -> VariantSettings.Rotation.R270
+                        Direction.WEST -> VariantSettings.Rotation.R90
+                        Direction.NORTH -> VariantSettings.Rotation.R180
+                        else -> null
+                    }
+                    StairShape.INNER_RIGHT -> when (direction) {
+                        Direction.WEST -> VariantSettings.Rotation.R180
+                        Direction.SOUTH -> VariantSettings.Rotation.R90
+                        Direction.NORTH -> VariantSettings.Rotation.R270
+                        else -> null
+                    }
                 }
             }
 
@@ -879,7 +912,7 @@ class ModelGenerator(generator: FabricDataOutput) : FabricModelProvider(generato
                             val isTop = half == BlockHalf.TOP
                             val model = getModel(shape, isTop, snowy)
 
-                            val yRot = getYRotation(direction, shape)
+                            val yRot = getYRotation(direction, shape, isTop)
                             val xRot = if (isTop) VariantSettings.Rotation.R180 else null
 
                             variants.add(VariantConfig(direction, half, shape, snowy, model, yRot, xRot))
