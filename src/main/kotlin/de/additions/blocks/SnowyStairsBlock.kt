@@ -65,8 +65,7 @@ class SnowyStairsBlock(blockstate: BlockState, settings: Settings) : StairsBlock
         val direction = ctx.side
         val blockPos = ctx.blockPos
         val fluidState = ctx.world.getFluidState(blockPos)
-
-        return this.defaultState
+        val blockState = this.defaultState
             .with(SNOWY, isSnow(snowyBlockState))
             .with(FACING, ctx.horizontalPlayerFacing)
             .with(
@@ -78,7 +77,8 @@ class SnowyStairsBlock(blockstate: BlockState, settings: Settings) : StairsBlock
                 }
             )
             .with(WATERLOGGED, fluidState.fluid == Fluids.WATER)
-            .with(SHAPE, getStairShape(this.defaultState, ctx.world, blockPos))
+
+        return blockState.with(SHAPE, getStairShape(blockState, ctx.world, blockPos))
     }
 
 
@@ -108,7 +108,6 @@ class SnowyStairsBlock(blockstate: BlockState, settings: Settings) : StairsBlock
         if (state.get(WATERLOGGED)) {
             tickView.scheduleFluidTick(pos, Fluids.WATER, Fluids.WATER.getTickRate(world))
         }
-
         val newState = if (direction.axis.isHorizontal) {
             state.with(SHAPE, getStairShape(state, world, pos))
         } else {
