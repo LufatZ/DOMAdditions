@@ -5,7 +5,7 @@ import eu.midnightdust.lib.config.MidnightConfig
 class AdditionsConfig : MidnightConfig() {
     companion object {
         @JvmField
-        @Comment(category = "about")
+        @Comment(category = "about", centered = true)
         var DayOfMind: Comment? = null
 
         @JvmField
@@ -13,7 +13,7 @@ class AdditionsConfig : MidnightConfig() {
         var aboutDayOfMind: Comment? = null
 
         @JvmField
-        @Comment(category = "features")
+        @Comment(category = "features", centered = true)
         var features: Comment? = null
 
         @JvmField
@@ -41,11 +41,7 @@ class AdditionsConfig : MidnightConfig() {
         var EnabledTrapdoor: Boolean = true
 
         @JvmField
-        @Entry(category = "features")
-        var EnabledDecorativeTrapdoor: Boolean = true
-
-        @JvmField
-        @Comment(category = "experimental")
+        @Comment(category = "experimental", centered = true)
         var experimental: Comment? = null
 
         @JvmField
