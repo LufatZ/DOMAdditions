@@ -45,11 +45,11 @@ class AdditionsConfig : MidnightConfig() {
         var EnabledDecorativeTrapdoor: Boolean = true
 
         @JvmField
-        @Comment(category = "experimentalSettings")
+        @Comment(category = "experimental")
         var experimental: Comment? = null
 
         @JvmField
-        @Entry(category = "experimentalSettings")
+        @Entry(category = "experimental")
         var EnabledInstruments: Boolean = false
 /*
         // Beispiel für einen String-Eintrag

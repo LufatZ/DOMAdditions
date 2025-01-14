@@ -3,7 +3,7 @@
 	"id": "additions",
 	"version": "${version}",
 	"name": "DayOfMind Additions",
-	"description": "DayOfMind Additions adds things that matches the vanilla gameplay and complete the DayOfMind-Modpack.",
+	"description": "DayOfMind is a mod that adds new blocks, recipes and features. With unique lanterns, expanded block variations and clever features like switching grass and dirt paths with a shovel, DayOfMind offers exciting possibilities for your adventures.",
 	"authors": [
 		"LufatZ",
 		"OxFaTech Team"
@@ -39,23 +39,21 @@
 		"modmenu": {
 			"links": {
 				"modmenu.additions.discord": "https://discord.gg/yRkqCvFcmz",
-				"modmenu.additions.crowdin": "https://crowdin.com/project/dayofmind-additions"
+				"modmenu.additions.crowdin": "https://crowdin.com/project/dayofmind-additions",
+				"modmenu.additions.github": "https://github.com/LufatZ/DOMAdditions/",
+				"modmenu.additions.oxfatech": "https://oxfatech.de",
+				"modmenu.additions.kofi": "https://ko-fi.com/oxfatech"
 			},
 			"update_checker": true
-		},
-		"sss_translate": {
-			"crowdin_project_name": "dayofmind-additions",
-			"minecraft_project_name": "additions",
-			"verbose": true
 		}
 	},
 	"mixins": [
 		"additions.mixins.json"
 	],
 	"depends": {
-		"fabricloader": ">=0.15.11",
-		"minecraft": "~1.21",
-		"java": ">=21",
+		"fabricloader": "*",
+		"minecraft": "*",
+		"java": "*",
 		"fabric-api": "*",
 		"fabric-language-kotlin": "*"
 	},
