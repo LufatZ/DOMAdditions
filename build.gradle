@@ -14,10 +14,8 @@ base {
 }
 
 repositories {
-	maven { url "https://maven.terraformersmc.com/" }												//modmenu
-	maven { url "https://gitlab.com/api/v4/projects/59105494/packages/maven" }						//crowdin
-	maven { url "https://api.modrinth.com/maven" }													//modrinth jade(waila) midnight(config) emi
-
+	maven { url "https://maven.terraformersmc.com/" }	//modmenu
+	maven { url "https://api.modrinth.com/maven" }	//modrinth jade(waila) midnight(config) emi
 }
 
 fabricApi {
@@ -32,10 +30,8 @@ dependencies {
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 	modImplementation "net.fabricmc:fabric-language-kotlin:${project.fabric_kotlin_version}"
-	modRuntimeOnly("com.terraformersmc:modmenu:${project.modmenu_version}")							//modmenu
-	//include modRuntimeOnly("net.sssubtlety.sss_translate:mod:${project.crowdin}")					//crowdin
+	modRuntimeOnly "com.terraformersmc:modmenu:${project.modmenu_version}"							//modmenu
 	modRuntimeOnly "maven.modrinth:jade:${project.jade}+fabric"										//jade (waila)
-	//modRuntimeOnly "maven.modrinth:emi:${project.emi}+${project.minecraft_version}+fabric"			//emi (item viewer)
 	modImplementation "maven.modrinth:midnightlib:${project.midnightlib}-fabric"					//midnight(config)
 }
 

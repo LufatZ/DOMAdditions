@@ -42,7 +42,6 @@ class TranslationGenerator(generator: FabricDataOutput, registryLookup: Completa
 
         val configKey: String = "additions.midnightconfig"
         translationBuilder.add("$configKey.title", "DayOfMind Config")
-        translationBuilder.add("$configKey.category.experimental", "Experimental Features")
         translationBuilder.add("$configKey.category.about", "About DayOfMind")
         translationBuilder.add("$configKey.category.features", "Features")
         translationBuilder.add("$configKey.EnabledInstruments", "Enable Instruments")
@@ -54,10 +53,6 @@ class TranslationGenerator(generator: FabricDataOutput, registryLookup: Completa
         translationBuilder.add(
             "$configKey.features",
             "The settings listed here are fully developed and can be used safely."
-        )
-        translationBuilder.add(
-            "$configKey.experimental",
-            "The settings listed here are still in development and may not work as expected."
         )
         translationBuilder.add("$configKey.EnabledInstruments.tooltip", "Enables the ability to craft instruments")
         translationBuilder.add("$configKey.EnabledShovelMixin", "Enable Shovel Mixin")
@@ -82,6 +77,13 @@ class TranslationGenerator(generator: FabricDataOutput, registryLookup: Completa
             "$configKey.EnabledTranslation.tooltip",
             "Enables the automatic download of translations"
         )
+        translationBuilder.add("$configKey.TranslationUrl", "Translation Source")
+        translationBuilder.add("$configKey.TranslationUrl.tooltip", "Select the source of the translations")
+        translationBuilder.add("$configKey.TranslationUrlCustom", "Custom Translation Source")
+        translationBuilder.add("$configKey.TranslationUrlCustom.tooltip", "Enter the URL of the custom translation source")
+        translationBuilder.add("$configKey.enum.TranslationVersion.CROWDIN", "Crowdin")
+        translationBuilder.add("$configKey.enum.TranslationVersion.OXFATECH", "OxFaTech")
+        translationBuilder.add("$configKey.enum.TranslationVersion.CUSTOM", "Custom")
         translationBuilder.add("$configKey.EnabledTrapdoor", "Enable Trapdoor")
         translationBuilder.add("$configKey.EnabledTrapdoor.tooltip", "Enables the ability to craft more trapdoors")
     }

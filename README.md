@@ -2,7 +2,8 @@
 
 # DayOfMind Additions
 Welcome to **DayOfMind**, a sophisticated Minecraft mod project developed by OxfaTech, designed to enhance your gaming experience with thoughtfully crafted additions. Our focus is on aesthetic integration with vanilla Minecraft. 🌟
-
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/R6R818TUQY)
+![Crowdin](https://badges.crowdin.net/dayofmind-additions/localized.svg)
 ---
 
 ## 📚 Quick Links
