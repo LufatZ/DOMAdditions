@@ -55,7 +55,8 @@
 		"minecraft": "*",
 		"java": "*",
 		"fabric-api": "*",
-		"fabric-language-kotlin": "*"
+		"fabric-language-kotlin": "*",
+		"midnightlib": "*"
 	},
 	"suggests": {
 		"another-mod": "*"
