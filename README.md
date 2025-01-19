@@ -101,14 +101,15 @@ Advanced building options with new trapdoor variants for detailed construction.
 
 ## 📈 Development Roadmap
 
-| Feature                     | Status     | Notes                              |
-|-----------------------------|------------|------------------------------------|
-| **Data Generation System**  | ✅ Active   | Unified block addition process     |
-| **Minecraft 1.21.4 Update** | ✅ Complete | Core features fully compatible     |
-| **Kotlin Migration**        | ✅ Complete | Modern codebase implementation     |
-| **Translations**            | ⏳ Ongoing  | Community contributions welcome    |
-| **Redstone Integration**    | 🚧 Planned | Advanced functionality development |
-| **Configuration System**    | 🚧 Planned | Enhanced customization options     |
+| Feature                          | Status     | Notes                           |
+|----------------------------------|------------|---------------------------------|
+| **Data Generation System**       | ✅ Active   | Unified block addition process  |
+| **Minecraft 1.21.4 Update**      | ✅ Complete | Core features fully compatible  |
+| **Kotlin Migration**             | ✅ Complete | Modern codebase implementation  |
+| **Translations Integration**     | ✅ Complete | Community contributions welcome |
+| **Configuration System**         | ✅ Complete | Enhanced customization options  |
+| **Special Block Features**       | 🚧 Planned | e.g. damege on magma slabs      |
+| **Redstone Lantern Integration** | 🚧 Planned | Power lanterns with redstone    |
 
 ---
 

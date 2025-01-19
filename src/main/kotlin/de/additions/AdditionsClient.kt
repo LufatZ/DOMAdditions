@@ -1,33 +1,45 @@
 package de.additions
 
+import de.additions.TranslationManager.clearTranslations
 import de.additions.blocks.BlockRegistry
-import de.additions.datagen.ModelGenerator
+import de.additions.config.AdditionsConfig
+import kotlinx.coroutines.runBlocking
 import net.fabricmc.api.ClientModInitializer
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry
+import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.client.render.RenderLayer
 import net.minecraft.state.property.Properties
 
-/**
- * Client-side initialization for the Additions mod.
- * Handles texture cutouts and block tinting.
- *
- * @see ModelGenerator for tinted item generation
- */
 object AdditionsClient : ClientModInitializer {
+
     override fun onInitializeClient() {
         textureCutOut()
         tintBlocks()
+        val logging = AdditionsConfig.TranslationLogging || FabricLoader.getInstance().isDevelopmentEnvironment
+        if (AdditionsConfig.EnabledTranslation) {
+            val url = when (AdditionsConfig.TranslationUrl) {
+                AdditionsConfig.Companion.TranslationVersion.OXFATECH -> "https://oxfatech.de/mod_translation/dayofmind-additions(latest).zip"
+                AdditionsConfig.Companion.TranslationVersion.CROWDIN -> "https://crowdin.com/backend/download/project/dayofmind-addition.zip"
+                else -> AdditionsConfig.TranslationUrlCustom
+            }
+            runBlocking {
+                TranslationManager.downloadTranslations(
+                    url = url,
+                    logging = logging
+                )
+            }
+        }
+        else if (!AdditionsConfig.EnabledTranslation) {
+            TranslationManager.clearTranslations(logging)
+        }
     }
 
-    /**
-     * Sets up cutout render layers for specific blocks that need transparency.
-     */
     private fun textureCutOut() {
         val blocksForTextureCutOut =
             BlockRegistry.registeredGrassBlocks +
-            BlockRegistry.registeredChains +
-            BlockRegistry.registeredLanterns
+                    BlockRegistry.registeredChains +
+                    BlockRegistry.registeredLanterns
 
         BlockRenderLayerMap.INSTANCE.putBlocks(
             RenderLayer.getCutoutMipped(),
@@ -35,9 +47,6 @@ object AdditionsClient : ClientModInitializer {
         )
     }
 
-    /**
-     * Registers color providers for blocks that need biome-based tinting.
-     */
     private fun tintBlocks() {
         val blocksForTint = BlockRegistry.registeredGrassBlocks
 
@@ -57,3 +66,4 @@ object AdditionsClient : ClientModInitializer {
         )
     }
 }
+

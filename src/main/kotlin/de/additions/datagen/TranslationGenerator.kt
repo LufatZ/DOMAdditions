@@ -84,6 +84,8 @@ class TranslationGenerator(generator: FabricDataOutput, registryLookup: Completa
         translationBuilder.add("$configKey.enum.TranslationVersion.CROWDIN", "Crowdin")
         translationBuilder.add("$configKey.enum.TranslationVersion.OXFATECH", "OxFaTech")
         translationBuilder.add("$configKey.enum.TranslationVersion.CUSTOM", "Custom")
+        translationBuilder.add("$configKey.TranslationLogging", "Translation Logging")
+        translationBuilder.add("$configKey.TranslationLogging.tooltip", "Enables detailed logging of the translation download. You probably don't want to enable this")
         translationBuilder.add("$configKey.EnabledTrapdoor", "Enable Trapdoor")
         translationBuilder.add("$configKey.EnabledTrapdoor.tooltip", "Enables the ability to craft more trapdoors")
     }
@@ -103,5 +105,4 @@ class TranslationGenerator(generator: FabricDataOutput, registryLookup: Completa
             translationBuilder.add(block.asItem(), "$parentName $blockType")
         }
     }
-
 }

@@ -49,6 +49,10 @@ class AdditionsConfig : MidnightConfig() {
 
         @JvmField
         @Entry(category = "features")
+        var TranslationLogging: Boolean = false
+
+        @JvmField
+        @Entry(category = "features")
         var EnabledTrapdoor: Boolean = true
 
     }
