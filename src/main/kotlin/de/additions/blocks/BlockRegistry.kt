@@ -1,8 +1,6 @@
 /**
  * Registry für zusätzliche Minecraft-Blöcke und deren Varianten.
  * Ermöglicht die automatische Registrierung von Treppen, Platten und Laternen-Varianten.
- *
- * @property registeredBlocks Liste aller registrierten Blöcke als ItemStacks
  */
 package de.additions.blocks
 
@@ -165,6 +163,11 @@ object BlockRegistry {
                         settings.registryKey(keyOf("${baseName}_slab"))
                     )).also { registeredGrassBlocks.add(it) }
                 }
+                is DirtPathBlock -> {
+                    register("${baseName}_slab", PathSlab(
+                        settings.registryKey(keyOf("${baseName}_slab"))
+                    )).also { registeredDirtBlockVariants.add(it) }
+                }
                 else -> {
                     register("${baseName}_slab", SlabBlock(
                         settings.registryKey(keyOf("${baseName}_slab"))
@@ -178,7 +181,10 @@ object BlockRegistry {
                     parent.defaultState,
                     settings.registryKey(keyOf("${baseName}_stairs"))
                 )).also { registeredGrassBlocks.add(it) }
-
+                is DirtPathBlock -> register("${baseName}_stairs", PathStair(
+                    parent.defaultState,
+                    settings.registryKey(keyOf("${baseName}_stairs"))
+                )).also { registeredDirtBlockVariants.add(it) }
                 else -> register("${baseName}_stairs", StairsBlock(
                     parent.defaultState,
                     settings.registryKey(keyOf("${baseName}_stairs"))
