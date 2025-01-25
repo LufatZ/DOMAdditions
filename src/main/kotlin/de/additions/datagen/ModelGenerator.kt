@@ -72,6 +72,10 @@ class ModelGenerator(generator: FabricDataOutput) : FabricModelProvider(generato
         Blocks.SMOOTH_SANDSTONE to Blocks.SANDSTONE
     )
 
+    private val snowyOvergrownBlocks = listOf<Block>(
+        Blocks.GRASS_BLOCK, Blocks.PODZOL, Blocks.MYCELIUM
+    )
+
     /**
      * Blocks where "_block" should be removed
      */
@@ -345,7 +349,7 @@ class ModelGenerator(generator: FabricDataOutput) : FabricModelProvider(generato
         val snowyTextureMap = configureBlockTextureMapping(
             parent = parent,
             top = Blocks.SNOW,
-            side = side,
+            side = if (parent in snowyOvergrownBlocks) Blocks.GRASS_BLOCK else side,
             bottom = bottom,
             hasSideAndTop = parent in hasSideAndTop,
             removeBlock = parent in removeBlock,
@@ -362,6 +366,14 @@ class ModelGenerator(generator: FabricDataOutput) : FabricModelProvider(generato
                 TextureKey.SIDE,
                 TextureKey.BOTTOM,
                 TextureKey.LAYER0
+            ).upload(stair, "", textureMap, generator?.modelCollector)
+
+            in snowyOvergrownBlocks -> Model(
+                Optional.of(Identifier.of("${MODID}:block/template_overgrown_stair")),
+                Optional.empty(),
+                TextureKey.TOP,
+                TextureKey.SIDE,
+                TextureKey.BOTTOM,
             ).upload(stair, "", textureMap, generator?.modelCollector)
 
             is DirtPathBlock -> Model(
@@ -385,6 +397,14 @@ class ModelGenerator(generator: FabricDataOutput) : FabricModelProvider(generato
                 TextureKey.LAYER0
             ).upload(stair, "_rotated", textureMap, generator?.modelCollector)
 
+            in snowyOvergrownBlocks -> Model(
+                Optional.of(Identifier.of("${MODID}:block/template_overgrown_stair_rotated")),
+                Optional.empty(),
+                TextureKey.TOP,
+                TextureKey.SIDE,
+                TextureKey.BOTTOM,
+            ).upload(stair, "_rotated", textureMap, generator?.modelCollector)
+
             is DirtPathBlock -> Model(
                 Optional.of(Identifier.of("$MODID:block/template_path_stair_rotated")),
                 Optional.empty(),
@@ -404,6 +424,14 @@ class ModelGenerator(generator: FabricDataOutput) : FabricModelProvider(generato
                 TextureKey.SIDE,
                 TextureKey.BOTTOM,
                 TextureKey.LAYER0
+            ).upload(stair, "_outer", textureMap, generator?.modelCollector)
+
+            in snowyOvergrownBlocks -> Model(
+                Optional.of(Identifier.of("${MODID}:block/template_overgrown_stair_outer")),
+                Optional.empty(),
+                TextureKey.TOP,
+                TextureKey.SIDE,
+                TextureKey.BOTTOM,
             ).upload(stair, "_outer", textureMap, generator?.modelCollector)
 
             is DirtPathBlock -> Model(
@@ -427,6 +455,14 @@ class ModelGenerator(generator: FabricDataOutput) : FabricModelProvider(generato
                 TextureKey.LAYER0
             ).upload(stair, "_outer_rotated", textureMap, generator?.modelCollector)
 
+            in snowyOvergrownBlocks -> Model(
+                Optional.of(Identifier.of("${MODID}:block/template_overgrown_stair_outer_rotated")),
+                Optional.empty(),
+                TextureKey.TOP,
+                TextureKey.SIDE,
+                TextureKey.BOTTOM,
+            ).upload(stair, "_outer_rotated", textureMap, generator?.modelCollector)
+
             is DirtPathBlock -> Model(
                 Optional.of(Identifier.of("$MODID:block/template_path_stair_outer_rotated")),
                 Optional.empty(),
@@ -446,6 +482,14 @@ class ModelGenerator(generator: FabricDataOutput) : FabricModelProvider(generato
                 TextureKey.SIDE,
                 TextureKey.BOTTOM,
                 TextureKey.LAYER0
+            ).upload(stair, "_inner", textureMap, generator?.modelCollector)
+
+            in snowyOvergrownBlocks -> Model(
+                Optional.of(Identifier.of("${MODID}:block/template_overgrown_stair_inner")),
+                Optional.empty(),
+                TextureKey.TOP,
+                TextureKey.SIDE,
+                TextureKey.BOTTOM,
             ).upload(stair, "_inner", textureMap, generator?.modelCollector)
 
             is DirtPathBlock -> Model(
@@ -469,6 +513,14 @@ class ModelGenerator(generator: FabricDataOutput) : FabricModelProvider(generato
                 TextureKey.LAYER0
             ).upload(stair, "_inner_rotated", textureMap, generator?.modelCollector)
 
+            in snowyOvergrownBlocks -> Model(
+                Optional.of(Identifier.of("${MODID}:block/template_overgrown_stair_inner_rotated")),
+                Optional.empty(),
+                TextureKey.TOP,
+                TextureKey.SIDE,
+                TextureKey.BOTTOM,
+            ).upload(stair, "_inner_rotated", textureMap, generator?.modelCollector)
+
             is DirtPathBlock -> Model(
                 Optional.of(Identifier.of("$MODID:block/template_path_stair_inner_rotated")),
                 Optional.empty(),
@@ -482,7 +534,7 @@ class ModelGenerator(generator: FabricDataOutput) : FabricModelProvider(generato
 
         // Snowy models for grass blocks
         val snowyDefaultModel = when (parent) {
-            is GrassBlock -> Model(
+            in snowyOvergrownBlocks -> Model(
                 Optional.of(Identifier.of("${MODID}:block/template_grass_stair_snowy")),
                 Optional.empty(),
                 TextureKey.TOP,
@@ -494,7 +546,7 @@ class ModelGenerator(generator: FabricDataOutput) : FabricModelProvider(generato
         }
 
         val snowyDefaultModelRotated = when (parent) {
-            is GrassBlock -> Model(
+            in snowyOvergrownBlocks -> Model(
                 Optional.of(Identifier.of("${MODID}:block/template_grass_stair_snowy_rotated")),
                 Optional.empty(),
                 TextureKey.TOP,
@@ -506,7 +558,7 @@ class ModelGenerator(generator: FabricDataOutput) : FabricModelProvider(generato
         }
 
         val snowyOuterModel = when (parent) {
-            is GrassBlock -> Model(
+            in snowyOvergrownBlocks -> Model(
                 Optional.of(Identifier.of("${MODID}:block/template_grass_stair_outer_snowy")),
                 Optional.empty(),
                 TextureKey.TOP,
@@ -518,7 +570,7 @@ class ModelGenerator(generator: FabricDataOutput) : FabricModelProvider(generato
         }
 
         val snowyOuterModelRotated = when (parent) {
-            is GrassBlock -> Model(
+            in snowyOvergrownBlocks -> Model(
                 Optional.of(Identifier.of("${MODID}:block/template_grass_stair_outer_snowy_rotated")),
                 Optional.empty(),
                 TextureKey.TOP,
@@ -530,7 +582,7 @@ class ModelGenerator(generator: FabricDataOutput) : FabricModelProvider(generato
         }
 
         val snowyInnerModel = when (parent) {
-            is GrassBlock -> Model(
+            in snowyOvergrownBlocks -> Model(
                 Optional.of(Identifier.of("${MODID}:block/template_grass_stair_inner_snowy")),
                 Optional.empty(),
                 TextureKey.TOP,
@@ -542,7 +594,7 @@ class ModelGenerator(generator: FabricDataOutput) : FabricModelProvider(generato
         }
 
         val snowyInnerModelRotated = when (parent) {
-            is GrassBlock -> Model(
+            in snowyOvergrownBlocks -> Model(
                 Optional.of(Identifier.of("${MODID}:block/template_grass_stair_inner_snowy_rotated")),
                 Optional.empty(),
                 TextureKey.TOP,
@@ -557,7 +609,7 @@ class ModelGenerator(generator: FabricDataOutput) : FabricModelProvider(generato
 
         generator?.blockStateCollector?.accept(
             when (parent) {
-                is GrassBlock -> createSnowyStairsBlockState(
+                in snowyOvergrownBlocks -> createSnowyStairsBlockState(
                     stair,
                     innerModel,
                     defaultModel,
@@ -714,7 +766,7 @@ class ModelGenerator(generator: FabricDataOutput) : FabricModelProvider(generato
         val snowyTextureMap = configureBlockTextureMapping(
             parent = parent,
             top = Blocks.SNOW,
-            side = side,
+            side = if (parent in snowyOvergrownBlocks) Blocks.GRASS_BLOCK else side,
             bottom = bottom,
             hasSideAndTop = parent in hasSideAndTop,
             removeBlock = parent in removeBlock,
@@ -750,7 +802,7 @@ class ModelGenerator(generator: FabricDataOutput) : FabricModelProvider(generato
                 generator?.modelCollector
             )
 
-            Blocks.PODZOL,  Blocks.MYCELIUM -> Model(
+            in snowyOvergrownBlocks -> Model(
                 Optional.of(Identifier.of("$MODID:block/template_overgrown_slab_bottom")),
                 Optional.empty(),
                 TextureKey.TOP,
@@ -772,7 +824,7 @@ class ModelGenerator(generator: FabricDataOutput) : FabricModelProvider(generato
         }
 
         val snowyBottomModel = when (parent) {
-            is GrassBlock, Blocks.PODZOL,  Blocks.MYCELIUM -> Model(
+            in snowyOvergrownBlocks -> Model(
                 Optional.of(Identifier.of("${MODID}:block/template_snowy_grass_slab_bottom")),
                 Optional.empty(),
                 TextureKey.TOP,
@@ -816,7 +868,7 @@ class ModelGenerator(generator: FabricDataOutput) : FabricModelProvider(generato
                 generator?.modelCollector
             )
 
-            Blocks.PODZOL,  Blocks.MYCELIUM -> Model(
+            in snowyOvergrownBlocks -> Model(
                 Optional.of(Identifier.of("$MODID:block/template_overgrown_slab_top")),
                 Optional.empty(),
                 TextureKey.TOP,
@@ -839,14 +891,7 @@ class ModelGenerator(generator: FabricDataOutput) : FabricModelProvider(generato
 
 
         val snowyTopModel = when (parent) {
-            is GrassBlock -> Models.SLAB_TOP.upload(
-                slab,
-                "_snow_top",
-                snowyTextureMap,
-                generator?.modelCollector
-            )
-
-            Blocks.PODZOL,  Blocks.MYCELIUM -> Models.SLAB_TOP.upload(
+            in snowyOvergrownBlocks  -> Models.SLAB_TOP.upload(
                 slab,
                 "_snow_top",
                 snowyTextureMap,
@@ -858,12 +903,12 @@ class ModelGenerator(generator: FabricDataOutput) : FabricModelProvider(generato
 
         val fullBlockModel = Identifier.of("block/${extractCleanBlockIdentifier(parent)}")
 
-        val snowyFullBlockModel =when (parent){is GrassBlock ->  Identifier.of("block/${extractCleanBlockIdentifier(parent)}_snow") else -> null}
+        val snowyFullBlockModel = when (parent){in snowyOvergrownBlocks ->  Identifier.of("block/${extractCleanBlockIdentifier(Blocks.GRASS_BLOCK)}_snow") else -> null}
 
         generateBlockItemModel(slab, parent, bottomModel, generator)
 
         generator?.blockStateCollector?.accept(
-            if (parent is GrassBlock) {
+            if (parent in snowyOvergrownBlocks) {
                 createSnowySlabBlockState(
                     slab,
                     bottomModel,
