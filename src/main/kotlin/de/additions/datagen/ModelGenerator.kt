@@ -364,6 +364,14 @@ class ModelGenerator(generator: FabricDataOutput) : FabricModelProvider(generato
                 TextureKey.LAYER0
             ).upload(stair, "", textureMap, generator?.modelCollector)
 
+            is DirtPathBlock -> Model(
+                Optional.of(Identifier.of("$MODID:block/template_path_stair")),
+                Optional.empty(),
+                TextureKey.TOP,
+                TextureKey.SIDE,
+                TextureKey.BOTTOM,
+            ).upload(stair, "", textureMap, generator?.modelCollector)
+
             else -> Models.STAIRS.upload(stair, "", textureMap, generator?.modelCollector)
         }
 
@@ -375,6 +383,14 @@ class ModelGenerator(generator: FabricDataOutput) : FabricModelProvider(generato
                 TextureKey.SIDE,
                 TextureKey.BOTTOM,
                 TextureKey.LAYER0
+            ).upload(stair, "_rotated", textureMap, generator?.modelCollector)
+
+            is DirtPathBlock -> Model(
+                Optional.of(Identifier.of("$MODID:block/template_path_stair_rotated")),
+                Optional.empty(),
+                TextureKey.TOP,
+                TextureKey.SIDE,
+                TextureKey.BOTTOM,
             ).upload(stair, "_rotated", textureMap, generator?.modelCollector)
 
             else -> Models.STAIRS.upload(stair, "_rotated", textureMap, generator?.modelCollector)
@@ -390,6 +406,14 @@ class ModelGenerator(generator: FabricDataOutput) : FabricModelProvider(generato
                 TextureKey.LAYER0
             ).upload(stair, "_outer", textureMap, generator?.modelCollector)
 
+            is DirtPathBlock -> Model(
+                Optional.of(Identifier.of("$MODID:block/template_path_stair_outer")),
+                Optional.empty(),
+                TextureKey.TOP,
+                TextureKey.SIDE,
+                TextureKey.BOTTOM,
+            ).upload(stair, "_outer", textureMap, generator?.modelCollector)
+
             else -> Models.OUTER_STAIRS.upload(stair, "", textureMap, generator?.modelCollector)
         }
 
@@ -401,6 +425,14 @@ class ModelGenerator(generator: FabricDataOutput) : FabricModelProvider(generato
                 TextureKey.SIDE,
                 TextureKey.BOTTOM,
                 TextureKey.LAYER0
+            ).upload(stair, "_outer_rotated", textureMap, generator?.modelCollector)
+
+            is DirtPathBlock -> Model(
+                Optional.of(Identifier.of("$MODID:block/template_path_stair_outer_rotated")),
+                Optional.empty(),
+                TextureKey.TOP,
+                TextureKey.SIDE,
+                TextureKey.BOTTOM,
             ).upload(stair, "_outer_rotated", textureMap, generator?.modelCollector)
 
             else -> Models.OUTER_STAIRS.upload(stair, "_rotated", textureMap, generator?.modelCollector)
@@ -416,6 +448,14 @@ class ModelGenerator(generator: FabricDataOutput) : FabricModelProvider(generato
                 TextureKey.LAYER0
             ).upload(stair, "_inner", textureMap, generator?.modelCollector)
 
+            is DirtPathBlock -> Model(
+                Optional.of(Identifier.of("$MODID:block/template_path_stair_inner")),
+                Optional.empty(),
+                TextureKey.TOP,
+                TextureKey.SIDE,
+                TextureKey.BOTTOM,
+            ).upload(stair, "_inner", textureMap, generator?.modelCollector)
+
             else -> Models.INNER_STAIRS.upload(stair, "", textureMap, generator?.modelCollector)
         }
 
@@ -427,6 +467,14 @@ class ModelGenerator(generator: FabricDataOutput) : FabricModelProvider(generato
                 TextureKey.SIDE,
                 TextureKey.BOTTOM,
                 TextureKey.LAYER0
+            ).upload(stair, "_inner_rotated", textureMap, generator?.modelCollector)
+
+            is DirtPathBlock -> Model(
+                Optional.of(Identifier.of("$MODID:block/template_path_stair_inner_rotated")),
+                Optional.empty(),
+                TextureKey.TOP,
+                TextureKey.SIDE,
+                TextureKey.BOTTOM,
             ).upload(stair, "_inner_rotated", textureMap, generator?.modelCollector)
 
             else -> Models.INNER_STAIRS.upload(stair, "_rotated", textureMap, generator?.modelCollector)
@@ -509,13 +557,7 @@ class ModelGenerator(generator: FabricDataOutput) : FabricModelProvider(generato
 
         generator?.blockStateCollector?.accept(
             when (parent) {
-                !is GrassBlock -> createStairsBlockState(
-                    stair,
-                    innerModel,
-                    defaultModel,
-                    outerModel
-                )
-                else -> createSnowyStairsBlockState(
+                is GrassBlock -> createSnowyStairsBlockState(
                     stair,
                     innerModel,
                     defaultModel,
@@ -529,6 +571,23 @@ class ModelGenerator(generator: FabricDataOutput) : FabricModelProvider(generato
                     snowyInnerModelRotated,
                     snowyDefaultModelRotated,
                     snowyOuterModelRotated
+                )
+
+                is DirtPathBlock -> createOvergrownStairsBlockState(
+                    stair,
+                    innerModel,
+                    defaultModel,
+                    outerModel,
+                    innerModelRotated,
+                    defaultModelRotated,
+                    outerModelRotated
+                )
+
+                else -> createStairsBlockState(
+                    stair,
+                    innerModel,
+                    defaultModel,
+                    outerModel
                 )
             }
         )
@@ -964,6 +1023,167 @@ class ModelGenerator(generator: FabricDataOutput) : FabricModelProvider(generato
                         config.half,
                         config.shape,
                         config.snowy,
+                        createVariant(config)
+                    )
+                }
+            })
+    }
+    /**
+     * Creates a BlockStateSupplier for overgrown stairs blocks with all possible variants.
+     *
+     * This function generates all possible blockstate variants for a stairs block that can be overgrown.
+     * It handles different stair shapes (straight, inner, outer), positions (top/bottom), and directions (N/S/E/W).
+     *
+     * @param stairsBlock The stairs block to create variants for
+     * @param innerModelId Model for inner corner variant
+     * @param regularModelId Model for straight variant
+     * @param outerModelId Model for outer corner variant
+     * @param innerModelRotated Model for rotated inner corner variant (top half)
+     * @param defaultModelRotated Model for rotated straight variant (top half)
+     * @param outerModelRotated Model for rotated outer corner variant (top half)
+     * @return BlockStateSupplier containing all possible variants
+     */
+    fun createOvergrownStairsBlockState(
+        stairsBlock: Block,
+        innerModelId: Identifier,
+        regularModelId: Identifier,
+        outerModelId: Identifier,
+        innerModelRotated: Identifier?,
+        defaultModelRotated: Identifier?,
+        outerModelRotated: Identifier?
+    ): BlockStateSupplier {
+
+        data class VariantConfig(
+            val direction: Direction,
+            val half: BlockHalf,
+            val shape: StairShape,
+            val modelId: Identifier?,
+            val yRot: VariantSettings.Rotation? = null,
+            val xRot: VariantSettings.Rotation? = null
+        )
+
+        fun createVariant(config: VariantConfig): BlockStateVariant =
+            BlockStateVariant.create().apply {
+                put(VariantSettings.MODEL, config.modelId)
+                config.yRot?.let { put(VariantSettings.Y, it) }
+                config.xRot?.let { put(VariantSettings.X, it) }
+                put(VariantSettings.UVLOCK, true)
+            }
+
+        fun getYRotation(direction: Direction, shape: StairShape, isTop: Boolean): VariantSettings.Rotation? =
+            if (isTop) {
+                when (shape) {
+                    StairShape.STRAIGHT -> when (direction) {
+                        Direction.WEST -> VariantSettings.Rotation.R180
+                        Direction.SOUTH -> VariantSettings.Rotation.R90
+                        Direction.NORTH -> VariantSettings.Rotation.R270
+                        else -> null
+                    }
+                    StairShape.OUTER_RIGHT -> when (direction) {
+                        Direction.EAST -> VariantSettings.Rotation.R90
+                        Direction.WEST -> VariantSettings.Rotation.R270
+                        Direction.SOUTH -> VariantSettings.Rotation.R180
+                        else -> null
+                    }
+                    StairShape.OUTER_LEFT -> when (direction) {
+                        Direction.WEST -> VariantSettings.Rotation.R180
+                        Direction.SOUTH -> VariantSettings.Rotation.R90
+                        Direction.NORTH -> VariantSettings.Rotation.R270
+                        else -> null
+                    }
+                    StairShape.INNER_RIGHT -> when (direction) {
+                        Direction.EAST -> VariantSettings.Rotation.R90
+                        Direction.WEST -> VariantSettings.Rotation.R270
+                        Direction.SOUTH -> VariantSettings.Rotation.R180
+                        else -> null
+                    }
+                    StairShape.INNER_LEFT -> when (direction) {
+                        Direction.WEST -> VariantSettings.Rotation.R180
+                        Direction.SOUTH -> VariantSettings.Rotation.R90
+                        Direction.NORTH -> VariantSettings.Rotation.R270
+                        else -> null
+                    }
+                }
+            } else {
+                when (shape) {
+                    StairShape.STRAIGHT -> when (direction) {
+                        Direction.WEST -> VariantSettings.Rotation.R180
+                        Direction.SOUTH -> VariantSettings.Rotation.R90
+                        Direction.NORTH -> VariantSettings.Rotation.R270
+                        else -> null
+                    }
+                    StairShape.OUTER_LEFT -> when (direction) {
+                        Direction.EAST -> VariantSettings.Rotation.R270
+                        Direction.WEST -> VariantSettings.Rotation.R90
+                        Direction.NORTH -> VariantSettings.Rotation.R180
+                        else -> null
+                    }
+                    StairShape.OUTER_RIGHT -> when (direction) {
+                        Direction.WEST -> VariantSettings.Rotation.R180
+                        Direction.SOUTH -> VariantSettings.Rotation.R90
+                        Direction.NORTH -> VariantSettings.Rotation.R270
+                        else -> null
+                    }
+                    StairShape.INNER_LEFT -> when (direction) {
+                        Direction.EAST -> VariantSettings.Rotation.R270
+                        Direction.WEST -> VariantSettings.Rotation.R90
+                        Direction.NORTH -> VariantSettings.Rotation.R180
+                        else -> null
+                    }
+                    StairShape.INNER_RIGHT -> when (direction) {
+                        Direction.WEST -> VariantSettings.Rotation.R180
+                        Direction.SOUTH -> VariantSettings.Rotation.R90
+                        Direction.NORTH -> VariantSettings.Rotation.R270
+                        else -> null
+                    }
+                }
+            }
+
+        fun generateVariants(): List<VariantConfig> {
+            val variants = mutableListOf<VariantConfig>()
+
+            fun getModel(shape: StairShape, isTop: Boolean): Identifier? =
+                when {
+                    isTop -> when (shape) {
+                        StairShape.STRAIGHT -> defaultModelRotated
+                        StairShape.INNER_LEFT, StairShape.INNER_RIGHT -> innerModelRotated
+                        StairShape.OUTER_LEFT, StairShape.OUTER_RIGHT -> outerModelRotated
+                    }
+                    else -> when (shape) {
+                        StairShape.STRAIGHT -> regularModelId
+                        StairShape.INNER_LEFT, StairShape.INNER_RIGHT -> innerModelId
+                        StairShape.OUTER_LEFT, StairShape.OUTER_RIGHT -> outerModelId
+                    }
+                }
+
+                BlockHalf.entries.forEach { half ->
+                    Direction.entries.filter { it.axis.isHorizontal }.forEach { direction ->
+                        StairShape.entries.forEach { shape ->
+                            val isTop = half == BlockHalf.TOP
+                            val model = getModel(shape, isTop)
+
+                            val yRot = getYRotation(direction, shape, isTop)
+                            val xRot = if (isTop) VariantSettings.Rotation.R180 else null
+
+                            variants.add(VariantConfig(direction, half, shape, model, yRot, xRot))
+                        }
+                    }
+                }
+
+            return variants
+        }
+
+        return VariantsBlockStateSupplier.create(stairsBlock)
+            .coordinate(BlockStateVariantMap.create(
+                Properties.HORIZONTAL_FACING,
+                Properties.BLOCK_HALF,
+                Properties.STAIR_SHAPE
+            ).apply {
+                generateVariants().forEach { config ->
+                    register(
+                        config.direction,
+                        config.half,
+                        config.shape,
                         createVariant(config)
                     )
                 }
