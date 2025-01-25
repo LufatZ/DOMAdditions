@@ -6,6 +6,7 @@ import net.fabricmc.fabric.api.client.datagen.v1.provider.FabricModelProvider
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.minecraft.block.Block
 import net.minecraft.block.Blocks
+import net.minecraft.block.DirtPathBlock
 import net.minecraft.block.GrassBlock
 import net.minecraft.block.SnowBlock
 import net.minecraft.block.enums.BlockHalf
@@ -677,6 +678,19 @@ class ModelGenerator(generator: FabricDataOutput) : FabricModelProvider(generato
                 generator?.modelCollector
             )
 
+            is DirtPathBlock -> Model(
+                Optional.of(Identifier.of("$MODID:block/template_path_slab_bottom")),
+                Optional.empty(),
+                TextureKey.TOP,
+                TextureKey.SIDE,
+                TextureKey.BOTTOM,
+            ).upload(
+                slab,
+                "",
+                textureMap,
+                generator?.modelCollector
+            )
+
             else -> Models.SLAB.upload(
                 slab,
                 "",
@@ -710,6 +724,19 @@ class ModelGenerator(generator: FabricDataOutput) : FabricModelProvider(generato
                 TextureKey.SIDE,
                 TextureKey.BOTTOM,
                 TextureKey.LAYER0
+            ).upload(
+                slab,
+                "_top",
+                textureMap,
+                generator?.modelCollector
+            )
+
+            is DirtPathBlock -> Model(
+                Optional.of(Identifier.of("$MODID:block/template_path_slab_top")),
+                Optional.empty(),
+                TextureKey.TOP,
+                TextureKey.SIDE,
+                TextureKey.BOTTOM,
             ).upload(
                 slab,
                 "_top",
