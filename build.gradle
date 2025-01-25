@@ -6,17 +6,34 @@ plugins {
 	id "org.jetbrains.kotlin.jvm" version "2.0.21"
 }
 
-// Read the build number from a properties file or create it if it doesn't exist
 def buildNumberFile = file('build.number')
+def currentModVersion = project.mod_version
 def buildNumber = 1
 
-if (buildNumberFile.exists()) {
-	buildNumber = Integer.parseInt(buildNumberFile.text.trim()) + 1
+// Read previous version from a separate file to track version changes
+def versionFile = file('last.version')
+
+if (versionFile.exists()) {
+	def previousVersion = versionFile.text.trim()
+
+	if (buildNumberFile.exists()) {
+		// Reset build number if mod version has changed
+		if (previousVersion != currentModVersion) {
+			buildNumber = 1
+		} else {
+			buildNumber = Integer.parseInt(buildNumberFile.text.trim()) + 1
+		}
+	}
 }
+
+// Write current build number
 buildNumberFile.text = buildNumber.toString()
 
-// Combine version with build number
+// Write current version for next comparison
+versionFile.text = currentModVersion
+
 version = "${project.mod_version}.build${buildNumber}"
+
 group = project.maven_group
 
 base {
