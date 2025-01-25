@@ -750,6 +750,19 @@ class ModelGenerator(generator: FabricDataOutput) : FabricModelProvider(generato
                 generator?.modelCollector
             )
 
+            Blocks.PODZOL,  Blocks.MYCELIUM -> Model(
+                Optional.of(Identifier.of("$MODID:block/template_overgrown_slab_bottom")),
+                Optional.empty(),
+                TextureKey.TOP,
+                TextureKey.SIDE,
+                TextureKey.BOTTOM,
+            ).upload(
+                slab,
+                "",
+                textureMap,
+                generator?.modelCollector
+            )
+
             else -> Models.SLAB.upload(
                 slab,
                 "",
@@ -759,7 +772,7 @@ class ModelGenerator(generator: FabricDataOutput) : FabricModelProvider(generato
         }
 
         val snowyBottomModel = when (parent) {
-            is GrassBlock -> Model(
+            is GrassBlock, Blocks.PODZOL,  Blocks.MYCELIUM -> Model(
                 Optional.of(Identifier.of("${MODID}:block/template_snowy_grass_slab_bottom")),
                 Optional.empty(),
                 TextureKey.TOP,
@@ -803,6 +816,19 @@ class ModelGenerator(generator: FabricDataOutput) : FabricModelProvider(generato
                 generator?.modelCollector
             )
 
+            Blocks.PODZOL,  Blocks.MYCELIUM -> Model(
+                Optional.of(Identifier.of("$MODID:block/template_overgrown_slab_top")),
+                Optional.empty(),
+                TextureKey.TOP,
+                TextureKey.SIDE,
+                TextureKey.BOTTOM,
+            ).upload(
+                slab,
+                "_top",
+                textureMap,
+                generator?.modelCollector
+            )
+
             else -> Models.SLAB_TOP.upload(
                 slab,
                 "",
@@ -814,6 +840,13 @@ class ModelGenerator(generator: FabricDataOutput) : FabricModelProvider(generato
 
         val snowyTopModel = when (parent) {
             is GrassBlock -> Models.SLAB_TOP.upload(
+                slab,
+                "_snow_top",
+                snowyTextureMap,
+                generator?.modelCollector
+            )
+
+            Blocks.PODZOL,  Blocks.MYCELIUM -> Models.SLAB_TOP.upload(
                 slab,
                 "_snow_top",
                 snowyTextureMap,
