@@ -2,17 +2,25 @@
 
 # DayOfMind Additions
 Welcome to **DayOfMind**, a sophisticated Minecraft mod project developed by OxfaTech, designed to enhance your gaming experience with thoughtfully crafted additions. Our focus is on aesthetic integration with vanilla Minecraft. 🌟
-[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/R6R818TUQY)
-![Crowdin](https://badges.crowdin.net/dayofmind-additions/localized.svg)
+![fabric](https://img.shields.io/badge/environment-any-707070?style=flat-square)
+![fabric](https://img.shields.io/badge/fabric-1.21.4-707070?style=flat-square)
+[![ko-fi](https://img.shields.io/badge/Ko--fi-FF5E5B?logo=ko-fi&logoColor=white)](https://ko-fi.com/R6R818TUQY)
+[![Crowdin](https://badges.crowdin.net/dayofmind-additions/localized.svg)](https://crowdin.com/project/dayofmind-additions)
+[![GitHub](https://img.shields.io/badge/GitHub-%23121011.svg?logo=github&logoColor=white)](https://github.com/LufatZ/DOMAdditions)
+[![Discord](https://img.shields.io/badge/Discord-%237289DA.svg?logo=discord&logoColor=white)](https://discord.gg/yRkqCvFcmz)
+[![Modrinth](https://img.shields.io/badge/Modrinth-0077DD?logo=modrinth&logoColor=white)](https://modrinth.com/mod/dayofmind-additions)
+[![CurseForge](https://img.shields.io/badge/CurseForge-551A8B?logo=curseforge&logoColor=white)](https://www.curseforge.com/minecraft/modpacks/day-of-mind)
+[![OxFaTech](https://img.shields.io/badge/OxFaTech-FF5E5B?logo=oxfatech&logoColor=white)](https://oxfatech.de)
 ---
 
 ## 📚 Quick Links
 - [**GitHub Repository**](https://github.com/LufatZ/DOMAdditions): Explore the code, report bugs, or contribute! ✍️
-- [**Discord Community**](https://discord.gg/uMs57SHZYn): Share your ideas and give feedback! 🫶
-- [**Translation Project on Crowdin**](https://crowdin.com/project/dayofmind-additions): Help translate the mod! ![Crowdin](https://badges.crowdin.net/dayofmind-additions/localized.svg)
+- [**Discord Community**](https://discord.gg/yRkqCvFcmz): Share your ideas and give feedback! 🫶
+- [**Translation Project on Crowdin**](https://crowdin.com/project/dayofmind-additions): Help translate the mod!
 - [**Modpack on Modrinth**](https://modrinth.com/modpack/dayofmind) | [**CurseForge**](https://www.curseforge.com/minecraft/modpacks/day-of-mind): Try out the official modpack! 🎮
-
-[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/R6R818TUQY)
+- [**Gallery on Modrinth**](https://modrinth.com/mod/dayofmind-additions/gallery): Visual showcase of our features! 🖼️
+- [**OxFaTech Website**](https://oxfatech.de): Professional services and support! 🛠️
+- [**Ko-fi Page**](https://ko-fi.com/R6R818TUQY): Support the project! ☕
 ---
 
 ## 🛠️ Features
@@ -40,9 +48,9 @@ More options for building with some nice slab and stair variants.
 | **Grass Block**          | Slabs, Stairs      | snowy property support, can be switched to dirt path with shovel |
 | **Dirt Block**           | Slabs, Stairs      | can be switched to dirt path with shovel                         |
 | **Dirt Path**            | Slabs, Stairs      | can be switched to dirt with shovel                              |
-| **Podzol**               | Slabs, Stairs      | none (Suggestions welcome)                                       |
+| **Podzol**               | Slabs, Stairs      | snowy property support                                           |
 | **Coarse Dirt**          | Slabs, Stairs      | none (Suggestions welcome)                                       |
-| **Mycelium**             | Slabs, Stairs      | none (Suggestions welcome)                                       |
+| **Mycelium**             | Slabs, Stairs      | snowy property support                                           |
 | **Rooted Dirt**          | Slabs, Stairs      | none (Suggestions welcome)                                       |
 | **Moss Block**           | Slabs, Stairs      | none (Suggestions welcome)                                       |
 | **Mud**                  | Slabs, Stairs      | none (Suggestions welcome)                                       |
@@ -108,7 +116,7 @@ Advanced building options with new trapdoor variants for detailed construction.
 | **Kotlin Migration**             | ✅ Complete | Modern codebase implementation  |
 | **Translations Integration**     | ✅ Complete | Community contributions welcome |
 | **Configuration System**         | ✅ Complete | Enhanced customization options  |
-| **Special Block Features**       | 🚧 Planned | e.g. damege on magma slabs      |
+| **Special Block Features**       | 🚧 Planned | e.g. damage on magma slabs      |
 | **Redstone Lantern Integration** | 🚧 Planned | Power lanterns with redstone    |
 
 ---
