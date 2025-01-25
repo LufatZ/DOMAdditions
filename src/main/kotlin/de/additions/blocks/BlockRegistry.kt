@@ -27,6 +27,7 @@ object BlockRegistry {
     val registeredChains: MutableList<Block> = mutableListOf()
     val registeredGrassBlocks: MutableList<Block> = mutableListOf()
     val registeredDirtBlockVariants: MutableList<Block> = mutableListOf()
+    val registeredMagmaBlockVariants: MutableList<Block> = mutableListOf()
 
 
     // Listen der Basis-Blöcke für Varianten
@@ -76,6 +77,10 @@ object BlockRegistry {
         logger.info("Trapdoor Variants disabled in configuration")
         listOf()
     }
+
+    /** Get registered Magma Block variants for BubbleColumnBlockMixin */
+    @JvmStatic
+    fun getRegisteredMagmaBlocks() = registeredMagmaBlockVariants.toList()
 
     /** Zentraler Registrierungsaufruf für alle Blocktypen */
     fun registerAllBlocks() {
@@ -173,6 +178,13 @@ object BlockRegistry {
                         settings.registryKey(keyOf("${baseName}_slab"))
                     )).also { registeredDirtBlockVariants.add(it) }
                 }
+                is MagmaBlock -> {
+                    register("${baseName}_slab", MagmaSlab(
+                        settings.registryKey(keyOf("${baseName}_slab"))
+                    )).also {
+                        registeredMagmaBlockVariants.add(it)
+                    }
+                }
                 else -> {
                     register("${baseName}_slab", SlabBlock(
                         settings.registryKey(keyOf("${baseName}_slab"))
@@ -191,7 +203,10 @@ object BlockRegistry {
                     parent.defaultState,
                     settings.registryKey(keyOf("${baseName}_stairs"))
                 ))
-
+                is MagmaBlock -> register("${baseName}_stairs", MagmaStair(
+                    parent.defaultState,
+                    settings.registryKey(keyOf("${baseName}_stairs"))
+                )).also { registeredMagmaBlockVariants.add(it) }
                 is DirtPathBlock -> register("${baseName}_stairs", PathStair(
                     parent.defaultState,
                     settings.registryKey(keyOf("${baseName}_stairs"))
