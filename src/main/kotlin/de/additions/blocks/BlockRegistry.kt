@@ -173,6 +173,11 @@ object BlockRegistry {
                         settings.registryKey(keyOf("${baseName}_slab"))
                     ))
                 }
+                is CryingObsidianBlock -> {
+                    register("${baseName}_slab", CryingObsidianSlab(
+                        settings.registryKey(keyOf("${baseName}_slab"))
+                    ))
+                }
                 is DirtPathBlock -> {
                     register("${baseName}_slab", PathSlab(
                         settings.registryKey(keyOf("${baseName}_slab"))
@@ -200,6 +205,10 @@ object BlockRegistry {
                 )).also { registeredGrassBlocks.add(it) }
 
                 Blocks.PODZOL, Blocks.MYCELIUM -> register("${baseName}_stairs", SnowyStairsBlock(
+                    parent.defaultState,
+                    settings.registryKey(keyOf("${baseName}_stairs"))
+                ))
+                is CryingObsidianBlock -> register("${baseName}_stairs", CryingObsidianStair(
                     parent.defaultState,
                     settings.registryKey(keyOf("${baseName}_stairs"))
                 ))
