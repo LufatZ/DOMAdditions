@@ -1,7 +1,10 @@
 package de.additions.datagen
 
 import de.additions.Additions.MODID
+import de.additions.Additions.logger
 import de.additions.blocks.BlockRegistry
+import de.additions.items.ItemRegistry
+import de.additions.items.RadiusMineItem
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider
 import net.minecraft.advancement.criterion.RecipeUnlockedCriterion
@@ -21,6 +24,7 @@ import net.minecraft.recipe.book.RecipeCategory
 import net.minecraft.registry.RegistryKey
 import net.minecraft.registry.RegistryKeys
 import net.minecraft.registry.RegistryWrapper
+import net.minecraft.registry.tag.BlockTags
 import net.minecraft.util.Identifier
 import java.util.concurrent.CompletableFuture
 
@@ -43,6 +47,8 @@ class AdditionsRecipeGenerator(
     registriesFuture: CompletableFuture<RegistryWrapper.WrapperLookup>
 ) : FabricRecipeProvider(output, registriesFuture) {
 
+    lateinit var lookUp: RegistryWrapper.WrapperLookup
+    lateinit var exporter: RecipeExporter
     /**
      * Overrides the default recipe generation method to provide custom recipe generation logic.
      *
@@ -54,11 +60,13 @@ class AdditionsRecipeGenerator(
         registryLookup: RegistryWrapper.WrapperLookup,
         exporter: RecipeExporter
     ): RecipeGenerator? {
+        this.lookUp = registryLookup
+        this.exporter = exporter
         // Create an anonymous RecipeGenerator that calls our custom generation method
         return object : RecipeGenerator(registryLookup, exporter) {
             override fun generate() {
                 // Invoke method to generate recipes for various block types
-                generateRecipes(registryLookup, exporter)
+                generateRecipes()
             }
         }
     }
@@ -71,14 +79,8 @@ class AdditionsRecipeGenerator(
      * - Slab blocks (6 items per craft)
      * - Trapdoor blocks (1 item per craft)
      * - Lantern blocks with multiple base material options
-     *
-     * @param registryLookup Provides access to game registries
-     * @param exporter Handles exporting generated recipes
      */
-    private fun generateRecipes(
-        registryLookup: RegistryWrapper.WrapperLookup,
-        exporter: RecipeExporter
-    ) {
+    private fun generateRecipes() {
         // Retrieve registered blocks from BlockRegistry
         val stairsBlocks = BlockRegistry.registeredStairs
         val baseBlocks = BlockRegistry.blockVariantsParents
@@ -87,74 +89,57 @@ class AdditionsRecipeGenerator(
         val trapdoorParents = BlockRegistry.trapdoorVariantsParents
         val lanternBlocks = BlockRegistry.registeredLanterns
         val lanternParents = BlockRegistry.lanternVariantsParents
-
+        val items = ItemRegistry.registeredItems
         // Generate stairs recipes
         stairsBlocks.forEachIndexed { index, stairBlock ->
-            createRecipe(
-                registryLookup,
+            createBlockRecipe(
                 stairBlock,
                 baseBlocks[index].asItem(),
-                exporter,
                 4  // 4 stairs per craft
             )
         }
 
         // Generate slab recipes
         slabsBlocks.forEachIndexed { index, slabBlock ->
-            createRecipe(
-                registryLookup,
+            createBlockRecipe(
                 slabBlock,
                 baseBlocks[index].asItem(),
-                exporter,
                 6  // 6 slabs per craft
             )
         }
 
         // Generate trapdoor recipes
         trapdoorBlocks.forEachIndexed { index, trapdoorBlock ->
-            createRecipe(
-                registryLookup,
+            createBlockRecipe(
                 trapdoorBlock,
                 trapdoorParents[index].asItem(),
-                exporter,
                 1
             )
         }
 
         // Generate lantern recipes from different base materials
-        // TODO: Refactor to use more dynamic material registration
         lanternBlocks.forEachIndexed { index, lanternBlock ->
             // Lantern recipe from candle
-            createRecipe(
-                registryLookup,
-                lanternBlock,
-                Items.CANDLE,
-                exporter,
-                1,
-                lanternParents[index].asItem(),
-                "_from_candle"
+            val lanternSource: Map<Item, String> = mapOf(
+                Items.CANDLE to "_from_candle",
+                Items.TORCH to "_from_torch",
+                Blocks.LANTERN.asItem() to "_from_lantern"
             )
+            for ((item, variant) in lanternSource) {
+                createBlockRecipe(
+                    lanternBlock,
+                    item,
+                    1,
+                    lanternParents[index].asItem(),
+                    variant
+                )
+            }
+        }
 
-            // Lantern recipe from torch
-            createRecipe(
-                registryLookup,
-                lanternBlock,
-                Items.TORCH,
-                exporter,
-                1,
-                lanternParents[index].asItem(),
-                "_from_torch"
-            )
-
-            // Lantern recipe from existing lantern
-            createRecipe(
-                registryLookup,
-                lanternBlock,
-                Blocks.LANTERN.asItem(),
-                exporter,
-                1,
-                lanternParents[index].asItem(),
-                "_from_lantern"
+        // Generate recipes for mod items
+        items.forEach{stack ->
+            createItemRecipe(
+                stack.item
             )
         }
     }
@@ -168,19 +153,15 @@ class AdditionsRecipeGenerator(
      * - Trapdoors: 2-item horizontal line
      * - Lanterns: Special pattern with base and secondary material
      *
-     * @param registryLookup Provides access to game registries
      * @param recipeBlock The block being crafted
      * @param baseBlock The primary material used in crafting
-     * @param exporter Handles exporting the generated recipe
      * @param amount Number of items produced by the recipe
      * @param secondaryMaterial Optional secondary material (e.g. used for lanterns)
      * @param recipeVariant Optional identifier for recipe variants
      */
-    private fun createRecipe(
-        registryLookup: RegistryWrapper.WrapperLookup,
+    private fun createBlockRecipe(
         recipeBlock: Block,
         baseBlock: Item,
-        exporter: RecipeExporter,
         amount: Int = 1,
         secondaryMaterial: ItemConvertible? = null,
         recipeVariant: String = ""
@@ -200,7 +181,7 @@ class AdditionsRecipeGenerator(
 
         // Build the shaped recipe
         ShapedRecipeJsonBuilder.create(
-            registryLookup.getOrThrow(RegistryKeys.ITEM),
+            lookUp.getOrThrow(RegistryKeys.ITEM),
             RecipeCategory.BUILDING_BLOCKS,
             recipeBlock,
             amount
@@ -244,3 +225,53 @@ class AdditionsRecipeGenerator(
      */
     override fun getName(): String = MODID
 }
+
+private fun AdditionsRecipeGenerator.createItemRecipe(item: Item) {
+    // Lambda, das den Fallback erzeugt und den Logeintrag schreibt
+    val fallbackShape: () -> List<String> = {
+        logger.warn("Falling back to single item recipe, because no shape is defined for this item. ($item)")
+        listOf("X")
+    }
+
+    val shape = when (item) {
+        is RadiusMineItem -> when (item.effectiveBlocks.id) {
+            BlockTags.SHOVEL_MINEABLE.id -> listOf(" M ", "MSM", " S ")
+            BlockTags.PICKAXE_MINEABLE.id -> listOf("MM ", "MS ", " S ")
+            else -> fallbackShape()
+        }
+        else -> fallbackShape()
+    }
+
+    if (item is RadiusMineItem) {
+        ShapedRecipeJsonBuilder.create(
+            lookUp.getOrThrow(RegistryKeys.ITEM),
+            RecipeCategory.BUILDING_BLOCKS,
+            item,
+            1
+        ).apply {
+            shape.forEach { patternLine ->
+                pattern(patternLine)
+            }
+            input('M', item.getMaterialIngredient(lookUp.getOrThrow(RegistryKeys.ITEM)))
+            input('S', Items.STICK)
+
+            criterion(
+                "has_${item.getMaterialName()}",
+                RecipeUnlockedCriterion.create(
+                    RegistryKey.of(
+                        RegistryKeys.RECIPE,
+                        Identifier.of("${MODID}:${item.translationKey}")
+                    )
+                )
+            )
+
+            offerTo(
+                exporter,
+                "${MODID}_${item.translationKey}"
+            )
+        }
+    } else {
+        logger.warn("Cant create recipe for $item, because there is no preset for it. If this Item can´t be crafted, ignore this warning.")
+    }
+}
+

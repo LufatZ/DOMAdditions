@@ -4,10 +4,10 @@ package de.additions.items
 import de.additions.Additions.MODID
 import de.additions.Additions.logger
 import de.additions.config.AdditionsConfig
+import de.additions.items.RadiusMineItem.Companion.materials
 import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
-import net.minecraft.item.ToolMaterial
 import net.minecraft.registry.Registries
 import net.minecraft.registry.Registry
 import net.minecraft.registry.RegistryKey
@@ -45,15 +45,6 @@ object ItemRegistry {
     }
 
     private fun addToolItems() {
-        val materials = mapOf(
-            "stone" to ToolMaterial.STONE,
-            "iron" to ToolMaterial.IRON,
-            "diamond" to ToolMaterial.DIAMOND,
-            "gold" to ToolMaterial.GOLD,
-            "netherite" to ToolMaterial.NETHERITE,
-            "wood" to ToolMaterial.WOOD
-        )
-
         materials.forEach { (materialName, material) ->
             runCatching {
                 val toolSettings = Item.Settings()
