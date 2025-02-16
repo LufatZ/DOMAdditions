@@ -41,6 +41,7 @@ base {
 }
 
 repositories {
+	maven { url "https://maven.shedaniel.me" }
 	maven { url "https://maven.terraformersmc.com/" } // modmenu
 	maven { url "https://api.modrinth.com/maven" }    // modrinth
 }
@@ -59,7 +60,11 @@ dependencies {
 	modImplementation "net.fabricmc:fabric-language-kotlin:${project.fabric_kotlin_version}"
 	modRuntimeOnly "com.terraformersmc:modmenu:${project.modmenu_version}"                           // modmenu
 	modRuntimeOnly "maven.modrinth:jade:${project.jade}+fabric"                                     // jade (waila)
-	modImplementation "maven.modrinth:midnightlib:${project.midnightlib}-fabric"                    // midnight(config)
+	modImplementation "maven.modrinth:midnightlib:${project.midnightlib}-fabric"
+	// REI-API (Compile-Only)
+	modCompileOnly "me.shedaniel:RoughlyEnoughItems-api-fabric:${project.rei}"
+	// REI Runtime (Runtime-Only)
+	modRuntimeOnly "me.shedaniel:RoughlyEnoughItems-fabric:${project.rei}"
 }
 
 processResources {

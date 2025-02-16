@@ -5,8 +5,15 @@ import de.additions.Additions.logger
 import de.additions.blocks.BlockRegistry
 import de.additions.items.ItemRegistry
 import de.additions.items.RadiusMineItem
+import de.additions.items.RadiusMineItem.Companion.C_DIAMOND
+import de.additions.items.RadiusMineItem.Companion.C_GOLD
+import de.additions.items.RadiusMineItem.Companion.C_IRON
+import de.additions.items.RadiusMineItem.Companion.C_NETHERITE
+import de.additions.items.RadiusMineItem.Companion.C_STONE
+import de.additions.items.RadiusMineItem.Companion.C_WOOD
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider
+import net.minecraft.advancement.criterion.InventoryChangedCriterion
 import net.minecraft.advancement.criterion.RecipeUnlockedCriterion
 import net.minecraft.block.Block
 import net.minecraft.block.Blocks
@@ -20,6 +27,8 @@ import net.minecraft.data.recipe.ShapedRecipeJsonBuilder
 import net.minecraft.item.Item
 import net.minecraft.item.ItemConvertible
 import net.minecraft.item.Items
+import net.minecraft.predicate.item.ItemPredicate
+import net.minecraft.recipe.Ingredient
 import net.minecraft.recipe.book.RecipeCategory
 import net.minecraft.registry.RegistryKey
 import net.minecraft.registry.RegistryKeys
@@ -42,7 +51,7 @@ import java.util.concurrent.CompletableFuture
  * @property output FabricDataOutput for writing generated recipe files
  * @property registriesFuture Provides access to game registries during recipe generation
  */
-class AdditionsRecipeGenerator(
+class RecipeGenerator(
     output: FabricDataOutput,
     registriesFuture: CompletableFuture<RegistryWrapper.WrapperLookup>
 ) : FabricRecipeProvider(output, registriesFuture) {
@@ -201,20 +210,114 @@ class AdditionsRecipeGenerator(
 
             // Add recipe unlock criterion
             criterion(
-                "has_${baseBlock.translationKey}",
-                RecipeUnlockedCriterion.create(
-                    RegistryKey.of(
-                        RegistryKeys.RECIPE,
-                        Identifier.of("${MODID}:${recipeBlock.translationKey}")
-                    )
+                "has_${baseBlock.translationKey.replaceBeforeLast('.', "").replace(".", "")}",
+                InventoryChangedCriterion.Conditions.items(
+                    ItemPredicate.Builder.create()
+                        .items(lookUp.getOrThrow(RegistryKeys.ITEM),baseBlock)
+                        .build()
                 )
             )
 
             // Export the recipe with a unique identifier
             offerTo(
                 exporter,
-                "${MODID}_${recipeBlock.translationKey}$recipeVariant"
+                RegistryKey.of(
+                    RegistryKeys.RECIPE,
+                    Identifier.of(MODID, recipeBlock.translationKey.replace(".","_") + recipeVariant)
+                )
             )
+        }
+    }
+
+    private fun createItemRecipe(item: Item) {
+        // Lambda, das den Fallback erzeugt und den Logeintrag schreibt
+        val eFallbackShape: () -> List<String> = {
+            logger.warn("Falling back to single item recipe, because no shape is defined for this item. ($item)")
+            listOf("X")
+        }
+        val eMaterialComponents: () -> Nothing? = {
+            logger.warn("Fallback -> Unknown material for additional recipe components. ($item)")
+            null
+        }
+
+        val shape = when (item) {
+            is RadiusMineItem -> when (item.effectiveBlocks.id) {
+                BlockTags.SHOVEL_MINEABLE.id -> listOf("XSX", "MSM", "XMX")
+                BlockTags.PICKAXE_MINEABLE.id -> listOf("MMX", "MSX", "XSX")
+                else -> eFallbackShape()
+            }
+            else -> eFallbackShape()
+        }
+        val additionalMaterial = when (item) {
+            is RadiusMineItem -> when (item.material) {
+                C_WOOD -> Ingredient.ofItems(Items.STRING)
+                C_STONE -> Ingredient.ofItems(Items.DEEPSLATE)
+                C_IRON -> Ingredient.ofItems(Items.COPPER_BLOCK)
+                C_DIAMOND -> Ingredient.ofItems(Items.AMETHYST_BLOCK)
+                C_GOLD -> Ingredient.ofItems(Items.GOLD_INGOT)
+                C_NETHERITE -> Ingredient.ofItems(Items.CRYING_OBSIDIAN)
+                else -> eMaterialComponents()
+            }
+            else -> null
+        }
+
+        if (item is RadiusMineItem) {
+            val itemLookup = lookUp.getOrThrow(RegistryKeys.ITEM)
+
+            ShapedRecipeJsonBuilder.create(
+                itemLookup,
+                RecipeCategory.TOOLS,
+                item,
+                1
+            ).apply {
+                shape.forEach { patternLine ->
+                    pattern(patternLine)
+                }
+                input('M', item.getMaterialIngredient(itemLookup))
+                input('S', Items.STICK)
+
+                if (additionalMaterial != null) {
+                    input('X', additionalMaterial)
+                }
+
+                group("radius_mine")
+
+                //material criterion
+                criterion(
+                    "has_${item.getMaterialName()}",
+                    InventoryChangedCriterion.Conditions.items(
+                        item.getCraftingTagOrItem().let { (tag, craftingItem) ->
+                            ItemPredicate.Builder.create().apply {
+                                when {
+                                    tag != null -> tag(itemLookup, tag)
+                                    craftingItem != null -> items(itemLookup, craftingItem)
+                                    else -> items(itemLookup, Items.STICK)
+                                }
+                            }.build()
+                        }
+                    )
+                )
+                // recipe unlock criterion
+                criterion(
+                    "has_recipe_${item.translationKey.replaceBeforeLast('.',"").replace(".","")}",
+                    RecipeUnlockedCriterion.create(
+                        RegistryKey.of(
+                            RegistryKeys.RECIPE,
+                            Identifier.of(MODID, item.translationKey.replace(".","_")) // Muss mit recipe_id in offerTo() übereinstimmen
+                        )
+                    )
+                )
+
+                offerTo(
+                    exporter,
+                    RegistryKey.of( // Konsistente RegistryKey-Erstellung
+                        RegistryKeys.RECIPE,
+                        Identifier.of(MODID, item.translationKey.replace(".","_"))
+                    )
+                )
+            }
+        } else {
+            logger.warn("Cant create recipe for $item, because there is no preset for it. If this Item can´t be crafted, ignore this warning.")
         }
     }
 
@@ -225,53 +328,3 @@ class AdditionsRecipeGenerator(
      */
     override fun getName(): String = MODID
 }
-
-private fun AdditionsRecipeGenerator.createItemRecipe(item: Item) {
-    // Lambda, das den Fallback erzeugt und den Logeintrag schreibt
-    val fallbackShape: () -> List<String> = {
-        logger.warn("Falling back to single item recipe, because no shape is defined for this item. ($item)")
-        listOf("X")
-    }
-
-    val shape = when (item) {
-        is RadiusMineItem -> when (item.effectiveBlocks.id) {
-            BlockTags.SHOVEL_MINEABLE.id -> listOf(" M ", "MSM", " S ")
-            BlockTags.PICKAXE_MINEABLE.id -> listOf("MM ", "MS ", " S ")
-            else -> fallbackShape()
-        }
-        else -> fallbackShape()
-    }
-
-    if (item is RadiusMineItem) {
-        ShapedRecipeJsonBuilder.create(
-            lookUp.getOrThrow(RegistryKeys.ITEM),
-            RecipeCategory.BUILDING_BLOCKS,
-            item,
-            1
-        ).apply {
-            shape.forEach { patternLine ->
-                pattern(patternLine)
-            }
-            input('M', item.getMaterialIngredient(lookUp.getOrThrow(RegistryKeys.ITEM)))
-            input('S', Items.STICK)
-
-            criterion(
-                "has_${item.getMaterialName()}",
-                RecipeUnlockedCriterion.create(
-                    RegistryKey.of(
-                        RegistryKeys.RECIPE,
-                        Identifier.of("${MODID}:${item.translationKey}")
-                    )
-                )
-            )
-
-            offerTo(
-                exporter,
-                "${MODID}_${item.translationKey}"
-            )
-        }
-    } else {
-        logger.warn("Cant create recipe for $item, because there is no preset for it. If this Item can´t be crafted, ignore this warning.")
-    }
-}
-

@@ -58,6 +58,9 @@ class TranslationGenerator(generator: FabricDataOutput, registryLookup: Completa
 
         add("itemGroup.additions.blocks", "DayOfMind Blocks")
         add("itemGroup.additions.items", "DayOfMind Items")
+
+        add("tag.item.additions.stones", "Stones")
+        add("tag.item.additions.stones.tooltip", "All stone variants")
     }
 
     private fun toolTipTranslationBuilder(
