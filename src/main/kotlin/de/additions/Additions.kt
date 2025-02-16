@@ -6,6 +6,7 @@ import de.additions.itemGroups.ItemGroupRegistry
 import de.additions.items.ItemRegistry
 import eu.midnightdust.lib.config.MidnightConfig
 import net.fabricmc.api.ModInitializer
+import net.fabricmc.loader.impl.FabricLoaderImpl
 import org.slf4j.LoggerFactory
 
 object Additions : ModInitializer {
@@ -18,5 +19,11 @@ object Additions : ModInitializer {
 		BlockRegistry.registerAllBlocks()
 		ItemRegistry.registerItems()
 		ItemGroupRegistry.registerItemGroups()
+		if (FabricLoaderImpl.INSTANCE.isDevelopmentEnvironment) {
+			val blocksString = BlockRegistry.registeredBlocks.withIndex().joinToString("\n") { (index, block) -> "$index.) $block" }
+			val itemsString = ItemRegistry.registeredItems.withIndex().joinToString("\n") { (index, item) -> "$index.) $item" }
+
+			logger.info("Added Blocks:\n$blocksString\nAdded Items:\n$itemsString")
+		}
 	}
 }

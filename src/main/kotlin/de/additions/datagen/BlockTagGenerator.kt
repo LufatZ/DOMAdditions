@@ -8,6 +8,7 @@ import net.minecraft.block.Block
 import net.minecraft.registry.RegistryKeys
 import net.minecraft.registry.RegistryWrapper
 import net.minecraft.registry.tag.BlockTags
+import net.minecraft.registry.tag.TagKey
 import net.minecraft.sound.BlockSoundGroup
 import java.util.concurrent.CompletableFuture
 
@@ -51,6 +52,10 @@ class BlockTagGenerator(
         useParentMineable(BlockRegistry.registeredTrapdoors, BlockRegistry.trapdoorVariantsParents)
         useParentMineable(BlockRegistry.registeredStairs, BlockRegistry.blockVariantsParents)
         useParentMineable(BlockRegistry.registeredSlabs, BlockRegistry.blockVariantsParents)
+        //add all slabs to slab tag
+        BlockRegistry.registeredSlabs.forEach{ slab -> addToTag(slab, BlockTags.SLABS) }
+        BlockRegistry.registeredStairs.forEach{ stair -> addToTag(stair, BlockTags.STAIRS) }
+        BlockRegistry.registeredTrapdoors.forEach{ trapdoor -> addToTag( trapdoor, BlockTags.TRAPDOORS) }
     }
 
     /**
@@ -149,16 +154,23 @@ class BlockTagGenerator(
 
     /** Marks a block as mineable by pickaxe */
     private fun mineableByPickaxe(block: Block) {
-        getOrCreateTagBuilder(BlockTags.PICKAXE_MINEABLE).add(block)
+        addToTag(block, BlockTags.PICKAXE_MINEABLE)
     }
 
     /** Marks a block as mineable by axe */
     private fun mineableByAxe(block: Block) {
-        getOrCreateTagBuilder(BlockTags.AXE_MINEABLE).add(block)
+        addToTag(block, BlockTags.AXE_MINEABLE)
     }
 
     /** Marks a block as mineable by shovel */
     private fun mineableByShovel(block: Block) {
-        getOrCreateTagBuilder(BlockTags.SHOVEL_MINEABLE).add(block)
+        addToTag(block, BlockTags.SHOVEL_MINEABLE)
+    }
+
+    private fun addToTag(
+        block: Block,
+        key: TagKey<Block>
+    ) {
+        getOrCreateTagBuilder(key).add(block)
     }
 }
