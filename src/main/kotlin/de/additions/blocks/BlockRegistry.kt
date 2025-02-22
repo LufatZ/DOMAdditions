@@ -88,6 +88,7 @@ object BlockRegistry {
         registerBlockVariants()
         registerLanternVariants()
         registerTrapdoorVariants()
+        registerChains()
         logger.info("Block registration completed. Total registered blocks: ${registeredBlocks.size}")
     }
 
@@ -282,5 +283,15 @@ object BlockRegistry {
             registeredTrapdoors.add(trapdoor)
         }
         logger.info("Trapdoor variant registration completed")
+    }
+    /**
+     * Register Chains
+     */
+    fun registerChains() {
+        logger.info("Starting chain registration")
+        val chainSettings = AbstractBlock.Settings.copy(Blocks.CHAIN)
+        val chain = register("redstone_chain", RedstoneChainBlock(chainSettings.registryKey(keyOf("redstone_chain"))))
+        registeredChains.add(chain)
+        logger.info("Chain registration completed")
     }
 }
