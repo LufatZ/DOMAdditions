@@ -1,9 +1,6 @@
 package de.additions.datagen.models
 
-import de.additions.datagen.models.BlockModels.generateLanternModels
-import de.additions.datagen.models.BlockModels.generateSlabModels
-import de.additions.datagen.models.BlockModels.generateStairModels
-import de.additions.datagen.models.BlockModels.generateTrapdoorModels
+import de.additions.datagen.models.BlockModels.init
 import de.additions.datagen.models.ItemModelsGenerator.generateItemsModels
 import net.fabricmc.fabric.api.client.datagen.v1.provider.FabricModelProvider
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
@@ -26,7 +23,9 @@ import net.minecraft.client.data.ItemModelGenerator
  *
  * @param generator The FabricDataOutput used for generating mod resources
  */
-class ModelGenerator(generator: FabricDataOutput) : FabricModelProvider(generator) {
+class ModelGenerator(
+    generator: FabricDataOutput,
+) : FabricModelProvider(generator) {
     companion object {
         /**
          * Configuration Lists for Special Block Texture Handling
@@ -34,12 +33,19 @@ class ModelGenerator(generator: FabricDataOutput) : FabricModelProvider(generato
          * These lists and maps define special rules for texture generation for specific block types.
          * They help manage unique cases where block textures differ from standard generation methods.
          */
-        val hasSideAndTop = listOf<Block>(
-            Blocks.PODZOL, Blocks.MYCELIUM, Blocks.POLISHED_BASALT,
-            Blocks.MUDDY_MANGROVE_ROOTS, Blocks.SMOOTH_RED_SANDSTONE,
-            Blocks.QUARTZ_BLOCK, Blocks.BASALT, Blocks.SMOOTH_SANDSTONE,
-            Blocks.DIRT_PATH, Blocks.GRASS_BLOCK
-        )
+        val hasSideAndTop =
+            listOf<Block>(
+                Blocks.PODZOL,
+                Blocks.MYCELIUM,
+                Blocks.POLISHED_BASALT,
+                Blocks.MUDDY_MANGROVE_ROOTS,
+                Blocks.SMOOTH_RED_SANDSTONE,
+                Blocks.QUARTZ_BLOCK,
+                Blocks.BASALT,
+                Blocks.SMOOTH_SANDSTONE,
+                Blocks.DIRT_PATH,
+                Blocks.GRASS_BLOCK,
+            )
 
         /**
          * Mapping for blocks with alternative texture sources
@@ -47,15 +53,19 @@ class ModelGenerator(generator: FabricDataOutput) : FabricModelProvider(generato
          * Used when a block's texture should be derived from another block,
          * typically for smoothed or processed variants.
          */
-        val hasNoTexture = mapOf<Block, Block>(
-            Blocks.SMOOTH_RED_SANDSTONE to Blocks.RED_SANDSTONE,
-            Blocks.SMOOTH_QUARTZ to Blocks.QUARTZ_BLOCK,
-            Blocks.SMOOTH_SANDSTONE to Blocks.SANDSTONE
-        )
+        val hasNoTexture =
+            mapOf<Block, Block>(
+                Blocks.SMOOTH_RED_SANDSTONE to Blocks.RED_SANDSTONE,
+                Blocks.SMOOTH_QUARTZ to Blocks.QUARTZ_BLOCK,
+                Blocks.SMOOTH_SANDSTONE to Blocks.SANDSTONE,
+            )
 
-        val snowyOvergrownBlocks = listOf<Block>(
-            Blocks.GRASS_BLOCK, Blocks.PODZOL, Blocks.MYCELIUM
-        )
+        val snowyOvergrownBlocks =
+            listOf<Block>(
+                Blocks.GRASS_BLOCK,
+                Blocks.PODZOL,
+                Blocks.MYCELIUM,
+            )
 
         /**
          * Blocks where "_block" should be removed
@@ -82,10 +92,7 @@ class ModelGenerator(generator: FabricDataOutput) : FabricModelProvider(generato
     override fun generateBlockStateModels(generator: BlockStateModelGenerator?) {
         with(generator) {
             // Generate models for registered blocks
-            generateStairModels()
-            generateSlabModels()
-            generateTrapdoorModels()
-            generateLanternModels()
+            init()
         }
     }
 
