@@ -16,26 +16,39 @@ import net.minecraft.registry.RegistryWrapper
 import java.util.concurrent.CompletableFuture
 import kotlin.text.trim
 
-class TranslationGenerator(generator: FabricDataOutput, registryLookup: CompletableFuture<RegistryWrapper.WrapperLookup>) : FabricLanguageProvider(generator,registryLookup) {
-    val processedKey = mutableListOf<String>()
-    lateinit var builder: TranslationBuilder
+class TranslationGenerator(
+    generator: FabricDataOutput,
+    registryLookup: CompletableFuture<RegistryWrapper.WrapperLookup>,
+) : FabricLanguageProvider(generator, registryLookup) {
+    private val processedKey = mutableListOf<String>()
+    private lateinit var builder: TranslationBuilder
 
-    private fun add(key: String, value: String) {
+    private fun add(
+        key: String,
+        value: String,
+    ) {
         if (processedKey.contains(key)) {
             logger.warn("Duplicate key: $key")
-        }else {
+        } else {
             processedKey.add(key)
             builder.add(key, value)
         }
     }
 
-    fun extractNameFromKey(translationKey: String): String {
-        return translationKey.split(".").last().split("_").joinToString(" ") { it.replaceFirstChar { it.uppercase() } }.replace("Block", "").replace("Item", "").trim()
-    }
+    private fun extractNameFromKey(translationKey: String): String =
+        translationKey
+            .split(".")
+            .last()
+            .split("_")
+            .joinToString(" ") {
+                it.replaceFirstChar { it.uppercase() }
+            }.replace("Block", "")
+            .replace("Item", "")
+            .trim()
 
     override fun generateTranslations(
         registryLookup: RegistryWrapper.WrapperLookup,
-        translationBuilder: TranslationBuilder
+        translationBuilder: TranslationBuilder,
     ) {
         builder = translationBuilder
 
@@ -43,11 +56,11 @@ class TranslationGenerator(generator: FabricDataOutput, registryLookup: Completa
         blockTranslationBuilder(BlockRegistry.registeredSlabs, BlockRegistry.blockVariantsParents)
         blockTranslationBuilder(
             BlockRegistry.registeredTrapdoors,
-            BlockRegistry.trapdoorVariantsParents
+            BlockRegistry.trapdoorVariantsParents,
         )
         blockTranslationBuilder(
             BlockRegistry.registeredLanterns,
-            BlockRegistry.lanternVariantsParents
+            BlockRegistry.lanternVariantsParents,
         )
         configTranslationbuilder()
         modMenuTranslationBuilder()
@@ -61,11 +74,10 @@ class TranslationGenerator(generator: FabricDataOutput, registryLookup: Completa
 
         add("tag.item.additions.stones", "Stones")
         add("tag.item.additions.stones.tooltip", "All stone variants")
+        add("item.minecraft.redstone_chain", "Redstone Chain")
     }
 
-    private fun toolTipTranslationBuilder(
-        items: MutableList<ItemStack>
-    ) {
+    private fun toolTipTranslationBuilder(items: MutableList<ItemStack>) {
         items.forEach { stack ->
             val item = stack.item
 
@@ -78,9 +90,7 @@ class TranslationGenerator(generator: FabricDataOutput, registryLookup: Completa
         }
     }
 
-    private fun itemsTranslationBuilder(
-        stacks: MutableList<ItemStack>
-    ) {
+    private fun itemsTranslationBuilder(stacks: MutableList<ItemStack>) {
         stacks.forEach { stack ->
             val itemName = extractNameFromKey(stack.item.translationKey)
             add(stack.item.translationKey, itemName)
@@ -105,34 +115,34 @@ class TranslationGenerator(generator: FabricDataOutput, registryLookup: Completa
         add("$configKey.DayOfMind", "DayOfMind")
         add(
             "$configKey.aboutDayOfMind",
-            "DayOfMind is a mod that adds new blocks, recipes and features. With unique lanterns, expanded block variations and clever features like switching grass and dirt paths with a shovel, DayOfMind offers exciting possibilities for your adventures."
+            "DayOfMind is a mod that adds new blocks, recipes and features. With unique lanterns, expanded block variations and clever features like switching grass and dirt paths with a shovel, DayOfMind offers exciting possibilities for your adventures.",
         )
         add(
             "$configKey.features",
-            "The settings listed here are fully developed and can be used safely."
+            "The settings listed here are fully developed and can be used safely.",
         )
         add("$configKey.EnabledInstruments.tooltip", "Enables the ability to craft instruments")
         add("$configKey.EnabledShovelMixin", "Enable Shovel Mixin")
         add(
             "$configKey.EnabledShovelMixin.tooltip",
-            "Enables the ability to switch grass and dirt paths with a shovel"
+            "Enables the ability to switch grass and dirt paths with a shovel",
         )
         add("$configKey.EnabledBlockVariants", "Enable Block Variants")
         add(
             "$configKey.EnabledBlockVariants.tooltip",
-            "Enables the ability to craft more block variants (stairs, slabs)"
+            "Enables the ability to craft more block variants (stairs, slabs)",
         )
         add("$configKey.EnabledLantern", "Enable Lantern")
         add("$configKey.EnabledLantern.tooltip", "Enables the ability to craft more lanterns")
         add("$configKey.EnabledRedstoneLantern", "Enable Redstone Lantern")
         add(
             "$configKey.EnabledRedstoneLantern.tooltip",
-            "Enables the ability to craft redstone lanterns"
+            "Enables the ability to craft redstone lanterns",
         )
         add("$configKey.EnabledTranslation", "Enable Translation")
         add(
             "$configKey.EnabledTranslation.tooltip",
-            "Enables the automatic download of translations"
+            "Enables the automatic download of translations",
         )
         add("$configKey.TranslationUrl", "Translation Source")
         add("$configKey.TranslationUrl.tooltip", "Select the source of the translations")
@@ -142,21 +152,28 @@ class TranslationGenerator(generator: FabricDataOutput, registryLookup: Completa
         add("$configKey.enum.TranslationVersion.OXFATECH", "OxFaTech")
         add("$configKey.enum.TranslationVersion.CUSTOM", "Custom")
         add("$configKey.TranslationLogging", "Translation Logging")
-        add("$configKey.TranslationLogging.tooltip", "Enables detailed logging of the translation download. You probably don't want to enable this")
+        add(
+            "$configKey.TranslationLogging.tooltip",
+            "Enables detailed logging of the translation download. You probably don't want to enable this",
+        )
         add("$configKey.EnabledTrapdoor", "Enable Trapdoor")
         add("$configKey.EnabledTrapdoor.tooltip", "Enables the ability to craft more trapdoors")
     }
 
-    fun blockTranslationBuilder(blockList: List<Block>, parentBlockList: List<Block>) {
+    private fun blockTranslationBuilder(
+        blockList: List<Block>,
+        parentBlockList: List<Block>,
+    ) {
         blockList.forEachIndexed { index, block ->
             val parentName = extractNameFromKey(parentBlockList[index].translationKey)
-            val blockType = when (block) {
-                is StairsBlock -> "Stairs"
-                is SlabBlock -> "Slab"
-                is TrapdoorBlock -> "Trapdoor"
-                is LanternBlock -> "Lantern"
-                else -> "Block"
-            }
+            val blockType =
+                when (block) {
+                    is StairsBlock -> "Stairs"
+                    is SlabBlock -> "Slab"
+                    is TrapdoorBlock -> "Trapdoor"
+                    is LanternBlock -> "Lantern"
+                    else -> "Block"
+                }
             add(block.asItem().translationKey, "$parentName $blockType")
         }
     }
