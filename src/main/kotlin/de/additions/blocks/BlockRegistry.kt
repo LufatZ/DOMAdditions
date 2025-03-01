@@ -2,6 +2,8 @@
  * Registry für zusätzliche Minecraft-Blöcke und deren Varianten.
  * Ermöglicht die automatische Registrierung von Treppen, Platten und Laternen-Varianten.
  */
+@file:Suppress("ktlint:standard:no-wildcard-imports")
+
 package de.additions.blocks
 
 import de.additions.Additions.MODID
@@ -22,61 +24,119 @@ object BlockRegistry {
     val registeredBlocks: MutableList<ItemStack> = mutableListOf()
     val registeredStairs: MutableList<Block> = mutableListOf()
     val registeredSlabs: MutableList<Block> = mutableListOf()
-    val registeredLanterns: MutableList<Block> = mutableListOf()
+    val registeredLanterns: MutableMap<Block, Block> = mutableMapOf()
     val registeredTrapdoors: MutableList<Block> = mutableListOf()
     val registeredChains: MutableList<Block> = mutableListOf()
     val registeredGrassBlocks: MutableList<Block> = mutableListOf()
-    val registeredDirtBlockVariants: MutableList<Block> = mutableListOf()
-    val registeredMagmaBlockVariants: MutableList<Block> = mutableListOf()
-
+    private val registeredDirtBlockVariants: MutableList<Block> = mutableListOf()
+    private val registeredMagmaBlockVariants: MutableList<Block> = mutableListOf()
 
     // Listen der Basis-Blöcke für Varianten
-    val blockVariantsParents: List<Block> = if (AdditionsConfig.EnabledBlockVariants)
-        listOf(
-            Blocks.DIRT, Blocks.DIRT_PATH, Blocks.PODZOL, Blocks.GRASS_BLOCK,
-            Blocks.COARSE_DIRT, Blocks.MYCELIUM, Blocks.ROOTED_DIRT,
-            Blocks.MOSS_BLOCK, Blocks.MUD, Blocks.MUDDY_MANGROVE_ROOTS,
-            Blocks.GOLD_BLOCK, Blocks.IRON_BLOCK, Blocks.DIAMOND_BLOCK,
-            Blocks.SMOOTH_BASALT, Blocks.POLISHED_BASALT,
-            Blocks.MAGMA_BLOCK, Blocks.OBSIDIAN, Blocks.CRYING_OBSIDIAN
-        )else {
-        logger.info("Block Variants disabled in configuration")
-        listOf()
-    }
-    val lanternVariantsParents: List<Block> = if (AdditionsConfig.EnabledLantern)
-        listOf(
-            Blocks.NETHERITE_BLOCK,
-            Blocks.COPPER_BLOCK,
-            Blocks.DIAMOND_BLOCK
-        )else {
+    val blockVariantsParents: List<Block> =
+        if (AdditionsConfig.EnabledBlockVariants) {
+            listOf(
+                Blocks.DIRT,
+                Blocks.DIRT_PATH,
+                Blocks.PODZOL,
+                Blocks.GRASS_BLOCK,
+                Blocks.COARSE_DIRT,
+                Blocks.MYCELIUM,
+                Blocks.ROOTED_DIRT,
+                Blocks.MOSS_BLOCK,
+                Blocks.MUD,
+                Blocks.MUDDY_MANGROVE_ROOTS,
+                Blocks.GOLD_BLOCK,
+                Blocks.IRON_BLOCK,
+                Blocks.DIAMOND_BLOCK,
+                Blocks.SMOOTH_BASALT,
+                Blocks.POLISHED_BASALT,
+                Blocks.MAGMA_BLOCK,
+                Blocks.OBSIDIAN,
+                Blocks.CRYING_OBSIDIAN,
+            )
+        } else {
+            logger.info("Block Variants disabled in configuration")
+            listOf()
+        }
+    private val lanternVariantsParents: List<Block> =
+        if (AdditionsConfig.EnabledLantern) {
+            listOf(
+                Blocks.NETHERITE_BLOCK,
+                Blocks.COPPER_BLOCK,
+                Blocks.DIAMOND_BLOCK,
+                Blocks.EMERALD_BLOCK,
+                Blocks.GOLD_BLOCK,
+                Blocks.IRON_BLOCK,
+            )
+        } else {
             logger.info("Lantern Variants disabled in configuration")
             listOf()
-    }
-    val trapdoorVariantsParents: List<Block> = if (AdditionsConfig.EnabledTrapdoor)
-        listOf(
-            Blocks.NETHERITE_BLOCK, Blocks.DIAMOND_BLOCK, Blocks.STONE,
-            Blocks.COBBLESTONE, Blocks.MOSSY_COBBLESTONE, Blocks.SMOOTH_STONE,
-            Blocks.STONE_BRICKS, Blocks.CHISELED_STONE_BRICKS, Blocks.MOSSY_STONE_BRICKS,
-            Blocks.GRANITE, Blocks.POLISHED_GRANITE, Blocks.DIORITE,
-            Blocks.POLISHED_DIORITE, Blocks.ANDESITE, Blocks.POLISHED_ANDESITE,
-            Blocks.DEEPSLATE, Blocks.COBBLED_DEEPSLATE, Blocks.CHISELED_DEEPSLATE,
-            Blocks.POLISHED_DEEPSLATE, Blocks.DEEPSLATE_BRICKS, Blocks.DEEPSLATE_TILES,
-            Blocks.TUFF, Blocks.CHISELED_TUFF, Blocks.POLISHED_TUFF,
-            Blocks.TUFF_BRICKS, Blocks.CHISELED_TUFF_BRICKS, Blocks.BRICKS,
-            Blocks.MUD_BRICKS, Blocks.SANDSTONE, Blocks.CHISELED_SANDSTONE,
-            Blocks.SMOOTH_SANDSTONE, Blocks.RED_SANDSTONE, Blocks.CHISELED_RED_SANDSTONE,
-            Blocks.SMOOTH_RED_SANDSTONE, Blocks.PRISMARINE, Blocks.PRISMARINE_BRICKS,
-            Blocks.DARK_PRISMARINE, Blocks.NETHERRACK, Blocks.NETHER_BRICKS,
-            Blocks.RED_NETHER_BRICKS, Blocks.BASALT, Blocks.SMOOTH_BASALT,
-            Blocks.POLISHED_BASALT, Blocks.BLACKSTONE, Blocks.CHISELED_POLISHED_BLACKSTONE,
-            Blocks.POLISHED_BLACKSTONE, Blocks.POLISHED_BLACKSTONE_BRICKS, Blocks.END_STONE,
-            Blocks.END_STONE_BRICKS, Blocks.PURPUR_BLOCK, Blocks.GOLD_BLOCK,
-            Blocks.EMERALD_BLOCK, Blocks.QUARTZ_BLOCK, Blocks.CHISELED_QUARTZ_BLOCK,
-            Blocks.QUARTZ_BRICKS, Blocks.SMOOTH_QUARTZ, Blocks.AMETHYST_BLOCK
-        )else {
-        logger.info("Trapdoor Variants disabled in configuration")
-        listOf()
-    }
+        }
+    val trapdoorVariantsParents: List<Block> =
+        if (AdditionsConfig.EnabledTrapdoor) {
+            listOf(
+                Blocks.NETHERITE_BLOCK,
+                Blocks.DIAMOND_BLOCK,
+                Blocks.STONE,
+                Blocks.COBBLESTONE,
+                Blocks.MOSSY_COBBLESTONE,
+                Blocks.SMOOTH_STONE,
+                Blocks.STONE_BRICKS,
+                Blocks.CHISELED_STONE_BRICKS,
+                Blocks.MOSSY_STONE_BRICKS,
+                Blocks.GRANITE,
+                Blocks.POLISHED_GRANITE,
+                Blocks.DIORITE,
+                Blocks.POLISHED_DIORITE,
+                Blocks.ANDESITE,
+                Blocks.POLISHED_ANDESITE,
+                Blocks.DEEPSLATE,
+                Blocks.COBBLED_DEEPSLATE,
+                Blocks.CHISELED_DEEPSLATE,
+                Blocks.POLISHED_DEEPSLATE,
+                Blocks.DEEPSLATE_BRICKS,
+                Blocks.DEEPSLATE_TILES,
+                Blocks.TUFF,
+                Blocks.CHISELED_TUFF,
+                Blocks.POLISHED_TUFF,
+                Blocks.TUFF_BRICKS,
+                Blocks.CHISELED_TUFF_BRICKS,
+                Blocks.BRICKS,
+                Blocks.MUD_BRICKS,
+                Blocks.SANDSTONE,
+                Blocks.CHISELED_SANDSTONE,
+                Blocks.SMOOTH_SANDSTONE,
+                Blocks.RED_SANDSTONE,
+                Blocks.CHISELED_RED_SANDSTONE,
+                Blocks.SMOOTH_RED_SANDSTONE,
+                Blocks.PRISMARINE,
+                Blocks.PRISMARINE_BRICKS,
+                Blocks.DARK_PRISMARINE,
+                Blocks.NETHERRACK,
+                Blocks.NETHER_BRICKS,
+                Blocks.RED_NETHER_BRICKS,
+                Blocks.BASALT,
+                Blocks.SMOOTH_BASALT,
+                Blocks.POLISHED_BASALT,
+                Blocks.BLACKSTONE,
+                Blocks.CHISELED_POLISHED_BLACKSTONE,
+                Blocks.POLISHED_BLACKSTONE,
+                Blocks.POLISHED_BLACKSTONE_BRICKS,
+                Blocks.END_STONE,
+                Blocks.END_STONE_BRICKS,
+                Blocks.PURPUR_BLOCK,
+                Blocks.GOLD_BLOCK,
+                Blocks.EMERALD_BLOCK,
+                Blocks.QUARTZ_BLOCK,
+                Blocks.CHISELED_QUARTZ_BLOCK,
+                Blocks.QUARTZ_BRICKS,
+                Blocks.SMOOTH_QUARTZ,
+                Blocks.AMETHYST_BLOCK,
+            )
+        } else {
+            logger.info("Trapdoor Variants disabled in configuration")
+            listOf()
+        }
 
     /** Get registered Magma Block variants for BubbleColumnBlockMixin */
     @JvmStatic
@@ -104,22 +164,24 @@ object BlockRegistry {
     private inline fun <reified T> keyOf(
         id: String,
         vanilla: Boolean = true,
-        type: RegistryKey<Registry<T>>? = null
+        type: RegistryKey<Registry<T>>? = null,
     ): RegistryKey<T> {
         @Suppress("UNCHECKED_CAST")
-        val resolvedType = type ?: when (T::class) {
-            Block::class -> RegistryKeys.BLOCK as RegistryKey<Registry<T>>
-            Item::class -> RegistryKeys.ITEM as RegistryKey<Registry<T>>
-            else -> throw IllegalArgumentException("Unsupported type: ${T::class}")
-        }
+        val resolvedType =
+            type ?: when (T::class) {
+                Block::class -> RegistryKeys.BLOCK as RegistryKey<Registry<T>>
+                Item::class -> RegistryKeys.ITEM as RegistryKey<Registry<T>>
+                else -> throw IllegalArgumentException("Unsupported type: ${T::class}")
+            }
 
-        val identifier = if (vanilla) {
-            logger.debug("Creating Vanilla registry key for: $id")
-            Identifier.ofVanilla(id)
-        } else {
-            logger.debug("Creating Mod-specific registry key for: $id")
-            Identifier.of(MODID, id)
-        }
+        val identifier =
+            if (vanilla) {
+                logger.debug("Creating Vanilla registry key for: $id")
+                Identifier.ofVanilla(id)
+            } else {
+                logger.debug("Creating Mod-specific registry key for: $id")
+                Identifier.of(MODID, id)
+            }
 
         return RegistryKey.of(resolvedType, identifier)
     }
@@ -131,7 +193,10 @@ object BlockRegistry {
      * @param block Der zu registrierende Block
      * @return Der registrierte Block
      */
-    private fun register(id: String, block: Block): Block {
+    private fun register(
+        id: String,
+        block: Block,
+    ): Block {
         logger.debug("Registering block variant: $id")
 
         val blockKey = keyOf(id = id, type = RegistryKeys.BLOCK)
@@ -152,81 +217,128 @@ object BlockRegistry {
     /**
      * Registriert Treppen- und Platten-Varianten für vorgegebene Basis-Blöcke.
      */
-    fun registerBlockVariants() {
+    private fun registerBlockVariants() {
         logger.info("Starting block variant registration")
 
         // Varianten für jeden Basis-Block erstellen
         blockVariantsParents.forEach { parent ->
-            val baseName = Registries.BLOCK.getId(parent).path.replace("_block", "")
+            val baseName =
+                Registries.BLOCK
+                    .getId(parent)
+                    .path
+                    .replace("_block", "")
             val settings = AbstractBlock.Settings.copy(parent)
 
             logger.debug("Creating variants for base block: $baseName")
 
             // Platten-Variante registrieren
-            val slab = when(parent) {
-                is GrassBlock -> {
-                    register("${baseName}_slab", SnowySlabBlock(
-                        settings.registryKey(keyOf("${baseName}_slab"))
-                    )).also { registeredGrassBlocks.add(it) }
-                }
-                Blocks.PODZOL, Blocks.MYCELIUM -> {
-                    register("${baseName}_slab", SnowySlabBlock(
-                        settings.registryKey(keyOf("${baseName}_slab"))
-                    ))
-                }
-                is CryingObsidianBlock -> {
-                    register("${baseName}_slab", CryingObsidianSlab(
-                        settings.registryKey(keyOf("${baseName}_slab"))
-                    ))
-                }
-                is DirtPathBlock -> {
-                    register("${baseName}_slab", PathSlab(
-                        settings.registryKey(keyOf("${baseName}_slab"))
-                    )).also { registeredDirtBlockVariants.add(it) }
-                }
-                is MagmaBlock -> {
-                    register("${baseName}_slab", MagmaSlab(
-                        settings.registryKey(keyOf("${baseName}_slab"))
-                    )).also {
-                        registeredMagmaBlockVariants.add(it)
+            val slab =
+                when (parent) {
+                    is GrassBlock -> {
+                        register(
+                            "${baseName}_slab",
+                            SnowySlabBlock(
+                                settings.registryKey(keyOf("${baseName}_slab")),
+                            ),
+                        ).also { registeredGrassBlocks.add(it) }
+                    }
+                    Blocks.PODZOL, Blocks.MYCELIUM -> {
+                        register(
+                            "${baseName}_slab",
+                            SnowySlabBlock(
+                                settings.registryKey(keyOf("${baseName}_slab")),
+                            ),
+                        )
+                    }
+                    is CryingObsidianBlock -> {
+                        register(
+                            "${baseName}_slab",
+                            CryingObsidianSlab(
+                                settings.registryKey(keyOf("${baseName}_slab")),
+                            ),
+                        )
+                    }
+                    is DirtPathBlock -> {
+                        register(
+                            "${baseName}_slab",
+                            PathSlab(
+                                settings.registryKey(keyOf("${baseName}_slab")),
+                            ),
+                        ).also { registeredDirtBlockVariants.add(it) }
+                    }
+                    is MagmaBlock -> {
+                        register(
+                            "${baseName}_slab",
+                            MagmaSlab(
+                                settings.registryKey(keyOf("${baseName}_slab")),
+                            ),
+                        ).also {
+                            registeredMagmaBlockVariants.add(it)
+                        }
+                    }
+                    else -> {
+                        register(
+                            "${baseName}_slab",
+                            SlabBlock(
+                                settings.registryKey(keyOf("${baseName}_slab")),
+                            ),
+                        ).also { if (parent == Blocks.DIRT) registeredDirtBlockVariants.add(it) }
                     }
                 }
-                else -> {
-                    register("${baseName}_slab", SlabBlock(
-                        settings.registryKey(keyOf("${baseName}_slab"))
-                    )).also { if (parent == Blocks.DIRT) registeredDirtBlockVariants.add(it) }
-                }
-            }
 
             // Treppen-Variante registrieren
-            val stair = when(parent){
-                is GrassBlock -> register("${baseName}_stairs", SnowyStairsBlock(
-                    parent.defaultState,
-                    settings.registryKey(keyOf("${baseName}_stairs"))
-                )).also { registeredGrassBlocks.add(it) }
+            val stair =
+                when (parent) {
+                    is GrassBlock ->
+                        register(
+                            "${baseName}_stairs",
+                            SnowyStairsBlock(
+                                parent.defaultState,
+                                settings.registryKey(keyOf("${baseName}_stairs")),
+                            ),
+                        ).also { registeredGrassBlocks.add(it) }
 
-                Blocks.PODZOL, Blocks.MYCELIUM -> register("${baseName}_stairs", SnowyStairsBlock(
-                    parent.defaultState,
-                    settings.registryKey(keyOf("${baseName}_stairs"))
-                ))
-                is CryingObsidianBlock -> register("${baseName}_stairs", CryingObsidianStair(
-                    parent.defaultState,
-                    settings.registryKey(keyOf("${baseName}_stairs"))
-                ))
-                is MagmaBlock -> register("${baseName}_stairs", MagmaStair(
-                    parent.defaultState,
-                    settings.registryKey(keyOf("${baseName}_stairs"))
-                )).also { registeredMagmaBlockVariants.add(it) }
-                is DirtPathBlock -> register("${baseName}_stairs", PathStair(
-                    parent.defaultState,
-                    settings.registryKey(keyOf("${baseName}_stairs"))
-                )).also { registeredDirtBlockVariants.add(it) }
-                else -> register("${baseName}_stairs", StairsBlock(
-                    parent.defaultState,
-                    settings.registryKey(keyOf("${baseName}_stairs"))
-                )).also { if (parent == Blocks.DIRT) registeredDirtBlockVariants.add(it) }
-
-            }
+                    Blocks.PODZOL, Blocks.MYCELIUM ->
+                        register(
+                            "${baseName}_stairs",
+                            SnowyStairsBlock(
+                                parent.defaultState,
+                                settings.registryKey(keyOf("${baseName}_stairs")),
+                            ),
+                        )
+                    is CryingObsidianBlock ->
+                        register(
+                            "${baseName}_stairs",
+                            CryingObsidianStair(
+                                parent.defaultState,
+                                settings.registryKey(keyOf("${baseName}_stairs")),
+                            ),
+                        )
+                    is MagmaBlock ->
+                        register(
+                            "${baseName}_stairs",
+                            MagmaStair(
+                                parent.defaultState,
+                                settings.registryKey(keyOf("${baseName}_stairs")),
+                            ),
+                        ).also { registeredMagmaBlockVariants.add(it) }
+                    is DirtPathBlock ->
+                        register(
+                            "${baseName}_stairs",
+                            PathStair(
+                                parent.defaultState,
+                                settings.registryKey(keyOf("${baseName}_stairs")),
+                            ),
+                        ).also { registeredDirtBlockVariants.add(it) }
+                    else ->
+                        register(
+                            "${baseName}_stairs",
+                            StairsBlock(
+                                parent.defaultState,
+                                settings.registryKey(keyOf("${baseName}_stairs")),
+                            ),
+                        ).also { if (parent == Blocks.DIRT) registeredDirtBlockVariants.add(it) }
+                }
             registeredStairs.add(stair)
             registeredSlabs.add(slab)
         }
@@ -237,57 +349,91 @@ object BlockRegistry {
     /**
      * Registriert Laternen- und Ketten-Varianten für vorgegebene Basis-Blöcke.
      */
-    fun registerLanternVariants() {
+    private fun registerLanternVariants() {
         logger.info("Starting lantern variant registration")
 
         lanternVariantsParents.forEach { baseBlock ->
-            val baseName = Registries.BLOCK.getId(baseBlock).path.replace("_block", "")
+            var lantern: Block? = null
+            var redstoneLantern: Block? = null
+            val baseName =
+                Registries.BLOCK
+                    .getId(baseBlock)
+                    .path
+                    .replace("_block", "")
             val lanternSettings = AbstractBlock.Settings.copy(Blocks.LANTERN)
 
-            logger.debug("Creating lantern and chain variants for base block: $baseName")
+            logger.debug("Creating lantern variants for base block: $baseName")
 
             // Laternen-Variante registrieren
-            val lantern =register("${baseName}_lantern", LanternBlock(
-                lanternSettings.registryKey(keyOf("${baseName}_lantern"))
-            ))
+            if (baseBlock != Blocks.IRON_BLOCK) {
+                lantern =
+                    register(
+                        "${baseName}_lantern",
+                        LanternBlock(
+                            lanternSettings.registryKey(keyOf("${baseName}_lantern")),
+                        ),
+                    )
+            }
 
             // Redstone-Varianten Logging
             if (AdditionsConfig.EnabledRedstoneLantern) {
-                logger.warn("Redstone Lanterns enabled but not yet implemented for $baseName")
+                logger.warn("Redstone Lanterns are enabled. Variant registration for: $baseName")
+                redstoneLantern =
+                    register(
+                        "${baseName}_redstone_lantern",
+                        RedstoneLantern(
+                            lanternSettings.registryKey(keyOf("${baseName}_redstone_lantern")).luminance(
+                                Blocks.createLightLevelFromLitBlockState(
+                                    15,
+                                ),
+                            ),
+                        ),
+                    )
             } else {
                 logger.debug("Redstone Lanterns disabled for $baseName")
             }
-
-            registeredLanterns.add(lantern)
+            lantern?.let { registeredLanterns[it] = baseBlock }
+            redstoneLantern?.let { registeredLanterns[it] = baseBlock }
         }
 
         logger.info("Lantern variant registration completed")
     }
+
     /**
      * Registriert Falltür-Varianten für vorgegebene Basis-Blöcke.
      */
-    fun registerTrapdoorVariants() {
+    private fun registerTrapdoorVariants() {
         logger.info("Starting trapdoor variant registration")
 
         trapdoorVariantsParents.forEach { baseBlock ->
-            val baseName = Registries.BLOCK.getId(baseBlock).path.replace("_block", "")
+            val baseName =
+                Registries.BLOCK
+                    .getId(baseBlock)
+                    .path
+                    .replace("_block", "")
             val trapdoorSettings = AbstractBlock.Settings.copy(baseBlock)
 
             logger.debug("Creating trapdoor variants for base block: $baseName")
 
             // Falltür-Variante registrieren
-            val trapdoor = register("${baseName}_trapdoor", TrapdoorBlock(
-                BlockSetType.OAK,trapdoorSettings.registryKey(keyOf("${baseName}_trapdoor"))
-            ))
+            val trapdoor =
+                register(
+                    "${baseName}_trapdoor",
+                    TrapdoorBlock(
+                        BlockSetType.OAK,
+                        trapdoorSettings.registryKey(keyOf("${baseName}_trapdoor")),
+                    ),
+                )
 
             registeredTrapdoors.add(trapdoor)
         }
         logger.info("Trapdoor variant registration completed")
     }
+
     /**
      * Register Chains
      */
-    fun registerChains() {
+    private fun registerChains() {
         logger.info("Starting chain registration")
         val chainSettings = AbstractBlock.Settings.copy(Blocks.CHAIN)
         val chain = register("redstone_chain", RedstoneChainBlock(chainSettings.registryKey(keyOf("redstone_chain"))))

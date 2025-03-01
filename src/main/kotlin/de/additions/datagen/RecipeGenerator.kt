@@ -3,6 +3,7 @@ package de.additions.datagen
 import de.additions.Additions.MODID
 import de.additions.Additions.logger
 import de.additions.blocks.BlockRegistry
+import de.additions.blocks.RedstoneLantern
 import de.additions.items.ItemRegistry
 import de.additions.items.RadiusMineItem
 import de.additions.items.RadiusMineItem.Companion.C_DIAMOND
@@ -53,11 +54,11 @@ import java.util.concurrent.CompletableFuture
  */
 class RecipeGenerator(
     output: FabricDataOutput,
-    registriesFuture: CompletableFuture<RegistryWrapper.WrapperLookup>
+    registriesFuture: CompletableFuture<RegistryWrapper.WrapperLookup>,
 ) : FabricRecipeProvider(output, registriesFuture) {
-
     lateinit var lookUp: RegistryWrapper.WrapperLookup
     lateinit var exporter: RecipeExporter
+
     /**
      * Overrides the default recipe generation method to provide custom recipe generation logic.
      *
@@ -67,7 +68,7 @@ class RecipeGenerator(
      */
     override fun getRecipeGenerator(
         registryLookup: RegistryWrapper.WrapperLookup,
-        exporter: RecipeExporter
+        exporter: RecipeExporter,
     ): RecipeGenerator? {
         this.lookUp = registryLookup
         this.exporter = exporter
@@ -97,14 +98,13 @@ class RecipeGenerator(
         val trapdoorBlocks = BlockRegistry.registeredTrapdoors
         val trapdoorParents = BlockRegistry.trapdoorVariantsParents
         val lanternBlocks = BlockRegistry.registeredLanterns
-        val lanternParents = BlockRegistry.lanternVariantsParents
         val items = ItemRegistry.registeredItems
         // Generate stairs recipes
         stairsBlocks.forEachIndexed { index, stairBlock ->
             createBlockRecipe(
                 stairBlock,
                 baseBlocks[index].asItem(),
-                4  // 4 stairs per craft
+                4, // 4 stairs per craft
             )
         }
 
@@ -113,7 +113,7 @@ class RecipeGenerator(
             createBlockRecipe(
                 slabBlock,
                 baseBlocks[index].asItem(),
-                6  // 6 slabs per craft
+                6, // 6 slabs per craft
             )
         }
 
@@ -122,33 +122,48 @@ class RecipeGenerator(
             createBlockRecipe(
                 trapdoorBlock,
                 trapdoorParents[index].asItem(),
-                1
+                1,
             )
         }
 
         // Generate lantern recipes from different base materials
-        lanternBlocks.forEachIndexed { index, lanternBlock ->
+        lanternBlocks.forEach { (lantern, baseBlock) ->
             // Lantern recipe from candle
-            val lanternSource: Map<Item, String> = mapOf(
-                Items.CANDLE to "_from_candle",
-                Items.TORCH to "_from_torch",
-                Blocks.LANTERN.asItem() to "_from_lantern"
-            )
-            for ((item, variant) in lanternSource) {
+            if (lantern !is RedstoneLantern) {
+                val lanternSource: Map<Item, String> =
+                    mapOf(
+                        Items.CANDLE to "_from_candle",
+                        Items.TORCH to "_from_torch",
+                        Blocks.LANTERN.asItem() to "_from_lantern",
+                    )
+                for ((item, variant) in lanternSource) {
+                    createBlockRecipe(
+                        lantern,
+                        item,
+                        1,
+                        baseBlock.asItem(),
+                        variant,
+                    )
+                }
+            } else {
+                val sister: Block? =
+                    BlockRegistry.registeredLanterns.entries
+                        .find { (lantern1, baseBlock1) ->
+                            lantern1 != lantern && baseBlock1 == baseBlock
+                        }?.key ?: Blocks.LANTERN
                 createBlockRecipe(
-                    lanternBlock,
-                    item,
+                    lantern,
+                    Blocks.REDSTONE_WIRE.asItem(),
                     1,
-                    lanternParents[index].asItem(),
-                    variant
+                    sister,
                 )
             }
         }
 
         // Generate recipes for mod items
-        items.forEach{stack ->
+        items.forEach { stack ->
             createItemRecipe(
-                stack.item
+                stack.item,
             )
         }
     }
@@ -173,60 +188,64 @@ class RecipeGenerator(
         baseBlock: Item,
         amount: Int = 1,
         secondaryMaterial: ItemConvertible? = null,
-        recipeVariant: String = ""
+        recipeVariant: String = "",
     ) {
         // Determine crafting pattern based on block type
-        val pattern = when(recipeBlock) {
-            is SlabBlock -> listOf("XXX")  // Horizontal line for slabs
-            is StairsBlock -> listOf(      // Stair-like pattern
-                "X  ",
-                "XX ",
-                "XXX"
-            )
-            is TrapdoorBlock -> listOf("XX")  // 2-item horizontal line
-            is LanternBlock -> listOf("IX")   // Special lantern pattern
-            else -> listOf("X")  // Fallback: single item
-        }
+        val pattern =
+            when (recipeBlock) {
+                is SlabBlock -> listOf("XXX") // Horizontal line for slabs
+                is StairsBlock ->
+                    listOf( // Stair-like pattern
+                        "X  ",
+                        "XX ",
+                        "XXX",
+                    )
+                is TrapdoorBlock -> listOf("XX") // 2-item horizontal line
+                is LanternBlock -> listOf("IX") // Special lantern pattern
+                else -> listOf("X") // Fallback: single item
+            }
 
         // Build the shaped recipe
-        ShapedRecipeJsonBuilder.create(
-            lookUp.getOrThrow(RegistryKeys.ITEM),
-            RecipeCategory.BUILDING_BLOCKS,
-            recipeBlock,
-            amount
-        ).apply {
-            // Apply crafting pattern
-            pattern.forEach { patternLine ->
-                pattern(patternLine)
-            }
+        ShapedRecipeJsonBuilder
+            .create(
+                lookUp.getOrThrow(RegistryKeys.ITEM),
+                RecipeCategory.BUILDING_BLOCKS,
+                recipeBlock,
+                amount,
+            ).apply {
+                // Apply crafting pattern
+                pattern.forEach { patternLine ->
+                    pattern(patternLine)
+                }
 
-            // Configure recipe inputs
-            if (secondaryMaterial != null) {
-                input('X', baseBlock)      // Base material
-                input('I', secondaryMaterial)  // Secondary material
-            } else {
-                input('X', baseBlock)      // Single material input
-            }
+                // Configure recipe inputs
+                if (secondaryMaterial != null) {
+                    input('X', baseBlock) // Base material
+                    input('I', secondaryMaterial) // Secondary material
+                } else {
+                    input('X', baseBlock) // Single material input
+                }
 
-            // Add recipe unlock criterion
-            criterion(
-                "has_${baseBlock.translationKey.replaceBeforeLast('.', "").replace(".", "")}",
-                InventoryChangedCriterion.Conditions.items(
-                    ItemPredicate.Builder.create()
-                        .items(lookUp.getOrThrow(RegistryKeys.ITEM),baseBlock)
-                        .build()
+                // Add recipe unlock criterion
+                criterion(
+                    "has_${baseBlock.translationKey.replaceBeforeLast('.', "").replace(".", "")}",
+                    InventoryChangedCriterion.Conditions.items(
+                        ItemPredicate.Builder
+                            .create()
+                            .items(lookUp.getOrThrow(RegistryKeys.ITEM), baseBlock)
+                            .build(),
+                    ),
                 )
-            )
 
-            // Export the recipe with a unique identifier
-            offerTo(
-                exporter,
-                RegistryKey.of(
-                    RegistryKeys.RECIPE,
-                    Identifier.of(MODID, recipeBlock.translationKey.replace(".","_") + recipeVariant)
+                // Export the recipe with a unique identifier
+                offerTo(
+                    exporter,
+                    RegistryKey.of(
+                        RegistryKeys.RECIPE,
+                        Identifier.of(MODID, recipeBlock.translationKey.replace(".", "_") + recipeVariant),
+                    ),
                 )
-            )
-        }
+            }
     }
 
     private fun createItemRecipe(item: Item) {
@@ -240,84 +259,94 @@ class RecipeGenerator(
             null
         }
 
-        val shape = when (item) {
-            is RadiusMineItem -> when (item.effectiveBlocks.id) {
-                BlockTags.SHOVEL_MINEABLE.id -> listOf("XSX", "MSM", "XMX")
-                BlockTags.PICKAXE_MINEABLE.id -> listOf("MMX", "MSX", "XSX")
+        val shape =
+            when (item) {
+                is RadiusMineItem ->
+                    when (item.effectiveBlocks.id) {
+                        BlockTags.SHOVEL_MINEABLE.id -> listOf("XSX", "MSM", "XMX")
+                        BlockTags.PICKAXE_MINEABLE.id -> listOf("MMX", "MSX", "XSX")
+                        else -> eFallbackShape()
+                    }
                 else -> eFallbackShape()
             }
-            else -> eFallbackShape()
-        }
-        val additionalMaterial = when (item) {
-            is RadiusMineItem -> when (item.material) {
-                C_WOOD -> Ingredient.ofItems(Items.STRING)
-                C_STONE -> Ingredient.ofItems(Items.DEEPSLATE)
-                C_IRON -> Ingredient.ofItems(Items.COPPER_BLOCK)
-                C_DIAMOND -> Ingredient.ofItems(Items.AMETHYST_BLOCK)
-                C_GOLD -> Ingredient.ofItems(Items.GOLD_INGOT)
-                C_NETHERITE -> Ingredient.ofItems(Items.CRYING_OBSIDIAN)
-                else -> eMaterialComponents()
+        val additionalMaterial =
+            when (item) {
+                is RadiusMineItem ->
+                    when (item.material) {
+                        C_WOOD -> Ingredient.ofItems(Items.STRING)
+                        C_STONE -> Ingredient.ofItems(Items.DEEPSLATE)
+                        C_IRON -> Ingredient.ofItems(Items.COPPER_BLOCK)
+                        C_DIAMOND -> Ingredient.ofItems(Items.AMETHYST_BLOCK)
+                        C_GOLD -> Ingredient.ofItems(Items.GOLD_INGOT)
+                        C_NETHERITE -> Ingredient.ofItems(Items.CRYING_OBSIDIAN)
+                        else -> eMaterialComponents()
+                    }
+                else -> null
             }
-            else -> null
-        }
 
         if (item is RadiusMineItem) {
             val itemLookup = lookUp.getOrThrow(RegistryKeys.ITEM)
 
-            ShapedRecipeJsonBuilder.create(
-                itemLookup,
-                RecipeCategory.TOOLS,
-                item,
-                1
-            ).apply {
-                shape.forEach { patternLine ->
-                    pattern(patternLine)
-                }
-                input('M', item.getMaterialIngredient(itemLookup))
-                input('S', Items.STICK)
+            ShapedRecipeJsonBuilder
+                .create(
+                    itemLookup,
+                    RecipeCategory.TOOLS,
+                    item,
+                    1,
+                ).apply {
+                    shape.forEach { patternLine ->
+                        pattern(patternLine)
+                    }
+                    input('M', item.getMaterialIngredient(itemLookup))
+                    input('S', Items.STICK)
 
-                if (additionalMaterial != null) {
-                    input('X', additionalMaterial)
-                }
+                    if (additionalMaterial != null) {
+                        input('X', additionalMaterial)
+                    }
 
-                group("radius_mine")
+                    group("radius_mine")
 
-                //material criterion
-                criterion(
-                    "has_${item.getMaterialName()}",
-                    InventoryChangedCriterion.Conditions.items(
-                        item.getCraftingTagOrItem().let { (tag, craftingItem) ->
-                            ItemPredicate.Builder.create().apply {
-                                when {
-                                    tag != null -> tag(itemLookup, tag)
-                                    craftingItem != null -> items(itemLookup, craftingItem)
-                                    else -> items(itemLookup, Items.STICK)
-                                }
-                            }.build()
-                        }
+                    // material criterion
+                    criterion(
+                        "has_${item.getMaterialName()}",
+                        InventoryChangedCriterion.Conditions.items(
+                            item.getCraftingTagOrItem().let { (tag, craftingItem) ->
+                                ItemPredicate.Builder
+                                    .create()
+                                    .apply {
+                                        when {
+                                            tag != null -> tag(itemLookup, tag)
+                                            craftingItem != null -> items(itemLookup, craftingItem)
+                                            else -> items(itemLookup, Items.STICK)
+                                        }
+                                    }.build()
+                            },
+                        ),
                     )
-                )
-                // recipe unlock criterion
-                criterion(
-                    "has_recipe_${item.translationKey.replaceBeforeLast('.',"").replace(".","")}",
-                    RecipeUnlockedCriterion.create(
-                        RegistryKey.of(
+                    // recipe unlock criterion
+                    criterion(
+                        "has_recipe_${item.translationKey.replaceBeforeLast('.',"").replace(".","")}",
+                        RecipeUnlockedCriterion.create(
+                            @Suppress("ktlint:standard:max-line-length")
+                            RegistryKey.of(
+                                RegistryKeys.RECIPE,
+                                Identifier.of(MODID, item.translationKey.replace(".", "_")), // Muss mit recipe_id in offerTo() übereinstimmen
+                            ),
+                        ),
+                    )
+
+                    offerTo(
+                        exporter,
+                        RegistryKey.of( // Konsistente RegistryKey-Erstellung
                             RegistryKeys.RECIPE,
-                            Identifier.of(MODID, item.translationKey.replace(".","_")) // Muss mit recipe_id in offerTo() übereinstimmen
-                        )
+                            Identifier.of(MODID, item.translationKey.replace(".", "_")),
+                        ),
                     )
-                )
-
-                offerTo(
-                    exporter,
-                    RegistryKey.of( // Konsistente RegistryKey-Erstellung
-                        RegistryKeys.RECIPE,
-                        Identifier.of(MODID, item.translationKey.replace(".","_"))
-                    )
-                )
-            }
+                }
         } else {
-            logger.warn("Cant create recipe for $item, because there is no preset for it. If this Item can´t be crafted, ignore this warning.")
+            logger.warn(
+                "Cant create recipe for $item, because there is no preset for it. If this Item can´t be crafted, ignore this warning.",
+            )
         }
     }
 

@@ -2,7 +2,6 @@ package de.additions.datagen.models
 
 import de.additions.Additions.MODID
 import de.additions.blocks.BlockRegistry.blockVariantsParents
-import de.additions.blocks.BlockRegistry.lanternVariantsParents
 import de.additions.blocks.BlockRegistry.registeredChains
 import de.additions.blocks.BlockRegistry.registeredLanterns
 import de.additions.blocks.BlockRegistry.registeredSlabs
@@ -91,11 +90,7 @@ object BlockModels {
      * using the parent block's texture as a base.
      */
     private fun generateLanternModels() {
-        registeredLanterns.forEachIndexed { index, lantern ->
-            when (val parentBlock = lanternVariantsParents[index]) {
-                else -> generateLanternModel(lantern, parentBlock)
-            }
-        }
+        registeredLanterns.forEach { (lantern, baseBlock) -> generateLanternModel(lantern, baseBlock) }
     }
 
     /**
@@ -563,6 +558,7 @@ object BlockModels {
                 textureMap,
                 generator.modelCollector,
             )
+
         val lanternModelhanging =
             Model(
                 Optional.of(Identifier.of("$MODID:block/template_lantern_hanging")),
@@ -576,13 +572,24 @@ object BlockModels {
                 generator.modelCollector,
             )
 
-        generateBlockItemModel(lantern, parent, lanternModelStanding, generator)
-
-        generator.blockStateCollector?.accept(
-            VariantsBlockStateSupplier
-                .create(lantern)
-                .coordinate(createBooleanModelMap(Properties.HANGING, lanternModelhanging, lanternModelStanding)),
-        )
+        if (parent == Blocks.IRON_BLOCK) {
+            val lanternStandingModelId = Identifier.ofVanilla("block/lantern")
+            val lanternHangingModelId = Identifier.ofVanilla("block/lantern_hanging")
+            val lanternItemModelId = Identifier.ofVanilla("item/lantern")
+            generator.registerParentedItemModel(lantern, lanternItemModelId)
+            generator.blockStateCollector.accept(
+                VariantsBlockStateSupplier.create(lantern).coordinate(
+                    createBooleanModelMap(Properties.HANGING, lanternHangingModelId, lanternStandingModelId),
+                ),
+            )
+        } else {
+            generator.blockStateCollector?.accept(
+                VariantsBlockStateSupplier
+                    .create(lantern)
+                    .coordinate(createBooleanModelMap(Properties.HANGING, lanternModelhanging, lanternModelStanding)),
+            )
+            generateBlockItemModel(lantern, parent, lanternModelStanding, generator)
+        }
     }
 
     /**

@@ -6,12 +6,15 @@ import net.fabricmc.fabric.api.datagen.v1.provider.FabricBlockLootTableProvider
 import net.minecraft.registry.RegistryWrapper
 import java.util.concurrent.CompletableFuture
 
-class LootGenerator(generator: FabricDataOutput, registryLookup: CompletableFuture<RegistryWrapper.WrapperLookup>) : FabricBlockLootTableProvider(generator,registryLookup) {
+class LootGenerator(
+    generator: FabricDataOutput,
+    registryLookup: CompletableFuture<RegistryWrapper.WrapperLookup>,
+) : FabricBlockLootTableProvider(generator, registryLookup) {
     override fun generate() {
         BlockRegistry.registeredTrapdoors.forEach { trapdoor ->
             addDrop(trapdoor)
         }
-        BlockRegistry.registeredLanterns.forEach { lantern ->
+        BlockRegistry.registeredLanterns.keys.toList().forEach { lantern ->
             addDrop(lantern)
         }
         BlockRegistry.registeredStairs.forEach { stair ->

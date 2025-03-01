@@ -19,13 +19,20 @@ import net.minecraft.world.BlockView
 import net.minecraft.world.World
 import net.minecraft.world.WorldView
 import net.minecraft.world.block.WireOrientation
-import net.minecraft.world.tick.ScheduledTickView
 
 /**
- * A chain block that conducts redstone power along its axis. When powered, it emits redstone particles
- * and propagates the redstone signal to adjacent blocks in the chain.
+ * A specialized chain block that conducts redstone power along its axis.
+ * This block extends the vanilla Chain Block functionality by adding redstone conductivity.
+ * When powered, it emits redstone particles and propagates power signals to adjacent blocks
+ * along its axis, creating a directional power transmission system.
  *
- * @property settings Block settings for material, hardness, etc.
+ * Features:
+ * - Conducts redstone power only along its placed axis (X, Y, or Z)
+ * - Power decreases by 1 for each block in the chain (similar to redstone dust)
+ * - Displays power level with redstone particles when active
+ * - Only connects to other RedstoneChain blocks with matching axes
+ *
+ * @property settings Block settings for material, hardness, sound, etc.
  */
 class RedstoneChainBlock(
     settings: Settings,
@@ -39,15 +46,22 @@ class RedstoneChainBlock(
                 .with(AXIS, Direction.Axis.Y)
     }
 
+    /**
+     * Registers block properties to the state manager.
+     * Adds POWERED and POWER properties in addition to the inherited WATERLOGGED and AXIS properties.
+     *
+     * @param builder State manager builder to register properties to
+     */
     override fun appendProperties(builder: StateManager.Builder<Block, BlockState>) {
         builder.add(POWERED, POWER, WATERLOGGED, AXIS)
     }
 
     /**
-     * Gets directions along the specified axis for power calculation.
+     * Determines the two directions along a specific axis.
+     * Used to check both directions along an axis for power sources.
      *
-     * @param axis The axis to get directions for
-     * @return Pair of positive and negative directions along the axis
+     * @param axis The axis (X, Y, or Z) to get directions for
+     * @return Pair containing positive and negative directions along the specified axis
      */
     private fun getAxisDirections(axis: Direction.Axis): Pair<Direction, Direction> =
         when (axis) {
@@ -57,13 +71,14 @@ class RedstoneChainBlock(
         }
 
     /**
-     * Calculates valid redstone power in a specific direction, ignoring same-type blocks with mismatched axes.
+     * Calculates valid redstone power in a specific direction.
+     * Ignores RedstoneChain blocks with mismatched axes to prevent cross-axis connections.
      *
-     * @param world The world context
-     * @param dir Direction to check for power
-     * @param pos Current block's pos
+     * @param world The world context for retrieving block states
+     * @param dir Direction to check for power input
+     * @param pos Current block's position
      * @param axis Axis of the current block
-     * @return Adjusted power level for the direction
+     * @return The adjusted power level from the specified direction (0 if invalid)
      */
     private fun getValidDirectionPower(
         world: WorldView,
@@ -85,12 +100,13 @@ class RedstoneChainBlock(
     }
 
     /**
-     * Gets the maximum redstone power available along the block's axis.
+     * Determines the maximum redstone power available along the block's axis.
+     * Checks both directions along the axis and returns the higher power value.
      *
-     * @param world The world context
+     * @param world The world context for block state queries
      * @param pos Current block position
      * @param axis Axis to check for power
-     * @return Pair containing maximum power level and its direction
+     * @return The maximum power level found along the block's axis
      */
     private fun getAxisPower(
         world: WorldView,
@@ -104,6 +120,13 @@ class RedstoneChainBlock(
         return if (power1 >= power2) power1 else power2
     }
 
+    /**
+     * Determines the initial block state when placed in the world.
+     * Sets the appropriate axis based on placement direction and calculates initial power level.
+     *
+     * @param ctx The item placement context containing placement information
+     * @return The block state to use when the block is first placed
+     */
     override fun getPlacementState(ctx: ItemPlacementContext): BlockState {
         val axis = ctx.side.axis
         val pos = ctx.blockPos
@@ -115,6 +138,17 @@ class RedstoneChainBlock(
             .with(AXIS, axis)
     }
 
+    /**
+     * Updates the block's state when a neighboring block changes.
+     * Recalculates power level and updates the block state accordingly.
+     *
+     * @param state The current block state
+     * @param world The world context
+     * @param pos The position of this block
+     * @param sourceBlock The block that caused the update
+     * @param wireOrientation The orientation of connecting wires (if applicable)
+     * @param notify Whether to notify neighbors of the change
+     */
     override fun neighborUpdate( // potentially wrong method
         state: BlockState?,
         world: World?,
@@ -128,8 +162,25 @@ class RedstoneChainBlock(
         world.setBlockState(pos, state.with(POWER, power).with(POWERED, power > 0))
     }
 
+    /**
+     * Determines whether this block can emit redstone power.
+     * Returns true if the block is in a powered state.
+     *
+     * @param state The block state to check
+     * @return true if the block can emit redstone power, false otherwise
+     */
     override fun emitsRedstonePower(state: BlockState): Boolean = state.get(POWERED)
 
+    /**
+     * Calculates the weak redstone power output in a specific direction.
+     * Decreases power by 1 compared to input power, similar to redstone dust.
+     *
+     * @param state The current block state
+     * @param world The block view context
+     * @param pos The position of this block
+     * @param direction The direction to calculate power for
+     * @return The power level emitted in the specified direction (power - 1, minimum 0)
+     */
     override fun getWeakRedstonePower(
         state: BlockState,
         world: BlockView,
@@ -137,6 +188,16 @@ class RedstoneChainBlock(
         direction: Direction,
     ): Int = (state.get(POWER) - 1).coerceAtLeast(0)
 
+    /**
+     * Creates visual particle effects when the block is powered.
+     * Generates red dust particles proportional to the power level.
+     * Only runs on the client side.
+     *
+     * @param state The current block state
+     * @param world The world context
+     * @param pos The position of this block
+     * @param random Random number generator for particle effects
+     */
     @Environment(EnvType.CLIENT)
     override fun randomDisplayTick(
         state: BlockState,

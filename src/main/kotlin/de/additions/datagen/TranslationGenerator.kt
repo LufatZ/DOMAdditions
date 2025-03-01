@@ -2,6 +2,7 @@ package de.additions.datagen
 
 import de.additions.Additions.logger
 import de.additions.blocks.BlockRegistry
+import de.additions.blocks.RedstoneLantern
 import de.additions.items.ItemRegistry
 import de.additions.items.RadiusMineItem
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
@@ -59,8 +60,8 @@ class TranslationGenerator(
             BlockRegistry.trapdoorVariantsParents,
         )
         blockTranslationBuilder(
-            BlockRegistry.registeredLanterns,
-            BlockRegistry.lanternVariantsParents,
+            BlockRegistry.registeredLanterns.keys.toList(),
+            BlockRegistry.registeredLanterns.values.toList(),
         )
         configTranslationbuilder()
         modMenuTranslationBuilder()
@@ -171,6 +172,7 @@ class TranslationGenerator(
                     is StairsBlock -> "Stairs"
                     is SlabBlock -> "Slab"
                     is TrapdoorBlock -> "Trapdoor"
+                    is RedstoneLantern -> "Redstone Lantern"
                     is LanternBlock -> "Lantern"
                     else -> "Block"
                 }
