@@ -24,18 +24,23 @@ Welcome to **DayOfMind**, a sophisticated Minecraft mod project developed by Oxf
 ---
 
 ## 🛠️ Features
-DayOfMind introduces carefully selected additions that expand Minecraft's creative potential while maintaining vanilla aesthetic integrity.
+DayOfMind Additions introduces carefully selected add-ons that expand Minecraft's creative potential while maintaining the vanilla aesthetic integrity.
+This mod is specifically designed for the Minecraft DayOfMind modpack, but can be used in any other modpack.
 
 ---
 
 ### ✨ Enhanced Lighting Blocks
 Our advanced lighting blocks introduces new lantern variants that complement vanilla Minecraft's aesthetic while providing new decoration options.
 
-| Lantern Type          | Material Base   | Special Properties         |
-|-----------------------|-----------------|----------------------------|
-| **Copper Lantern**    | Copper Block    | none (Suggestions welcome) |
-| **Diamond Lantern**   | Diamond Block   | none (Suggestions welcome) |
-| **Netherite Lantern** | Netherite Block | none (Suggestions welcome) |
+| Lantern Type          | Material Base   | Special Properties           |
+|-----------------------|-----------------|------------------------------|
+| **Copper Lantern**    | Copper Block    | redstone compatible variants |
+| **Diamond Lantern**   | Diamond Block   | redstone compatible variants |
+| **Emerald Lantern**   | Emerald Block   | redstone compatible variants |
+| **Netherite Lantern** | Netherite Block | redstone compatible variants |
+| **Gold Lantern**      | Gold Block      | redstone compatible variants |
+| **Iron Lantern**      | Iron Block      | redstone compatible variants |
+
 
 ---
 
@@ -111,13 +116,13 @@ Advanced building options with new trapdoor variants for detailed construction.
 
 | Feature                          | Status                   | Notes                           |
 |----------------------------------|--------------------------|---------------------------------|
-| **Data Generation System**       | ✅ Active                 | Unified block addition process  |
+| **Data Generation System**       | ✅ Complete               | Unified block addition process  |
 | **Minecraft 1.21.4 Update**      | ✅ Complete               | Core features fully compatible  |
 | **Kotlin Migration**             | ✅ Complete               | Modern codebase implementation  |
 | **Translations Integration**     | ✅ Complete               | Community contributions welcome |
 | **Configuration System**         | ✅ Complete               | Enhanced customization options  |
 | **Special Block Features**       | 💡 ready for suggestions | e.g. damage on magma slabs      |
-| **Redstone Lantern Integration** | 🚧 Planned               | Power lanterns with redstone    |
+| **Redstone Lantern Integration** | ✅ Complete               | Power lanterns with redstone    |
 
 ---
 
