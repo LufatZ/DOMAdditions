@@ -1,8 +1,7 @@
 package de.additions.datagen
 
 import de.additions.Additions.logger
-import de.additions.blocks.BlockRegistry
-import de.additions.blocks.RedstoneLantern
+import de.additions.blocks.*
 import de.additions.items.ItemRegistry
 import de.additions.items.RadiusMineItem
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
@@ -172,8 +171,19 @@ class TranslationGenerator(
                     is StairsBlock -> "Stairs"
                     is SlabBlock -> "Slab"
                     is TrapdoorBlock -> "Trapdoor"
-                    is RedstoneLantern -> "Redstone Lantern"
-                    is LanternBlock -> "Lantern"
+                    is LanternBlock -> {
+                        var prefix = ""
+                        if (block is SmallLantern || block is SmallRedstoneLantern) {
+                            prefix += "Small "
+                        }
+                        if (block is BigLantern || block is BigRedstoneLantern) {
+                            prefix += "Big "
+                        }
+                        if (block is RedstoneLantern) {
+                            prefix += "Redstone "
+                        }
+                        prefix + "Lantern"
+                    }
                     else -> "Block"
                 }
             add(block.asItem().translationKey, "$parentName $blockType")

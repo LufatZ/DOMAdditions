@@ -1,9 +1,10 @@
+@file:Suppress("ktlint:standard:no-wildcard-imports")
+
 package de.additions.datagen
 
 import de.additions.Additions.MODID
 import de.additions.Additions.logger
-import de.additions.blocks.BlockRegistry
-import de.additions.blocks.RedstoneLantern
+import de.additions.blocks.*
 import de.additions.items.ItemRegistry
 import de.additions.items.RadiusMineItem
 import de.additions.items.RadiusMineItem.Companion.C_DIAMOND
@@ -39,15 +40,14 @@ import net.minecraft.util.Identifier
 import java.util.concurrent.CompletableFuture
 
 /**
- * AdditionsRecipeGenerator is a specialized recipe generation class for dayofmind,
- * responsible for automatically creating crafting recipes for various block variants.
+ * AdditionsRecipeGenerator is responsible for automatically creating crafting recipes
+ * for various block variants and custom items in the Additions mod.
  *
  * Key Responsibilities:
- * - Generate recipes for stairs, slabs, trapdoors, and custom lanterns
- * - Automatically create recipes based on base block materials
- * - Support multiple recipe variants (e.g., lanterns created from different base items)
- *
- * Design Pattern: Uses a custom RecipeGenerator with a specialized generate() method
+ * - Generate recipes for decorative blocks (stairs, slabs, trapdoors)
+ * - Create recipes for normal and redstone lantern variants
+ * - Generate tool recipes for RadiusMineItem instances
+ * - Handle recipe variants with different base materials
  *
  * @property output FabricDataOutput for writing generated recipe files
  * @property registriesFuture Provides access to game registries during recipe generation
@@ -56,39 +56,35 @@ class RecipeGenerator(
     output: FabricDataOutput,
     registriesFuture: CompletableFuture<RegistryWrapper.WrapperLookup>,
 ) : FabricRecipeProvider(output, registriesFuture) {
-    lateinit var lookUp: RegistryWrapper.WrapperLookup
-    lateinit var exporter: RecipeExporter
+    // Registry lookup and exporter instances
+    private lateinit var lookUp: RegistryWrapper.WrapperLookup
+    private lateinit var exporter: RecipeExporter
 
     /**
      * Overrides the default recipe generation method to provide custom recipe generation logic.
      *
      * @param registryLookup Provides access to game registries
      * @param exporter Handles exporting generated recipes
-     * @return A custom RecipeGenerator that calls our specialized generation method
+     * @return A custom RecipeGenerator that uses our specialized generation methods
      */
     override fun getRecipeGenerator(
         registryLookup: RegistryWrapper.WrapperLookup,
         exporter: RecipeExporter,
-    ): RecipeGenerator? {
+    ): RecipeGenerator {
         this.lookUp = registryLookup
         this.exporter = exporter
-        // Create an anonymous RecipeGenerator that calls our custom generation method
+
+        // Create anonymous RecipeGenerator that calls our custom generation method
         return object : RecipeGenerator(registryLookup, exporter) {
             override fun generate() {
-                // Invoke method to generate recipes for various block types
                 generateRecipes()
             }
         }
     }
 
     /**
-     * Generates recipes for different block variants stored in BlockRegistry.
-     *
-     * Generates recipes for:
-     * - Stairs blocks (4 items per craft)
-     * - Slab blocks (6 items per craft)
-     * - Trapdoor blocks (1 item per craft)
-     * - Lantern blocks with multiple base material options
+     * Main recipe generation method that coordinates creation of all mod recipes.
+     * Processes each block type and generates appropriate crafting recipes.
      */
     private fun generateRecipes() {
         // Retrieve registered blocks from BlockRegistry
@@ -99,89 +95,138 @@ class RecipeGenerator(
         val trapdoorParents = BlockRegistry.trapdoorVariantsParents
         val lanternBlocks = BlockRegistry.registeredLanterns
         val items = ItemRegistry.registeredItems
-        // Generate stairs recipes
+
+        // Generate stairs recipes (4 stairs per craft)
         stairsBlocks.forEachIndexed { index, stairBlock ->
             createBlockRecipe(
                 stairBlock,
                 baseBlocks[index].asItem(),
-                4, // 4 stairs per craft
+                4,
             )
         }
 
-        // Generate slab recipes
+        // Generate slab recipes (6 slabs per craft)
         slabsBlocks.forEachIndexed { index, slabBlock ->
             createBlockRecipe(
                 slabBlock,
                 baseBlocks[index].asItem(),
-                6, // 6 slabs per craft
+                6,
             )
         }
 
-        // Generate trapdoor recipes
+        // Generate trapdoor recipes (1 trapdoor per craft)
         trapdoorBlocks.forEachIndexed { index, trapdoorBlock ->
             createBlockRecipe(
                 trapdoorBlock,
                 trapdoorParents[index].asItem(),
-                1,
+                2,
             )
         }
 
-        // Generate lantern recipes from different base materials
+        // Generate lantern recipes with multiple base material options
         lanternBlocks.forEach { (lantern, baseBlock) ->
-            // Lantern recipe from candle
             if (lantern !is RedstoneLantern) {
-                val lanternSource: Map<Item, String> =
-                    mapOf(
-                        Items.CANDLE to "_from_candle",
-                        Items.TORCH to "_from_torch",
-                        Blocks.LANTERN.asItem() to "_from_lantern",
-                    )
-                for ((item, variant) in lanternSource) {
-                    createBlockRecipe(
-                        lantern,
-                        item,
-                        1,
-                        baseBlock.asItem(),
-                        variant,
-                    )
-                }
+                // Normal lanterns can be crafted from candles, torches, or lanterns
+                generateNormalLanternRecipes(lantern, baseBlock)
             } else {
-                val sister: Block? =
-                    BlockRegistry.registeredLanterns.entries
-                        .find { (lantern1, baseBlock1) ->
-                            lantern1 != lantern && baseBlock1 == baseBlock
-                        }?.key ?: Blocks.LANTERN
-                createBlockRecipe(
-                    lantern,
-                    Blocks.REDSTONE_WIRE.asItem(),
-                    1,
-                    sister,
-                )
+                // Redstone lanterns are crafted from their normal counterparts
+                generateRedstoneLanternRecipe(lantern, baseBlock)
             }
         }
 
         // Generate recipes for mod items
         items.forEach { stack ->
-            createItemRecipe(
-                stack.item,
+            createItemRecipe(stack.item)
+        }
+    }
+
+    /**
+     * Generates recipes for normal lantern variants from different source materials.
+     *
+     * @param lantern The lantern block being crafted
+     * @param baseBlock The material block used as base
+     */
+    private fun generateNormalLanternRecipes(
+        lantern: Block,
+        baseBlock: Block,
+    ) {
+        val lanternSources =
+            mapOf(
+                Items.CANDLE to "_from_candle",
+                Items.TORCH to "_from_torch",
+                Blocks.LANTERN.asItem() to "_from_lantern",
+            )
+
+        for ((sourceItem, variantSuffix) in lanternSources) {
+            createBlockRecipe(
+                lantern,
+                sourceItem,
+                1,
+                baseBlock.asItem(),
+                variantSuffix,
             )
         }
     }
 
     /**
-     * Creates a shaped recipe for a specific block type with configurable parameters.
+     * Generates recipes for redstone lantern variants from their normal counterparts.
      *
-     * Supports different crafting patterns based on block type:
-     * - Slabs: Horizontal line (3 items)
-     * - Stairs: Stair-like pattern (3 rows)
-     * - Trapdoors: 2-item horizontal line
-     * - Lanterns: Special pattern with base and secondary material
+     * @param lantern The redstone lantern block being crafted
+     * @param baseBlock The material block used as base
+     */
+    private fun generateRedstoneLanternRecipe(
+        lantern: Block,
+        baseBlock: Block,
+    ) {
+        // Determine the corresponding normal lantern class based on redstone lantern type
+        val targetClass =
+            when (lantern) {
+                is SmallRedstoneLantern -> SmallLantern::class.java
+                is BigRedstoneLantern -> BigLantern::class.java
+                else -> LanternBlock::class.java
+            }
+
+        // Find the "sister" non-redstone lantern with matching base material
+        val sisterLantern = findSisterLantern(lantern, baseBlock, targetClass)
+
+        // Create recipe using the sister lantern and redstone
+        createBlockRecipe(
+            lantern,
+            Items.REDSTONE,
+            1,
+            sisterLantern,
+        )
+    }
+
+    /**
+     * Finds the corresponding "sister" lantern of the opposite type
+     * (normal vs. redstone) with the same base material.
+     *
+     * @param lantern The current lantern
+     * @param baseBlock The base material block
+     * @param targetClass The class of the lantern type to find
+     * @return The matching sister lantern or default lantern if not found
+     */
+    private fun findSisterLantern(
+        lantern: Block,
+        baseBlock: Block,
+        targetClass: Class<*>,
+    ): Block =
+        BlockRegistry.registeredLanterns.entries
+            .find { (candidateLantern, candidateBaseBlock) ->
+                candidateLantern != lantern &&
+                    targetClass.isInstance(candidateLantern) &&
+                    candidateBaseBlock == baseBlock
+            }?.key ?: Blocks.LANTERN
+
+    /**
+     * Creates a shaped recipe for a block with configurable parameters.
      *
      * @param recipeBlock The block being crafted
      * @param baseBlock The primary material used in crafting
      * @param amount Number of items produced by the recipe
-     * @param secondaryMaterial Optional secondary material (e.g. used for lanterns)
-     * @param recipeVariant Optional identifier for recipe variants
+     * @param secondaryMaterial Optional secondary material (e.g., for lanterns)
+     * @param recipeVariant Optional identifier suffix for recipe variants
      */
     private fun createBlockRecipe(
         recipeBlock: Block,
@@ -200,158 +245,214 @@ class RecipeGenerator(
                         "XX ",
                         "XXX",
                     )
-                is TrapdoorBlock -> listOf("XX") // 2-item horizontal line
+                is TrapdoorBlock -> listOf("XXX", "XXX") // 2-item horizontal line
                 is LanternBlock -> listOf("IX") // Special lantern pattern
                 else -> listOf("X") // Fallback: single item
             }
 
+        // Get registry key for items
+        val itemRegistry = lookUp.getOrThrow(RegistryKeys.ITEM)
+
         // Build the shaped recipe
         ShapedRecipeJsonBuilder
             .create(
-                lookUp.getOrThrow(RegistryKeys.ITEM),
+                itemRegistry,
                 RecipeCategory.BUILDING_BLOCKS,
                 recipeBlock,
                 amount,
             ).apply {
-                // Apply crafting pattern
+                // Apply the crafting pattern
                 pattern.forEach { patternLine ->
                     pattern(patternLine)
                 }
 
                 // Configure recipe inputs
+                input('X', baseBlock) // Base material
                 if (secondaryMaterial != null) {
-                    input('X', baseBlock) // Base material
                     input('I', secondaryMaterial) // Secondary material
-                } else {
-                    input('X', baseBlock) // Single material input
                 }
 
-                // Add recipe unlock criterion
+                // Create a clean identifier for the criterion
+                val criterionId = "has_${baseBlock.translationKey.replaceBeforeLast('.', "").replace(".", "")}"
+
+                // Add recipe unlock criterion based on having the base material
                 criterion(
-                    "has_${baseBlock.translationKey.replaceBeforeLast('.', "").replace(".", "")}",
+                    criterionId,
                     InventoryChangedCriterion.Conditions.items(
                         ItemPredicate.Builder
                             .create()
-                            .items(lookUp.getOrThrow(RegistryKeys.ITEM), baseBlock)
+                            .items(itemRegistry, baseBlock)
                             .build(),
                     ),
                 )
 
-                // Export the recipe with a unique identifier
+                // Create a unique recipe identifier
+                val recipeId = Identifier.of(MODID, recipeBlock.translationKey.replace(".", "_") + recipeVariant)
+
+                // Export the recipe
                 offerTo(
                     exporter,
-                    RegistryKey.of(
-                        RegistryKeys.RECIPE,
-                        Identifier.of(MODID, recipeBlock.translationKey.replace(".", "_") + recipeVariant),
-                    ),
+                    RegistryKey.of(RegistryKeys.RECIPE, recipeId),
                 )
             }
     }
 
+    /**
+     * Creates recipes for special items like radius mining tools.
+     * Different tools have different crafting patterns and materials.
+     *
+     * @param item The item to create a recipe for
+     */
     private fun createItemRecipe(item: Item) {
-        // Lambda, das den Fallback erzeugt und den Logeintrag schreibt
-        val eFallbackShape: () -> List<String> = {
-            logger.warn("Falling back to single item recipe, because no shape is defined for this item. ($item)")
-            listOf("X")
-        }
-        val eMaterialComponents: () -> Nothing? = {
-            logger.warn("Fallback -> Unknown material for additional recipe components. ($item)")
-            null
-        }
-
-        val shape =
-            when (item) {
-                is RadiusMineItem ->
-                    when (item.effectiveBlocks.id) {
-                        BlockTags.SHOVEL_MINEABLE.id -> listOf("XSX", "MSM", "XMX")
-                        BlockTags.PICKAXE_MINEABLE.id -> listOf("MMX", "MSX", "XSX")
-                        else -> eFallbackShape()
-                    }
-                else -> eFallbackShape()
-            }
-        val additionalMaterial =
-            when (item) {
-                is RadiusMineItem ->
-                    when (item.material) {
-                        C_WOOD -> Ingredient.ofItems(Items.STRING)
-                        C_STONE -> Ingredient.ofItems(Items.DEEPSLATE)
-                        C_IRON -> Ingredient.ofItems(Items.COPPER_BLOCK)
-                        C_DIAMOND -> Ingredient.ofItems(Items.AMETHYST_BLOCK)
-                        C_GOLD -> Ingredient.ofItems(Items.GOLD_INGOT)
-                        C_NETHERITE -> Ingredient.ofItems(Items.CRYING_OBSIDIAN)
-                        else -> eMaterialComponents()
-                    }
-                else -> null
-            }
-
-        if (item is RadiusMineItem) {
-            val itemLookup = lookUp.getOrThrow(RegistryKeys.ITEM)
-
-            ShapedRecipeJsonBuilder
-                .create(
-                    itemLookup,
-                    RecipeCategory.TOOLS,
-                    item,
-                    1,
-                ).apply {
-                    shape.forEach { patternLine ->
-                        pattern(patternLine)
-                    }
-                    input('M', item.getMaterialIngredient(itemLookup))
-                    input('S', Items.STICK)
-
-                    if (additionalMaterial != null) {
-                        input('X', additionalMaterial)
-                    }
-
-                    group("radius_mine")
-
-                    // material criterion
-                    criterion(
-                        "has_${item.getMaterialName()}",
-                        InventoryChangedCriterion.Conditions.items(
-                            item.getCraftingTagOrItem().let { (tag, craftingItem) ->
-                                ItemPredicate.Builder
-                                    .create()
-                                    .apply {
-                                        when {
-                                            tag != null -> tag(itemLookup, tag)
-                                            craftingItem != null -> items(itemLookup, craftingItem)
-                                            else -> items(itemLookup, Items.STICK)
-                                        }
-                                    }.build()
-                            },
-                        ),
-                    )
-                    // recipe unlock criterion
-                    criterion(
-                        "has_recipe_${item.translationKey.replaceBeforeLast('.',"").replace(".","")}",
-                        RecipeUnlockedCriterion.create(
-                            @Suppress("ktlint:standard:max-line-length")
-                            RegistryKey.of(
-                                RegistryKeys.RECIPE,
-                                Identifier.of(MODID, item.translationKey.replace(".", "_")), // Muss mit recipe_id in offerTo() übereinstimmen
-                            ),
-                        ),
-                    )
-
-                    offerTo(
-                        exporter,
-                        RegistryKey.of( // Konsistente RegistryKey-Erstellung
-                            RegistryKeys.RECIPE,
-                            Identifier.of(MODID, item.translationKey.replace(".", "_")),
-                        ),
-                    )
-                }
-        } else {
+        // Skip if not a supported item type
+        if (item !is RadiusMineItem) {
             logger.warn(
-                "Cant create recipe for $item, because there is no preset for it. If this Item can´t be crafted, ignore this warning.",
+                "Can't create recipe for $item because there is no preset for it. " +
+                    "If this item can't be crafted, ignore this warning.",
             )
+            return
         }
+
+        // Get crafting pattern based on tool type
+        val shape = getItemRecipeShape(item)
+
+        // Get additional material component based on tool material
+        val additionalMaterial = getAdditionalMaterial(item)
+
+        // Get item registry lookup
+        val itemLookup = lookUp.getOrThrow(RegistryKeys.ITEM)
+
+        // Create shaped recipe for the radius mining tool
+        ShapedRecipeJsonBuilder
+            .create(
+                itemLookup,
+                RecipeCategory.TOOLS,
+                item,
+                1,
+            ).apply {
+                // Apply crafting pattern
+                shape.forEach { patternLine ->
+                    pattern(patternLine)
+                }
+
+                // Configure recipe inputs
+                input('M', item.getMaterialIngredient(itemLookup))
+                input('S', Items.STICK)
+                if (additionalMaterial != null) {
+                    input('X', additionalMaterial)
+                }
+
+                // Group similar recipes together
+                group("radius_mine")
+
+                // Add material criterion
+                addMaterialCriterion(item, itemLookup)
+
+                // Add recipe unlock criterion
+                addRecipeUnlockCriterion(item)
+
+                // Generate recipe ID and export
+                val recipeId = Identifier.of(MODID, item.translationKey.replace(".", "_"))
+                offerTo(
+                    exporter,
+                    RegistryKey.of(RegistryKeys.RECIPE, recipeId),
+                )
+            }
     }
 
     /**
-     * Provides the name of this recipe generator, typically used for logging and identification.
+     * Determines the crafting pattern for a special item.
+     *
+     * @param item The item to get a recipe shape for
+     * @return List of strings representing the crafting pattern
+     */
+    private fun getItemRecipeShape(item: Item): List<String> {
+        if (item is RadiusMineItem) {
+            return when (item.effectiveBlocks.id) {
+                BlockTags.SHOVEL_MINEABLE.id -> listOf("XSX", "MSM", "XMX") // Shovel pattern
+                BlockTags.PICKAXE_MINEABLE.id -> listOf("MMX", "MSX", "XSX") // Pickaxe pattern
+                else -> {
+                    logger.warn("Falling back to single item recipe, because no shape is defined for ${item.effectiveBlocks.id}")
+                    listOf("X") // Fallback pattern
+                }
+            }
+        }
+
+        logger.warn("Falling back to single item recipe, because no shape is defined for this item. ($item)")
+        return listOf("X") // Default fallback
+    }
+
+    /**
+     * Determines the additional crafting material for special items based on their material tier.
+     *
+     * @param item The item to get additional material for
+     * @return Ingredient representing the additional crafting material
+     */
+    private fun getAdditionalMaterial(item: Item): Ingredient? {
+        if (item is RadiusMineItem) {
+            return when (item.material) {
+                C_WOOD -> Ingredient.ofItems(Items.STRING)
+                C_STONE -> Ingredient.ofItems(Items.DEEPSLATE)
+                C_IRON -> Ingredient.ofItems(Items.COPPER_BLOCK)
+                C_DIAMOND -> Ingredient.ofItems(Items.AMETHYST_BLOCK)
+                C_GOLD -> Ingredient.ofItems(Items.GOLD_BLOCK)
+                C_NETHERITE -> Ingredient.ofItems(Items.CRYING_OBSIDIAN)
+                else -> {
+                    logger.warn("Unknown material for additional recipe components: ${item.material}")
+                    null
+                }
+            }
+        }
+        return null
+    }
+
+    /**
+     * Adds a crafting criterion based on having the material used in the tool.
+     *
+     * @param item The RadiusMineItem to add criterion for
+     * @param itemLookup The item registry lookup
+     */
+    private fun ShapedRecipeJsonBuilder.addMaterialCriterion(
+        item: RadiusMineItem,
+        itemLookup: RegistryWrapper<Item>,
+    ) {
+        criterion(
+            "has_${item.getMaterialName()}",
+            InventoryChangedCriterion.Conditions.items(
+                item.getCraftingTagOrItem().let { (tag, craftingItem) ->
+                    ItemPredicate.Builder
+                        .create()
+                        .apply {
+                            when {
+                                tag != null -> tag(itemLookup, tag)
+                                craftingItem != null -> items(itemLookup, craftingItem)
+                                else -> items(itemLookup, Items.STICK)
+                            }
+                        }.build()
+                },
+            ),
+        )
+    }
+
+    /**
+     * Adds a recipe unlock criterion for the item.
+     *
+     * @param item The item to add a recipe unlock criterion for
+     */
+    private fun ShapedRecipeJsonBuilder.addRecipeUnlockCriterion(item: Item) {
+        val criterionId = "has_recipe_${item.translationKey.replaceBeforeLast('.', "").replace(".", "")}"
+        val recipeId = Identifier.of(MODID, item.translationKey.replace(".", "_"))
+
+        criterion(
+            criterionId,
+            RecipeUnlockedCriterion.create(
+                RegistryKey.of(RegistryKeys.RECIPE, recipeId),
+            ),
+        )
+    }
+
+    /**
+     * Provides the name of this recipe generator for identification purposes.
      *
      * @return The mod ID used as the generator's name
      */

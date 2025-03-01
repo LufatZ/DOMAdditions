@@ -21,7 +21,7 @@ import org.jetbrains.annotations.Nullable
  * This block behaves like a Redstone Lamp but maintains the appearance of a Lantern.
  * The lantern will light up when receiving a redstone signal and turn off when the signal is removed.
  */
-class RedstoneLantern(
+open class RedstoneLantern(
     settings: Settings?,
 ) : LanternBlock(settings) {
     companion object {

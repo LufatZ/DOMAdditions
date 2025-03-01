@@ -1,8 +1,5 @@
 {
 	"parent": "block/block",
-	"textures": {
-		"particle": "#particle"
-	},
 	"elements": [
 		{
 			"from": [5, 1, 5],
@@ -104,7 +101,8 @@
 			"scale": [0.7, 0.7, 0.7]
 		},
 		"gui": {
-			"translation": [0, 3.25, 0],
+			"rotation": [0, 90, 0],
+			"translation": [0, 1.25, 0],
 			"scale": [1, 1, 1]
 		},
 		"fixed": {

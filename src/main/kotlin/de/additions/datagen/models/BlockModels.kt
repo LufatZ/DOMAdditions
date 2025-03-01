@@ -1,6 +1,7 @@
 package de.additions.datagen.models
 
 import de.additions.Additions.MODID
+import de.additions.blocks.*
 import de.additions.blocks.BlockRegistry.blockVariantsParents
 import de.additions.blocks.BlockRegistry.registeredChains
 import de.additions.blocks.BlockRegistry.registeredLanterns
@@ -545,10 +546,22 @@ object BlockModels {
                 put(TextureKey.TEXTURE, Identifier.of("block/${extractCleanBlockIdentifier(parent)}"))
                 put(TextureKey.PARTICLE, Identifier.of("block/lantern"))
             }
+        val standingTemplateModelId =
+            when (lantern) {
+                is SmallLantern, is SmallRedstoneLantern -> "$MODID:block/template_small_lantern_standing"
+                is BigLantern, is BigRedstoneLantern -> "$MODID:block/template_big_lantern_standing"
+                else -> "$MODID:block/template_lantern_standing"
+            }
+        val hangingTemplateModelId =
+            when (lantern) {
+                is SmallLantern -> "$MODID:block/template_small_lantern_hanging"
+                is BigLantern -> "$MODID:block/template_big_lantern_hanging"
+                else -> "$MODID:block/template_lantern_hanging"
+            }
 
         val lanternModelStanding =
             Model(
-                Optional.of(Identifier.of("$MODID:block/template_lantern_standing")),
+                Optional.of(Identifier.of(standingTemplateModelId)),
                 Optional.empty(),
                 TextureKey.TEXTURE,
                 TextureKey.PARTICLE,
@@ -561,7 +574,7 @@ object BlockModels {
 
         val lanternModelhanging =
             Model(
-                Optional.of(Identifier.of("$MODID:block/template_lantern_hanging")),
+                Optional.of(Identifier.of(hangingTemplateModelId)),
                 Optional.empty(),
                 TextureKey.TEXTURE,
                 TextureKey.PARTICLE,
@@ -572,7 +585,11 @@ object BlockModels {
                 generator.modelCollector,
             )
 
-        if (parent == Blocks.IRON_BLOCK) {
+        if (parent == Blocks.IRON_BLOCK &&
+            lantern is RedstoneLantern &&
+            lantern !is BigRedstoneLantern &&
+            lantern !is SmallRedstoneLantern
+        ) {
             val lanternStandingModelId = Identifier.ofVanilla("block/lantern")
             val lanternHangingModelId = Identifier.ofVanilla("block/lantern_hanging")
             val lanternItemModelId = Identifier.ofVanilla("item/lantern")

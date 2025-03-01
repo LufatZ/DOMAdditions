@@ -67,6 +67,7 @@ object BlockRegistry {
                 Blocks.EMERALD_BLOCK,
                 Blocks.GOLD_BLOCK,
                 Blocks.IRON_BLOCK,
+                Blocks.AMETHYST_BLOCK,
             )
         } else {
             logger.info("Lantern Variants disabled in configuration")
@@ -355,6 +356,11 @@ object BlockRegistry {
         lanternVariantsParents.forEach { baseBlock ->
             var lantern: Block? = null
             var redstoneLantern: Block? = null
+            var bigLantern: Block? = null
+            var bigRedstoneLantern: Block? = null
+            var smallLantern: Block? = null
+            var smallRedstoneLantern: Block? = null
+
             val baseName =
                 Registries.BLOCK
                     .getId(baseBlock)
@@ -375,6 +381,21 @@ object BlockRegistry {
                     )
             }
 
+            bigLantern =
+                register(
+                    "${baseName}_big_lantern",
+                    BigLantern(
+                        lanternSettings.registryKey(keyOf("${baseName}_big_lantern")),
+                    ),
+                )
+            smallLantern =
+                register(
+                    "${baseName}_small_lantern",
+                    SmallLantern(
+                        lanternSettings.registryKey(keyOf("${baseName}_small_lantern")),
+                    ),
+                )
+
             // Redstone-Varianten Logging
             if (AdditionsConfig.EnabledRedstoneLantern) {
                 logger.warn("Redstone Lanterns are enabled. Variant registration for: $baseName")
@@ -389,11 +410,37 @@ object BlockRegistry {
                             ),
                         ),
                     )
+                bigRedstoneLantern =
+                    register(
+                        "${baseName}_big_redstone_lantern",
+                        BigRedstoneLantern(
+                            lanternSettings.registryKey(keyOf("${baseName}_big_redstone_lantern")).luminance(
+                                Blocks.createLightLevelFromLitBlockState(
+                                    15,
+                                ),
+                            ),
+                        ),
+                    )
+                smallRedstoneLantern =
+                    register(
+                        "${baseName}_small_redstone_lantern",
+                        SmallRedstoneLantern(
+                            lanternSettings.registryKey(keyOf("${baseName}_small_redstone_lantern")).luminance(
+                                Blocks.createLightLevelFromLitBlockState(
+                                    15,
+                                ),
+                            ),
+                        ),
+                    )
             } else {
                 logger.debug("Redstone Lanterns disabled for $baseName")
             }
             lantern?.let { registeredLanterns[it] = baseBlock }
             redstoneLantern?.let { registeredLanterns[it] = baseBlock }
+            bigLantern.let { registeredLanterns[it] = baseBlock }
+            bigRedstoneLantern?.let { registeredLanterns[it] = baseBlock }
+            smallLantern.let { registeredLanterns[it] = baseBlock }
+            smallRedstoneLantern?.let { registeredLanterns[it] = baseBlock }
         }
 
         logger.info("Lantern variant registration completed")
