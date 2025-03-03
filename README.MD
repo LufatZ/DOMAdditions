@@ -176,3 +176,16 @@ If you enjoy DayOfMind, consider:
 
 ## ❤️ Acknowledgments
 Special thanks to our contributors, translators, and community members who help make DayOfMind better every day.
+
+# NEED A SERVER?
+[![A mushroom-head robot](https://www.bisecthosting.com/images/CF/DayofMind_revamp/bh_promo.png 'DayOfMind Discord Banner')](https://www.bisecthosting.com/clients/aff.php?aff=3251)
+---
+Embark on Epic Adventures with the DayOfMind Minecraft Modpack!🌍✨
+
+Ready to level up your Minecraft experience? DayOfMind has you covered! 🚀
+
+And when it's time to host your server with BisectHosting, don't forget to use code [ 'DAYOFMIND' ](https://www.bisecthosting.com/clients/aff.php?aff=3251) for an awesome 25% discount! We're here to make your Minecraft journey extraordinary. 🌟🎮
+
+Join the DayOfMind adventure today with BisectHosting. Your Minecraft world will never be the same again!
+
+
