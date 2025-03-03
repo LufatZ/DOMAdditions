@@ -36,6 +36,7 @@ import net.minecraft.registry.RegistryKey
 import net.minecraft.registry.RegistryKeys
 import net.minecraft.registry.RegistryWrapper
 import net.minecraft.registry.tag.BlockTags
+import net.minecraft.registry.tag.ItemTags
 import net.minecraft.util.Identifier
 import java.util.concurrent.CompletableFuture
 
@@ -48,6 +49,7 @@ import java.util.concurrent.CompletableFuture
  * - Create recipes for normal and redstone lantern variants
  * - Generate tool recipes for RadiusMineItem instances
  * - Handle recipe variants with different base materials
+ * - Create vanilla override recipes like the name tag
  *
  * @property output FabricDataOutput for writing generated recipe files
  * @property registriesFuture Provides access to game registries during recipe generation
@@ -138,6 +140,76 @@ class RecipeGenerator(
         items.forEach { stack ->
             createItemRecipe(stack.item)
         }
+
+        // Generate vanilla override recipes
+        createNameTagRecipe()
+    }
+
+    /**
+     * Creates a custom recipe for the name tag item.
+     * Pattern:
+     * " #i"
+     * "#O#"
+     * "P# "
+     * Where:
+     * # - String
+     * i - Iron Nugget
+     * O - Any Sign (from the signs tag)
+     * P - Paper
+     */
+    private fun createNameTagRecipe() {
+        // Get item registry lookup
+        val itemLookup = lookUp.getOrThrow(RegistryKeys.ITEM)
+
+        // Create shaped recipe for the name tag
+        ShapedRecipeJsonBuilder
+            .create(
+                itemLookup,
+                RecipeCategory.TOOLS,
+                Items.NAME_TAG,
+                1,
+            ).apply {
+                // Apply the crafting pattern
+                pattern(" #i")
+                pattern("#O#")
+                pattern("P# ")
+
+                // Configure recipe inputs
+                input('#', Items.STRING)
+                input('i', Items.IRON_NUGGET)
+                input('O', ItemTags.SIGNS)
+                input('P', Items.PAPER)
+
+                // Add recipe unlock criterion based on having the primary materials
+                criterion(
+                    "has_string",
+                    InventoryChangedCriterion.Conditions.items(
+                        ItemPredicate.Builder
+                            .create()
+                            .items(itemLookup, Items.STRING)
+                            .build(),
+                    ),
+                )
+
+                criterion(
+                    "has_paper",
+                    InventoryChangedCriterion.Conditions.items(
+                        ItemPredicate.Builder
+                            .create()
+                            .items(itemLookup, Items.PAPER)
+                            .build(),
+                    ),
+                )
+
+                // Create a unique recipe identifier
+                val recipeId = Identifier.of(MODID, "name_tag")
+
+                // Export the recipe
+                offerTo(
+                    exporter,
+                    RegistryKey.of(RegistryKeys.RECIPE, recipeId),
+                )
+            }
     }
 
     /**
