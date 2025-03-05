@@ -9,6 +9,7 @@ package de.additions.blocks
 import de.additions.Additions.MODID
 import de.additions.Additions.logger
 import de.additions.config.AdditionsConfig
+import de.additions.itemGroups.ItemGroupRegistry
 import net.minecraft.block.*
 import net.minecraft.item.BlockItem
 import net.minecraft.item.Item
@@ -151,6 +152,13 @@ object BlockRegistry {
         registerTrapdoorVariants()
         registerChains()
         logger.info("Block registration completed. Total registered blocks: ${registeredBlocks.size}")
+
+        // Füge alle registrierten Blöcke zu den Standard-Item-Gruppen hinzu
+        ItemGroupRegistry.registerItemsAfterCommonParent(registeredLanterns.keys.toList(), Blocks.LANTERN)
+        ItemGroupRegistry.registerItemsAfterCommonParent(registeredChains, Blocks.CHAIN)
+        ItemGroupRegistry.registerItemsInDefaultGroups(registeredTrapdoors, trapdoorVariantsParents)
+        ItemGroupRegistry.registerItemsInDefaultGroups(registeredSlabs, blockVariantsParents)
+        ItemGroupRegistry.registerItemsInDefaultGroups(registeredStairs, blockVariantsParents)
     }
 
     /**
