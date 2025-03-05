@@ -8,6 +8,7 @@ import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroupEntries
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents
 import net.minecraft.block.Block
+import net.minecraft.item.Item
 import net.minecraft.item.ItemGroups
 import net.minecraft.item.ItemStack
 import net.minecraft.registry.Registries
@@ -85,8 +86,8 @@ object ItemGroupRegistry {
      * @param parentItems List of vanilla/existing blocks that the mod blocks should be placed after
      */
     fun registerItemsInDefaultGroups(
-        items: List<Block>,
-        parentItems: List<Block>,
+        items: List<Item>,
+        parentItems: List<Item>,
     ) {
         // Add to Building Blocks group
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.BUILDING_BLOCKS).register { itemGroup ->
@@ -140,6 +141,17 @@ object ItemGroupRegistry {
         }
     }
 
+    fun registerBlocksInDefaultGroups(
+        blocks: List<Block>,
+        parentBlocks: List<Block>,
+    ) {
+        val items = mutableListOf<Item>()
+        val parentItems = mutableListOf<Item>()
+        blocks.forEach { items.add(it.asItem()) }
+        parentBlocks.forEach { parentItems.add(it.asItem()) }
+        registerItemsInDefaultGroups(items, parentItems)
+    }
+
     /**
      * Registers mod items in default Minecraft item groups using a single, common parent block.
      *
@@ -168,6 +180,17 @@ object ItemGroupRegistry {
     ) {
         val parentList = mutableListOf<Block>()
         items.forEach { parentList.add(parentItem) }
+        registerBlocksInDefaultGroups(items, parentList)
+    }
+
+    fun registerItemsAfterCommonParent(
+        stacks: List<ItemStack>,
+        parentItem: Item,
+    ) {
+        val parentList = mutableListOf<Item>()
+        val items = mutableListOf<Item>()
+        stacks.forEach { items.add(it.item) }
+        items.forEach { parentList.add(parentItem) }
         registerItemsInDefaultGroups(items, parentList)
     }
 
@@ -185,12 +208,12 @@ object ItemGroupRegistry {
      */
     private fun addToGroupAfterParent(
         itemGroup: FabricItemGroupEntries,
-        items: List<Block>,
-        parents: List<Block>,
+        items: List<Item>,
+        parents: List<Item>,
     ) {
         parents.forEachIndexed { index, parent ->
-            val item = items[index].asItem()
-            val parentItem = parent.asItem()
+            val item = items[index]
+            val parentItem = parent
 
             // Check if parent item exists in the current group
             if (itemGroup.displayStacks.any { it.item == parentItem }) {

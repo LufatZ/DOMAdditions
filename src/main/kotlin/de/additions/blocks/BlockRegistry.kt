@@ -156,9 +156,9 @@ object BlockRegistry {
         // Füge alle registrierten Blöcke zu den Standard-Item-Gruppen hinzu
         ItemGroupRegistry.registerItemsAfterCommonParent(registeredLanterns.keys.toList(), Blocks.LANTERN)
         ItemGroupRegistry.registerItemsAfterCommonParent(registeredChains, Blocks.CHAIN)
-        ItemGroupRegistry.registerItemsInDefaultGroups(registeredTrapdoors, trapdoorVariantsParents)
-        ItemGroupRegistry.registerItemsInDefaultGroups(registeredSlabs, blockVariantsParents)
-        ItemGroupRegistry.registerItemsInDefaultGroups(registeredStairs, blockVariantsParents)
+        ItemGroupRegistry.registerBlocksInDefaultGroups(registeredTrapdoors, trapdoorVariantsParents)
+        ItemGroupRegistry.registerBlocksInDefaultGroups(registeredSlabs, blockVariantsParents)
+        ItemGroupRegistry.registerBlocksInDefaultGroups(registeredStairs, blockVariantsParents)
     }
 
     /**

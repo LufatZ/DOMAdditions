@@ -1,13 +1,14 @@
 package de.additions.items
 
-
 import de.additions.Additions.MODID
 import de.additions.Additions.logger
 import de.additions.config.AdditionsConfig
+import de.additions.itemGroups.ItemGroupRegistry
 import de.additions.items.RadiusMineItem.Companion.materials
 import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
+import net.minecraft.item.Items
 import net.minecraft.registry.Registries
 import net.minecraft.registry.Registry
 import net.minecraft.registry.RegistryKey
@@ -26,6 +27,7 @@ object ItemRegistry {
         logger.info("Registering added items")
         registerAddedItems(addedItems)
         logger.info("Finished item registration with ${registeredItems.size} items")
+        ItemGroupRegistry.registerItemsAfterCommonParent(registeredItems, Items.DIAMOND_PICKAXE)
     }
 
     private fun registerAddedItems(items: Map<String, Item>) {
@@ -49,8 +51,22 @@ object ItemRegistry {
             runCatching {
                 val toolSettings = Item.Settings()
 
-                val bigShovel = RadiusMineItem(material, BlockTags.SHOVEL_MINEABLE, 1.5f, -3.0f, toolSettings.registryKey(RegistryKey.of(RegistryKeys.ITEM, Identifier.of(MODID, "big_${materialName}_shovel"))))
-                val hammer = RadiusMineItem(material, BlockTags.PICKAXE_MINEABLE, 1.0f, -2.8f, toolSettings.registryKey(RegistryKey.of(RegistryKeys.ITEM, Identifier.of(MODID, "${materialName}_hammer"))))
+                val bigShovel =
+                    RadiusMineItem(
+                        material,
+                        BlockTags.SHOVEL_MINEABLE,
+                        1.5f,
+                        -3.0f,
+                        toolSettings.registryKey(RegistryKey.of(RegistryKeys.ITEM, Identifier.of(MODID, "big_${materialName}_shovel"))),
+                    )
+                val hammer =
+                    RadiusMineItem(
+                        material,
+                        BlockTags.PICKAXE_MINEABLE,
+                        1.0f,
+                        -2.8f,
+                        toolSettings.registryKey(RegistryKey.of(RegistryKeys.ITEM, Identifier.of(MODID, "${materialName}_hammer"))),
+                    )
 
                 addedItems["big_${materialName}_shovel"] = bigShovel
                 addedItems["${materialName}_hammer"] = hammer
@@ -64,5 +80,4 @@ object ItemRegistry {
             }
         }
     }
-
 }
