@@ -49,23 +49,20 @@ object ItemRegistry {
     private fun addToolItems() {
         materials.forEach { (materialName, material) ->
             runCatching {
-                val toolSettings = Item.Settings()
+                val shovelSettings = Item.Settings().shovel(material, 1.5f, -3.0f)
+                val hammerSettings = Item.Settings().pickaxe(material, 1f, -2.8f)
 
                 val bigShovel =
                     RadiusMineItem(
                         material,
                         BlockTags.SHOVEL_MINEABLE,
-                        1.5f,
-                        -3.0f,
-                        toolSettings.registryKey(RegistryKey.of(RegistryKeys.ITEM, Identifier.of(MODID, "big_${materialName}_shovel"))),
+                        shovelSettings.registryKey(RegistryKey.of(RegistryKeys.ITEM, Identifier.of(MODID, "big_${materialName}_shovel"))),
                     )
                 val hammer =
                     RadiusMineItem(
                         material,
                         BlockTags.PICKAXE_MINEABLE,
-                        1.0f,
-                        -2.8f,
-                        toolSettings.registryKey(RegistryKey.of(RegistryKeys.ITEM, Identifier.of(MODID, "${materialName}_hammer"))),
+                        hammerSettings.registryKey(RegistryKey.of(RegistryKeys.ITEM, Identifier.of(MODID, "${materialName}_hammer"))),
                     )
 
                 addedItems["big_${materialName}_shovel"] = bigShovel

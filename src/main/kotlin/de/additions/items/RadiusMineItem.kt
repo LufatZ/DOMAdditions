@@ -6,12 +6,12 @@ import net.minecraft.block.Block
 import net.minecraft.block.BlockState
 import net.minecraft.block.Blocks
 import net.minecraft.component.DataComponentTypes
+import net.minecraft.component.type.TooltipDisplayComponent
 import net.minecraft.entity.EquipmentSlot
 import net.minecraft.entity.LivingEntity
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.item.Items
-import net.minecraft.item.MiningToolItem
 import net.minecraft.item.ToolMaterial
 import net.minecraft.item.tooltip.TooltipType
 import net.minecraft.recipe.Ingredient
@@ -23,92 +23,95 @@ import net.minecraft.util.Formatting
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
 import net.minecraft.world.World
+import java.util.function.Consumer
 
 /**
  * A custom mining tool that mines blocks in a radius around the target block.
  *
  * @property material The tool material defining durability and properties
  * @property effectiveBlocks Tag specifying which blocks can be mined effectively
- * @param attackDamage Base attack damage
- * @param attackSpeed Attack speed modifier
  * @param settings Item settings
  */
 class RadiusMineItem(
     val material: ToolMaterial,
     val effectiveBlocks: TagKey<Block>,
-    attackDamage: Float,
-    attackSpeed: Float,
-    settings: Settings
-) : MiningToolItem(material, effectiveBlocks, attackDamage, attackSpeed, settings) {
-
+    settings: Settings,
+) : Item(settings) {
     companion object {
         /** Multiplier for tool durability values */
         private const val DMULTI = 10.0f
 
         // Custom tool materials with multiplied durability
-        val C_WOOD = ToolMaterial(
-            ToolMaterial.WOOD.incorrectBlocksForDrops,
-            (ToolMaterial.WOOD.durability * DMULTI).toInt(),
-            ToolMaterial.WOOD.speed,
-            ToolMaterial.WOOD.attackDamageBonus,
-            ToolMaterial.WOOD.enchantmentValue,
-            ToolMaterial.WOOD.repairItems
-        )
+        val C_WOOD =
+            ToolMaterial(
+                ToolMaterial.WOOD.incorrectBlocksForDrops,
+                (ToolMaterial.WOOD.durability * DMULTI).toInt(),
+                ToolMaterial.WOOD.speed,
+                ToolMaterial.WOOD.attackDamageBonus,
+                ToolMaterial.WOOD.enchantmentValue,
+                ToolMaterial.WOOD.repairItems,
+            )
 
-        val C_STONE = ToolMaterial(
-            ToolMaterial.STONE.incorrectBlocksForDrops,
-            (ToolMaterial.STONE.durability * DMULTI).toInt(),
-            ToolMaterial.STONE.speed,
-            ToolMaterial.STONE.attackDamageBonus,
-            ToolMaterial.STONE.enchantmentValue,
-            ToolMaterial.STONE.repairItems
-        )
+        val C_STONE =
+            ToolMaterial(
+                ToolMaterial.STONE.incorrectBlocksForDrops,
+                (ToolMaterial.STONE.durability * DMULTI).toInt(),
+                ToolMaterial.STONE.speed,
+                ToolMaterial.STONE.attackDamageBonus,
+                ToolMaterial.STONE.enchantmentValue,
+                ToolMaterial.STONE.repairItems,
+            )
 
-        val C_IRON = ToolMaterial(
-            ToolMaterial.IRON.incorrectBlocksForDrops,
-            (ToolMaterial.IRON.durability * DMULTI).toInt(),
-            ToolMaterial.IRON.speed,
-            ToolMaterial.IRON.attackDamageBonus,
-            ToolMaterial.IRON.enchantmentValue,
-            ToolMaterial.IRON.repairItems
-        )
+        val C_IRON =
+            ToolMaterial(
+                ToolMaterial.IRON.incorrectBlocksForDrops,
+                (ToolMaterial.IRON.durability * DMULTI).toInt(),
+                ToolMaterial.IRON.speed,
+                ToolMaterial.IRON.attackDamageBonus,
+                ToolMaterial.IRON.enchantmentValue,
+                ToolMaterial.IRON.repairItems,
+            )
 
-        val C_DIAMOND = ToolMaterial(
-            ToolMaterial.DIAMOND.incorrectBlocksForDrops,
-            (ToolMaterial.DIAMOND.durability * DMULTI).toInt(),
-            ToolMaterial.DIAMOND.speed,
-            ToolMaterial.DIAMOND.attackDamageBonus,
-            ToolMaterial.DIAMOND.enchantmentValue,
-            ToolMaterial.DIAMOND.repairItems
-        )
+        val C_DIAMOND =
+            ToolMaterial(
+                ToolMaterial.DIAMOND.incorrectBlocksForDrops,
+                (ToolMaterial.DIAMOND.durability * DMULTI).toInt(),
+                ToolMaterial.DIAMOND.speed,
+                ToolMaterial.DIAMOND.attackDamageBonus,
+                ToolMaterial.DIAMOND.enchantmentValue,
+                ToolMaterial.DIAMOND.repairItems,
+            )
 
-        val C_GOLD = ToolMaterial(
-            ToolMaterial.GOLD.incorrectBlocksForDrops,
-            (ToolMaterial.GOLD.durability * DMULTI).toInt(),
-            ToolMaterial.GOLD.speed,
-            ToolMaterial.GOLD.attackDamageBonus,
-            ToolMaterial.GOLD.enchantmentValue,
-            ToolMaterial.GOLD.repairItems
-        )
+        val C_GOLD =
+            ToolMaterial(
+                ToolMaterial.GOLD.incorrectBlocksForDrops,
+                (ToolMaterial.GOLD.durability * DMULTI).toInt(),
+                ToolMaterial.GOLD.speed,
+                ToolMaterial.GOLD.attackDamageBonus,
+                ToolMaterial.GOLD.enchantmentValue,
+                ToolMaterial.GOLD.repairItems,
+            )
 
-        val C_NETHERITE = ToolMaterial(
-            ToolMaterial.NETHERITE.incorrectBlocksForDrops,
-            (ToolMaterial.NETHERITE.durability * DMULTI).toInt(),
-            ToolMaterial.NETHERITE.speed,
-            ToolMaterial.NETHERITE.attackDamageBonus,
-            ToolMaterial.NETHERITE.enchantmentValue,
-            ToolMaterial.NETHERITE.repairItems
-        )
+        val C_NETHERITE =
+            ToolMaterial(
+                ToolMaterial.NETHERITE.incorrectBlocksForDrops,
+                (ToolMaterial.NETHERITE.durability * DMULTI).toInt(),
+                ToolMaterial.NETHERITE.speed,
+                ToolMaterial.NETHERITE.attackDamageBonus,
+                ToolMaterial.NETHERITE.enchantmentValue,
+                ToolMaterial.NETHERITE.repairItems,
+            )
 
         /** Map of material names to their corresponding ToolMaterial instances */
-        val materials = mapOf(
-            "wood" to C_WOOD,
-            "stone" to C_STONE,
-            "iron" to C_IRON,
-            "diamond" to C_DIAMOND,
-            "gold" to C_GOLD,
-            "netherite" to C_NETHERITE
-        )
+        val materials =
+            mapOf(
+                "wood" to C_WOOD,
+                "stone" to C_STONE,
+                "iron" to C_IRON,
+                "diamond" to C_DIAMOND,
+                "gold" to C_GOLD,
+                "netherite" to C_NETHERITE,
+            )
     }
 
     // Translation keys and tooltip configuration
@@ -119,28 +122,28 @@ class RadiusMineItem(
     /**
      * @return Map containing the tooltip translation key and description
      */
-    fun getTooltip(): Map<String, String> {
-        return mapOf(tooltipKey to tooltipDescription)
-    }
+    fun getTooltip(): Map<String, String> = mapOf(tooltipKey to tooltipDescription)
 
     /**
      * Adds the tooltip to the item stack
      */
+    @Deprecated("Deprecated in Java")
     override fun appendTooltip(
         stack: ItemStack,
         context: TooltipContext,
-        tooltip: MutableList<Text>,
-        type: TooltipType
+        displayComponent: TooltipDisplayComponent,
+        textConsumer: Consumer<Text>,
+        type: TooltipType,
     ) {
-        tooltip.add(Text.translatable(tooltipKey).formatted(Formatting.DARK_GREEN))
+        textConsumer.accept(Text.translatable(tooltipKey).formatted(Formatting.DARK_GREEN))
     }
 
     /**
      * Gets the crafting components for this tool's material
      * @return Pair containing either a tag key or specific item
      */
-    fun getCraftingTagOrItem(): Pair<TagKey<Item>?, Item?> {
-        return when (material) {
+    fun getCraftingTagOrItem(): Pair<TagKey<Item>?, Item?> =
+        when (material) {
             C_WOOD -> Pair(ItemTags.PLANKS, null)
             C_STONE -> Pair(ItemTagGenerator.stonesTag, null)
             C_IRON -> Pair(null, Items.IRON_INGOT)
@@ -152,7 +155,6 @@ class RadiusMineItem(
                 Pair(ItemTags.PLANKS, null)
             }
         }
-    }
 
     /**
      * Creates an ingredient for crafting recipes
@@ -175,8 +177,8 @@ class RadiusMineItem(
      * Gets the representative block for the tool material
      * @return Block associated with the tool material
      */
-    fun getMaterialBlock(): Block {
-        return when (material) {
+    fun getMaterialBlock(): Block =
+        when (material) {
             C_WOOD -> Blocks.STRIPPED_DARK_OAK_LOG
             C_STONE -> Blocks.STONE
             C_IRON -> Blocks.IRON_BLOCK
@@ -188,18 +190,16 @@ class RadiusMineItem(
                 Blocks.OAK_PLANKS
             }
         }
-    }
 
     /**
      * Gets the name of the tool material
      * @return Material name or "unknown" if not found
      */
-    fun getMaterialName(): String {
-        return materials.entries.firstOrNull { it.value == material }?.key ?: run {
+    fun getMaterialName(): String =
+        materials.entries.firstOrNull { it.value == material }?.key ?: run {
             logger.warn("$unknownMaterial (from getMaterialName)")
             "unknown"
         }
-    }
 
     /**
      * Handles the block breaking logic with radius mining
@@ -210,7 +210,7 @@ class RadiusMineItem(
         world: World,
         state: BlockState,
         pos: BlockPos,
-        miner: LivingEntity
+        miner: LivingEntity,
     ): Boolean {
         val result = super.postMine(stack, world, state, pos, miner)
         val toolComponent = stack.get(DataComponentTypes.TOOL)
@@ -267,7 +267,7 @@ class RadiusMineItem(
         world: World,
         miner: LivingEntity,
         stack: ItemStack,
-        toolComponent: net.minecraft.component.type.ToolComponent
+        toolComponent: net.minecraft.component.type.ToolComponent,
     ) {
         if (targetPos == miner.blockPos) return
 
