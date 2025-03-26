@@ -1,6 +1,10 @@
+@file:Suppress("ktlint:standard:no-wildcard-imports")
+
 package de.additions.blocks
 
-import net.minecraft.block.*
+import net.minecraft.block.Block
+import net.minecraft.block.BlockState
+import net.minecraft.block.StairsBlock
 import net.minecraft.block.enums.BlockHalf
 import net.minecraft.block.enums.StairShape
 import net.minecraft.fluid.Fluids
@@ -22,19 +26,23 @@ import net.minecraft.world.tick.ScheduledTickView
  * @param blockstate The block state of the base block.
  * @param settings The block settings (e.g., hardness, tool required).
  */
-class SnowyStairsBlock(blockstate: BlockState, settings: Settings) : StairsBlock(blockstate, settings) {
-
+class SnowyStairsBlock(
+    blockstate: BlockState,
+    settings: Settings,
+) : StairsBlock(blockstate, settings) {
     companion object {
         val SNOWY: BooleanProperty = Properties.SNOWY
     }
 
     init {
-        this.defaultState = this.stateManager.getDefaultState()
-            .with(FACING, Direction.NORTH)
-            .with(HALF, BlockHalf.BOTTOM)
-            .with(SHAPE, StairShape.STRAIGHT)
-            .with(WATERLOGGED, false)
-            .with(SNOWY, false)
+        this.defaultState =
+            this.stateManager
+                .getDefaultState()
+                .with(FACING, Direction.NORTH)
+                .with(HALF, BlockHalf.BOTTOM)
+                .with(SHAPE, StairShape.STRAIGHT)
+                .with(WATERLOGGED, false)
+                .with(SNOWY, false)
     }
 
     /**
@@ -65,22 +73,21 @@ class SnowyStairsBlock(blockstate: BlockState, settings: Settings) : StairsBlock
         val direction = ctx.side
         val blockPos = ctx.blockPos
         val fluidState = ctx.world.getFluidState(blockPos)
-        val blockState = this.defaultState
-            .with(SNOWY, isSnow(snowyBlockState))
-            .with(FACING, ctx.horizontalPlayerFacing)
-            .with(
-                HALF,
-                if (direction != Direction.DOWN && (direction == Direction.UP || !(ctx.hitPos.y - blockPos.y.toDouble() > 0.5))) {
-                    BlockHalf.BOTTOM
-                } else {
-                    BlockHalf.TOP
-                }
-            )
-            .with(WATERLOGGED, fluidState.fluid == Fluids.WATER)
+        val blockState =
+            this.defaultState
+                .with(SNOWY, isSnow(snowyBlockState))
+                .with(FACING, ctx.horizontalPlayerFacing)
+                .with(
+                    HALF,
+                    if (direction != Direction.DOWN && (direction == Direction.UP || !(ctx.hitPos.y - blockPos.y.toDouble() > 0.5))) {
+                        BlockHalf.BOTTOM
+                    } else {
+                        BlockHalf.TOP
+                    },
+                ).with(WATERLOGGED, fluidState.fluid == Fluids.WATER)
 
         return blockState.with(SHAPE, getStairShape(blockState, ctx.world, blockPos))
     }
-
 
     /**
      * Updates the block state when a neighboring block changes.
@@ -103,16 +110,17 @@ class SnowyStairsBlock(blockstate: BlockState, settings: Settings) : StairsBlock
         direction: Direction,
         neighborPos: BlockPos,
         neighborState: BlockState,
-        random: Random
+        random: Random,
     ): BlockState {
         if (state.get(WATERLOGGED)) {
             tickView.scheduleFluidTick(pos, Fluids.WATER, Fluids.WATER.getTickRate(world))
         }
-        val newState = if (direction.axis.isHorizontal) {
-            state.with(SHAPE, getStairShape(state, world, pos))
-        } else {
-            super.getStateForNeighborUpdate(state, world, tickView, pos, direction, neighborPos, neighborState, random)
-        }
+        val newState =
+            if (direction.axis.isHorizontal) {
+                state.with(SHAPE, getStairShape(state, world, pos))
+            } else {
+                super.getStateForNeighborUpdate(state, world, tickView, pos, direction, neighborPos, neighborState, random)
+            }
 
         return newState.with(SNOWY, isSnow(world.getBlockState(pos.up())))
     }
@@ -123,9 +131,7 @@ class SnowyStairsBlock(blockstate: BlockState, settings: Settings) : StairsBlock
      * @param state The block state to check.
      * @return True if the block state is snow, false otherwise.
      */
-    private fun isSnow(state: BlockState): Boolean {
-        return state.isIn(BlockTags.SNOW)
-    }
+    private fun isSnow(state: BlockState): Boolean = state.isIn(BlockTags.SNOW)
 
     /**
      * Determines the shape of the stair block based on neighboring blocks.
@@ -135,7 +141,11 @@ class SnowyStairsBlock(blockstate: BlockState, settings: Settings) : StairsBlock
      * @param pos The position of the block.
      * @return The stair shape.
      */
-    private fun getStairShape(state: BlockState, world: BlockView, pos: BlockPos): StairShape {
+    private fun getStairShape(
+        state: BlockState,
+        world: BlockView,
+        pos: BlockPos,
+    ): StairShape {
         val direction = state.get(FACING)
         val blockState = world.getBlockState(pos.offset(direction))
         if (blockState.block is StairsBlock && state.get(HALF) == blockState.get(HALF)) {
@@ -173,8 +183,15 @@ class SnowyStairsBlock(blockstate: BlockState, settings: Settings) : StairsBlock
      * @param dir The direction to check.
      * @return True if the orientation is different, false otherwise.
      */
-    private fun isDifferentOrientation(state: BlockState, world: BlockView, pos: BlockPos, dir: Direction): Boolean {
+    private fun isDifferentOrientation(
+        state: BlockState,
+        world: BlockView,
+        pos: BlockPos,
+        dir: Direction,
+    ): Boolean {
         val neighborState = world.getBlockState(pos.offset(dir))
-        return neighborState.block !is StairsBlock || neighborState.get(FACING) != state.get(FACING) || neighborState.get(HALF) != state.get(HALF)
+        return neighborState.block !is StairsBlock ||
+            neighborState.get(FACING) != state.get(FACING) ||
+            neighborState.get(HALF) != state.get(HALF)
     }
 }

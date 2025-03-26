@@ -218,7 +218,7 @@ class RedstoneChainBlock(
             val offsets = List(3) { random.nextGaussian() * 0.1 }
             val velocity = List(3) { random.nextGaussian() * 0.02 }
 
-            world.addParticle(
+            world.addParticleClient(
                 DustParticleEffect(0xFF0000, scale),
                 pos.x + 0.5 + offsets[0],
                 pos.y + 0.5 + offsets[1],

@@ -1,6 +1,5 @@
 package de.additions.blocks
 
-import net.minecraft.block.AbstractBlock.Settings
 import net.minecraft.block.BlockState
 import net.minecraft.block.SlabBlock
 import net.minecraft.block.enums.SlabType
@@ -23,8 +22,9 @@ import net.minecraft.world.World
  *
  * @property settings Block properties (hardness, sounds, etc)
  */
-class CryingObsidianSlab(settings: Settings) : SlabBlock(settings) {
-
+class CryingObsidianSlab(
+    settings: Settings,
+) : SlabBlock(settings) {
     /**
      * Handles visual effects with 20% chance per tick.
      * Delegates to type-specific handlers based on slab configuration.
@@ -34,7 +34,12 @@ class CryingObsidianSlab(settings: Settings) : SlabBlock(settings) {
      * @param pos Block position in world
      * @param random Random number generator for particle placement
      */
-    override fun randomDisplayTick(state: BlockState, world: World, pos: BlockPos, random: Random) {
+    override fun randomDisplayTick(
+        state: BlockState,
+        world: World,
+        pos: BlockPos,
+        random: Random,
+    ) {
         if (random.nextInt(5) == 0) {
             when (state.get(TYPE)) {
                 SlabType.DOUBLE -> handleDoubleSlab(world, pos, random)
@@ -51,7 +56,11 @@ class CryingObsidianSlab(settings: Settings) : SlabBlock(settings) {
      * @param pos Block position
      * @param random Random number generator
      */
-    private fun handleDoubleSlab(world: World, pos: BlockPos, random: Random) {
+    private fun handleDoubleSlab(
+        world: World,
+        pos: BlockPos,
+        random: Random,
+    ) {
         val direction = Direction.random(random)
         if (direction != Direction.UP) {
             trySpawnParticle(world, pos, direction, random, 0.5, 0.5)
@@ -65,7 +74,11 @@ class CryingObsidianSlab(settings: Settings) : SlabBlock(settings) {
      * @param pos Block position
      * @param random Random number generator
      */
-    private fun handleBottomSlab(world: World, pos: BlockPos, random: Random) {
+    private fun handleBottomSlab(
+        world: World,
+        pos: BlockPos,
+        random: Random,
+    ) {
         val direction = Direction.random(random)
         if (direction != Direction.UP) {
             trySpawnParticle(world, pos, direction, random, 0.0, 0.5)
@@ -79,7 +92,11 @@ class CryingObsidianSlab(settings: Settings) : SlabBlock(settings) {
      * @param pos Block position
      * @param random Random number generator
      */
-    private fun handleTopSlab(world: World, pos: BlockPos, random: Random) {
+    private fun handleTopSlab(
+        world: World,
+        pos: BlockPos,
+        random: Random,
+    ) {
         val direction = Direction.random(random)
         if (direction != Direction.DOWN) {
             trySpawnParticle(world, pos, direction, random, 0.5, 1.0)
@@ -102,23 +119,24 @@ class CryingObsidianSlab(settings: Settings) : SlabBlock(settings) {
         direction: Direction,
         random: Random,
         yBase: Double,
-        yRange: Double
+        yRange: Double,
     ) {
         val blockPos = pos.offset(direction)
         val blockState = world.getBlockState(blockPos)
         if (!blockState.isOpaque || !blockState.isSideSolidFullSquare(world, blockPos, direction.opposite)) {
             val (x, y, z) = calculateParticlePosition(direction, random, yBase, yRange)
-            world.addParticle(
+            world.addParticleClient(
                 ParticleTypes.DRIPPING_OBSIDIAN_TEAR,
                 pos.x + x,
                 pos.y + y,
                 pos.z + z,
                 0.0,
                 0.0,
-                0.0
+                0.0,
             )
         }
     }
+
     /**
      * Calculates particle positions along slab edges
      *
@@ -132,23 +150,26 @@ class CryingObsidianSlab(settings: Settings) : SlabBlock(settings) {
         direction: Direction,
         random: Random,
         yBase: Double,
-        yRange: Double
+        yRange: Double,
     ): Triple<Double, Double, Double> {
-        val x = when (direction.axis) {
-            Direction.Axis.X -> 0.5 + direction.offsetX * 0.6
-            else -> random.nextDouble()
-        }
+        val x =
+            when (direction.axis) {
+                Direction.Axis.X -> 0.5 + direction.offsetX * 0.6
+                else -> random.nextDouble()
+            }
 
-        val z = when (direction.axis) {
-            Direction.Axis.Z -> 0.5 + direction.offsetZ * 0.6
-            else -> random.nextDouble()
-        }
+        val z =
+            when (direction.axis) {
+                Direction.Axis.Z -> 0.5 + direction.offsetZ * 0.6
+                else -> random.nextDouble()
+            }
 
-        val y = when {
-            direction == Direction.DOWN && yBase == 0.0 -> 0.0
-            direction == Direction.UP && yRange == 1.0 -> 1.0
-            else -> yBase + random.nextDouble() * (yRange - yBase)
-        }
+        val y =
+            when {
+                direction == Direction.DOWN && yBase == 0.0 -> 0.0
+                direction == Direction.UP && yRange == 1.0 -> 1.0
+                else -> yBase + random.nextDouble() * (yRange - yBase)
+            }
 
         return Triple(x, y, z)
     }

@@ -1,6 +1,10 @@
+@file:Suppress("ktlint:standard:no-wildcard-imports")
+
 package de.additions.blocks
 
-import net.minecraft.block.*
+import net.minecraft.block.Block
+import net.minecraft.block.BlockState
+import net.minecraft.block.SlabBlock
 import net.minecraft.block.enums.SlabType
 import net.minecraft.fluid.Fluids
 import net.minecraft.item.ItemPlacementContext
@@ -19,17 +23,19 @@ import net.minecraft.world.tick.ScheduledTickView
  *
  * @param settings The block settings (e.g., hardness, tool required).
  */
-class SnowySlabBlock(settings: Settings) : SlabBlock(settings) {
-
+class SnowySlabBlock(
+    settings: Settings,
+) : SlabBlock(settings) {
     companion object {
         val SNOWY: BooleanProperty = Properties.SNOWY
     }
 
     init {
-        this.defaultState = this.stateManager.defaultState
-            .with(SNOWY, false)
-            .with(TYPE, SlabType.BOTTOM)
-            .with(WATERLOGGED, false)
+        this.defaultState =
+            this.stateManager.defaultState
+                .with(SNOWY, false)
+                .with(TYPE, SlabType.BOTTOM)
+                .with(WATERLOGGED, false)
     }
 
     /**
@@ -57,7 +63,8 @@ class SnowySlabBlock(settings: Settings) : SlabBlock(settings) {
 
         // Check if the block is already a slab and set it to double
         if (currentBlockState.isOf(this)) {
-            return currentBlockState.with(TYPE, SlabType.DOUBLE)
+            return currentBlockState
+                .with(TYPE, SlabType.DOUBLE)
                 .with(WATERLOGGED, false)
                 .with(SNOWY, isSnowy)
         }
@@ -93,7 +100,7 @@ class SnowySlabBlock(settings: Settings) : SlabBlock(settings) {
         direction: Direction,
         neighborPos: BlockPos,
         neighborState: BlockState,
-        random: Random
+        random: Random,
     ): BlockState {
         if (state.get(WATERLOGGED)) {
             tickView.scheduleFluidTick(pos, Fluids.WATER, Fluids.WATER.getTickRate(world))
@@ -111,7 +118,5 @@ class SnowySlabBlock(settings: Settings) : SlabBlock(settings) {
      * @param state The block state to check.
      * @return True if the block state is snow, false otherwise.
      */
-    private fun isSnow(state: BlockState): Boolean {
-        return state.isIn(BlockTags.SNOW)
-    }
+    private fun isSnow(state: BlockState): Boolean = state.isIn(BlockTags.SNOW)
 }
