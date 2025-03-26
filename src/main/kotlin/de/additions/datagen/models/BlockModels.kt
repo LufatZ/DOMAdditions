@@ -1,3 +1,5 @@
+@file:Suppress("ktlint:standard:no-wildcard-imports")
+
 package de.additions.datagen.models
 
 import de.additions.Additions.MODID
@@ -24,8 +26,7 @@ import net.minecraft.block.Blocks
 import net.minecraft.block.DirtPathBlock
 import net.minecraft.block.GrassBlock
 import net.minecraft.client.data.*
-import net.minecraft.client.data.BlockStateModelGenerator.createBooleanModelMap
-import net.minecraft.client.data.BlockStateModelGenerator.createStairsBlockState
+import net.minecraft.client.data.BlockStateModelGenerator.*
 import net.minecraft.state.property.Properties
 import net.minecraft.util.Identifier
 import java.util.*
@@ -111,7 +112,7 @@ object BlockModels {
         val chainItemModelId = Identifier.ofVanilla("item/chain")
 
         registeredChains.forEach { chain ->
-            generator.registerAxisRotated(chain, chainModelId)
+            generator.registerAxisRotated(chain, createWeightedVariant(chainModelId))
             generator.registerParentedItemModel(chain, chainItemModelId)
         }
     }
@@ -469,9 +470,9 @@ object BlockModels {
                 else ->
                     createStairsBlockState(
                         stair,
-                        innerModel,
-                        defaultModel,
-                        outerModel,
+                        createWeightedVariant(innerModel),
+                        createWeightedVariant(defaultModel),
+                        createWeightedVariant(outerModel),
                     )
             },
         )
@@ -522,9 +523,9 @@ object BlockModels {
         generator.blockStateCollector?.accept(
             BlockStateModelGenerator.createTrapdoorBlockState(
                 trapdoor,
-                topModel,
-                bottomModel,
-                openModel,
+                createWeightedVariant(topModel),
+                createWeightedVariant(bottomModel),
+                createWeightedVariant(openModel),
             ),
         )
     }
@@ -568,16 +569,18 @@ object BlockModels {
             )
 
         val lanternModelhanging =
-            Model(
-                Optional.of(Identifier.of(hangingTemplateModelId)),
-                Optional.empty(),
-                TextureKey.TEXTURE,
-                TextureKey.PARTICLE,
-            ).upload(
-                lantern,
-                "_hanging",
-                textureMap,
-                generator.modelCollector,
+            createWeightedVariant(
+                Model(
+                    Optional.of(Identifier.of(hangingTemplateModelId)),
+                    Optional.empty(),
+                    TextureKey.TEXTURE,
+                    TextureKey.PARTICLE,
+                ).upload(
+                    lantern,
+                    "_hanging",
+                    textureMap,
+                    generator.modelCollector,
+                ),
             )
 
         if (parent == Blocks.IRON_BLOCK &&
@@ -585,20 +588,20 @@ object BlockModels {
             lantern !is BigRedstoneLantern &&
             lantern !is SmallRedstoneLantern
         ) {
-            val lanternStandingModelId = Identifier.ofVanilla("block/lantern")
-            val lanternHangingModelId = Identifier.ofVanilla("block/lantern_hanging")
+            val lanternStandingModel = createWeightedVariant(Identifier.ofVanilla("block/lantern"))
+            val lanternHangingModel = createWeightedVariant(Identifier.ofVanilla("block/lantern_hanging"))
             val lanternItemModelId = Identifier.ofVanilla("item/lantern")
             generator.registerParentedItemModel(lantern, lanternItemModelId)
             generator.blockStateCollector.accept(
-                VariantsBlockStateSupplier.create(lantern).coordinate(
-                    createBooleanModelMap(Properties.HANGING, lanternHangingModelId, lanternStandingModelId),
+                VariantsBlockModelDefinitionCreator.of(lantern).with(
+                    createBooleanModelMap(Properties.HANGING, lanternHangingModel, lanternStandingModel),
                 ),
             )
         } else {
             generator.blockStateCollector?.accept(
-                VariantsBlockStateSupplier
-                    .create(lantern)
-                    .coordinate(createBooleanModelMap(Properties.HANGING, lanternModelhanging, lanternModelStanding)),
+                VariantsBlockModelDefinitionCreator.of(lantern).with(
+                    createBooleanModelMap(Properties.HANGING, lanternModelhanging, createWeightedVariant(lanternModelStanding)),
+                ),
             )
             generateBlockItemModel(lantern, parent, lanternModelStanding, generator)
         }
@@ -804,11 +807,11 @@ object BlockModels {
                     snowyFullBlockModel,
                 )
             } else {
-                BlockStateModelGenerator.createSlabBlockState(
+                createSlabBlockState(
                     slab,
-                    bottomModel,
-                    topModel,
-                    fullBlockModel,
+                    createWeightedVariant(bottomModel),
+                    createWeightedVariant(topModel),
+                    createWeightedVariant(fullBlockModel),
                 )
             },
         )
