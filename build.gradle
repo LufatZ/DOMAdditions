@@ -62,9 +62,9 @@ dependencies {
 	modRuntimeOnly "maven.modrinth:jade:${project.jade}+fabric"                                     // jade (waila)
 	modImplementation "maven.modrinth:midnightlib:${project.midnightlib}-fabric"
 	// REI-API (Compile-Only)
-	modCompileOnly "me.shedaniel:RoughlyEnoughItems-api-fabric:${project.rei}"
+	//modCompileOnly "me.shedaniel:RoughlyEnoughItems-api-fabric:${project.rei}"
 	// REI Runtime (Runtime-Only)
-	modRuntimeOnly "me.shedaniel:RoughlyEnoughItems-fabric:${project.rei}"
+	//modRuntimeOnly "me.shedaniel:RoughlyEnoughItems-fabric:${project.rei}"
 }
 
 processResources {

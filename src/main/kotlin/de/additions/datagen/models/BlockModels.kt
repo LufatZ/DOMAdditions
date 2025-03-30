@@ -11,9 +11,10 @@ import de.additions.blocks.BlockRegistry.registeredSlabs
 import de.additions.blocks.BlockRegistry.registeredStairs
 import de.additions.blocks.BlockRegistry.registeredTrapdoors
 import de.additions.blocks.BlockRegistry.trapdoorVariantsParents
-import de.additions.datagen.models.CustomStates.createOvergrownStairsBlockState
-import de.additions.datagen.models.CustomStates.createSnowySlabBlockState
-import de.additions.datagen.models.CustomStates.createSnowyStairsBlockState
+import de.additions.datagen.models.CustomStates.createNewOvergrownStairsBlockState
+import de.additions.datagen.models.CustomStates.createNewSnowySlabBlockState
+import de.additions.datagen.models.CustomStates.createNewSnowyStairsBlockState
+import de.additions.datagen.models.CustomStates.createStairsModelMap
 import de.additions.datagen.models.ModelGenerator.Companion.hasNoTexture
 import de.additions.datagen.models.ModelGenerator.Companion.hasSideAndTop
 import de.additions.datagen.models.ModelGenerator.Companion.removeBlock
@@ -152,7 +153,7 @@ object BlockModels {
             )
 
         // Regular models
-        val defaultModel =
+        val regularModel =
             when (parent) {
                 is GrassBlock ->
                     Model(
@@ -185,7 +186,7 @@ object BlockModels {
                 else -> Models.STAIRS.upload(stair, "", textureMap, generator.modelCollector)
             }
 
-        val defaultModelRotated =
+        val regularModelRotated =
             when (parent) {
                 is GrassBlock ->
                     Model(
@@ -351,7 +352,7 @@ object BlockModels {
             }
 
         // Snowy models for grass blocks
-        val snowyDefaultModel =
+        val regularSnowyModel =
             when (parent) {
                 in snowyOvergrownBlocks ->
                     Model(
@@ -365,7 +366,7 @@ object BlockModels {
                 else -> null
             }
 
-        val snowyDefaultModelRotated =
+        val regularSnowyModelRotated =
             when (parent) {
                 in snowyOvergrownBlocks ->
                     Model(
@@ -379,7 +380,7 @@ object BlockModels {
                 else -> null
             }
 
-        val snowyOuterModel =
+        val outerSnowyModel =
             when (parent) {
                 in snowyOvergrownBlocks ->
                     Model(
@@ -393,7 +394,7 @@ object BlockModels {
                 else -> null
             }
 
-        val snowyOuterModelRotated =
+        val outerSnowyModelRotated =
             when (parent) {
                 in snowyOvergrownBlocks ->
                     Model(
@@ -407,7 +408,7 @@ object BlockModels {
                 else -> null
             }
 
-        val snowyInnerModel =
+        val innerSnowyModel =
             when (parent) {
                 in snowyOvergrownBlocks ->
                     Model(
@@ -421,7 +422,7 @@ object BlockModels {
                 else -> null
             }
 
-        val snowyInnerModelRotated =
+        val innerSnowyModelRotated =
             when (parent) {
                 in snowyOvergrownBlocks ->
                     Model(
@@ -435,43 +436,45 @@ object BlockModels {
                 else -> null
             }
 
-        generateBlockItemModel(stair, parent, defaultModel, generator)
+        generateBlockItemModel(stair, parent, regularModel, generator)
 
         generator.blockStateCollector?.accept(
             when (parent) {
                 in snowyOvergrownBlocks ->
-                    createSnowyStairsBlockState(
+                    createNewSnowyStairsBlockState(
                         stair,
-                        innerModel,
-                        defaultModel,
-                        outerModel,
-                        innerModelRotated,
-                        defaultModelRotated,
-                        outerModelRotated,
-                        snowyInnerModel,
-                        snowyDefaultModel,
-                        snowyOuterModel,
-                        snowyInnerModelRotated,
-                        snowyDefaultModelRotated,
-                        snowyOuterModelRotated,
+                        createStairsModelMap(
+                            createWeightedVariant(innerModel),
+                            createWeightedVariant(regularModel),
+                            createWeightedVariant(outerModel),
+                            createWeightedVariant(innerModelRotated),
+                            createWeightedVariant(regularModelRotated),
+                            createWeightedVariant(outerModelRotated),
+                            createWeightedVariant(innerSnowyModel),
+                            createWeightedVariant(regularSnowyModel),
+                            createWeightedVariant(outerSnowyModel),
+                            createWeightedVariant(innerSnowyModelRotated),
+                            createWeightedVariant(regularSnowyModelRotated),
+                            createWeightedVariant(outerSnowyModelRotated),
+                        ),
                     )
 
                 is DirtPathBlock ->
-                    createOvergrownStairsBlockState(
+                    createNewOvergrownStairsBlockState(
                         stair,
-                        innerModel,
-                        defaultModel,
-                        outerModel,
-                        innerModelRotated,
-                        defaultModelRotated,
-                        outerModelRotated,
+                        createWeightedVariant(innerModel),
+                        createWeightedVariant(regularModel),
+                        createWeightedVariant(outerModel),
+                        createWeightedVariant(innerModelRotated),
+                        createWeightedVariant(regularModelRotated),
+                        createWeightedVariant(outerModelRotated),
                     )
 
                 else ->
                     createStairsBlockState(
                         stair,
                         createWeightedVariant(innerModel),
-                        createWeightedVariant(defaultModel),
+                        createWeightedVariant(regularModel),
                         createWeightedVariant(outerModel),
                     )
             },
@@ -797,14 +800,14 @@ object BlockModels {
 
         generator.blockStateCollector?.accept(
             if (parent in snowyOvergrownBlocks) {
-                createSnowySlabBlockState(
+                createNewSnowySlabBlockState(
                     slab,
-                    bottomModel,
-                    topModel,
-                    fullBlockModel,
-                    snowyBottomModel,
-                    snowyTopModel,
-                    snowyFullBlockModel,
+                    createWeightedVariant(bottomModel),
+                    createWeightedVariant(topModel),
+                    createWeightedVariant(fullBlockModel),
+                    createWeightedVariant(snowyBottomModel),
+                    createWeightedVariant(snowyTopModel),
+                    createWeightedVariant(snowyFullBlockModel),
                 )
             } else {
                 createSlabBlockState(

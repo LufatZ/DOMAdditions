@@ -103,6 +103,7 @@ class BlockTagGenerator(
                     BlockSoundGroup.NETHER_ORE -> ::mineableByPickaxe
                     BlockSoundGroup.NETHERRACK -> ::mineableByPickaxe
                     BlockSoundGroup.SCULK -> ::mineableByPickaxe
+                    BlockSoundGroup.IRON -> ::mineableByPickaxe
 
                     // Wood-like groups (Axe)
                     BlockSoundGroup.WOOD -> ::mineableByAxe
