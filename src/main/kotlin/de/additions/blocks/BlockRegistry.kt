@@ -23,7 +23,11 @@ import net.minecraft.util.Identifier
 object BlockRegistry {
     /** Speichert alle registrierten Blöcke als ItemStacks für spätere Verwendung */
     val registeredBlocks: MutableList<ItemStack> = mutableListOf()
+
+    @JvmStatic
     val registeredStairs: MutableList<Block> = mutableListOf()
+
+    @JvmStatic
     val registeredSlabs: MutableList<Block> = mutableListOf()
     val registeredLanterns: MutableMap<Block, Block> = mutableMapOf()
     val registeredTrapdoors: MutableList<Block> = mutableListOf()
@@ -33,6 +37,7 @@ object BlockRegistry {
     private val registeredMagmaBlockVariants: MutableList<Block> = mutableListOf()
 
     // Listen der Basis-Blöcke für Varianten
+    @JvmStatic
     val blockVariantsParents: List<Block> =
         if (AdditionsConfig.EnabledBlockVariants) {
             listOf(

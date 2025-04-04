@@ -6,15 +6,10 @@ import de.additions.items.ItemRegistry
 import de.additions.items.RadiusMineItem
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricLanguageProvider
-import net.minecraft.block.Block
-import net.minecraft.block.LanternBlock
-import net.minecraft.block.SlabBlock
-import net.minecraft.block.StairsBlock
-import net.minecraft.block.TrapdoorBlock
+import net.minecraft.block.*
 import net.minecraft.item.ItemStack
 import net.minecraft.registry.RegistryWrapper
 import java.util.concurrent.CompletableFuture
-import kotlin.text.trim
 
 class TranslationGenerator(
     generator: FabricDataOutput,
@@ -82,7 +77,7 @@ class TranslationGenerator(
             val item = stack.item
 
             if (item is RadiusMineItem) {
-                val tooltip = item.getTooltip()
+                val tooltip = item.getTooltipData()
                 tooltip.forEach { (key, desc) ->
                     add(key, desc)
                 }
@@ -98,7 +93,7 @@ class TranslationGenerator(
     }
 
     private fun modMenuTranslationBuilder() {
-        val menuKey: String = "modmenu.additions"
+        val menuKey = "modmenu.additions"
         add("$menuKey.crowdin", "Help translate on Crowdin")
         add("$menuKey.discord", "Join the Discord")
         add("$menuKey.github", "View on GitHub")
