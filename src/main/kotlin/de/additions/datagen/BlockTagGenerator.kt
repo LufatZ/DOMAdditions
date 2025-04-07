@@ -2,17 +2,20 @@
 
 package de.additions.datagen
 
+import de.additions.Additions.MODID
 import de.additions.Additions.logger
 import de.additions.blocks.BlockRegistry
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider
 import net.minecraft.block.Block
+import net.minecraft.block.Blocks
 import net.minecraft.registry.RegistryKeys
 import net.minecraft.registry.RegistryWrapper
 import net.minecraft.registry.tag.BlockTags
 import net.minecraft.registry.tag.TagKey
 import net.minecraft.sound.BlockSoundGroup
 import net.minecraft.sound.BlockSoundGroup.*
+import net.minecraft.util.Identifier
 import java.util.concurrent.CompletableFuture
 
 /**
@@ -176,6 +179,10 @@ class BlockTagGenerator(
                 MOSS_BLOCK,
                 GRAVEL,
             )
+
+        // Custom BlockTag for DirtlLike Blocks
+        val DirtLikeBlockTag: TagKey<Block> = TagKey.of(RegistryKeys.BLOCK, Identifier.of(MODID, "dirt_like"))
+        val DirtPathVariantTag: TagKey<Block> = TagKey.of(RegistryKeys.BLOCK, Identifier.of(MODID, "dirt_path_variant"))
     }
 
     /**
@@ -205,6 +212,9 @@ class BlockTagGenerator(
         BlockRegistry.registeredSlabs.forEach { slab -> addToTag(slab, BlockTags.SLABS) }
         BlockRegistry.registeredStairs.forEach { stair -> addToTag(stair, BlockTags.STAIRS) }
         BlockRegistry.registeredTrapdoors.forEach { trapdoor -> addToTag(trapdoor, BlockTags.TRAPDOORS) }
+
+        // 4. Add blocks to custom tags
+        addToTag(Blocks.DIRT_PATH, DirtPathVariantTag)
     }
 
     /**
@@ -271,10 +281,11 @@ class BlockTagGenerator(
 
                 // Assign additional specific material tags based on parent sound group
                 if (parentSoundGroup in DIRT_LIKE_SOUND_GROUPS) {
-                    addToTag(block, BlockTags.DIRT)
+                    val tag = if (parentBlock == Blocks.DIRT_PATH) DirtPathVariantTag else DirtLikeBlockTag
+                    addToTag(block, tag)
                     logger.debug(
                         "Added tag [{}] to block [{}] based on parent [{}]'s sound group [{}].",
-                        BlockTags.DIRT.id,
+                        tag.id,
                         block.translationKey,
                         parentBlock.translationKey,
                         parentSoundGroup,

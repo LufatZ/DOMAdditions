@@ -36,6 +36,22 @@ object BlockRegistry {
     private val registeredDirtBlockVariants: MutableList<Block> = mutableListOf()
     private val registeredMagmaBlockVariants: MutableList<Block> = mutableListOf()
 
+    @Suppress("ktlint:standard:property-naming")
+    var DIRT_PATH_STAIRS: Block = Blocks.OAK_STAIRS // Fallback-Block
+        private set
+
+    @Suppress("ktlint:standard:property-naming")
+    var DIRT_PATH_SLAB: Block = Blocks.OAK_SLAB // Fallback-Block
+        private set
+
+    @Suppress("ktlint:standard:property-naming")
+    var DIRT_STAIRS: Block = Blocks.OAK_STAIRS // Fallback-Block
+        private set
+
+    @Suppress("ktlint:standard:property-naming")
+    var DIRT_SLAB: Block = Blocks.OAK_SLAB // Fallback-Block
+        private set
+
     // Listen der Basis-Blöcke für Varianten
     @JvmStatic
     val blockVariantsParents: List<Block> =
@@ -232,132 +248,165 @@ object BlockRegistry {
      * Registriert Treppen- und Platten-Varianten für vorgegebene Basis-Blöcke.
      */
     private fun registerBlockVariants() {
-        logger.info("Starting block variant registration")
+        if (!AdditionsConfig.EnabledBlockVariants) {
+            logger.info("Block Variants disabled, using fallback blocks for properties.")
+            // Hier musst du nichts tun, die Vars haben ja schon Fallbacks.
+            return
+        } else {
+            logger.info("Starting block variant registration")
+            // Varianten für jeden Basis-Block erstellen
+            blockVariantsParents.forEach { parent ->
+                val baseName =
+                    Registries.BLOCK
+                        .getId(parent)
+                        .path
+                        .replace("_block", "")
+                val settings = AbstractBlock.Settings.copy(parent)
 
-        // Varianten für jeden Basis-Block erstellen
-        blockVariantsParents.forEach { parent ->
-            val baseName =
-                Registries.BLOCK
-                    .getId(parent)
-                    .path
-                    .replace("_block", "")
-            val settings = AbstractBlock.Settings.copy(parent)
+                logger.debug("Creating variants for base block: $baseName")
 
-            logger.debug("Creating variants for base block: $baseName")
-
-            // Platten-Variante registrieren
-            val slab =
-                when (parent) {
-                    is GrassBlock -> {
-                        register(
-                            "${baseName}_slab",
-                            SnowySlabBlock(
-                                settings.registryKey(keyOf("${baseName}_slab")),
-                            ),
-                        ).also { registeredGrassBlocks.add(it) }
-                    }
-                    Blocks.PODZOL, Blocks.MYCELIUM -> {
-                        register(
-                            "${baseName}_slab",
-                            SnowySlabBlock(
-                                settings.registryKey(keyOf("${baseName}_slab")),
-                            ),
-                        )
-                    }
-                    is CryingObsidianBlock -> {
-                        register(
-                            "${baseName}_slab",
-                            CryingObsidianSlab(
-                                settings.registryKey(keyOf("${baseName}_slab")),
-                            ),
-                        )
-                    }
-                    is DirtPathBlock -> {
-                        register(
-                            "${baseName}_slab",
-                            PathSlab(
-                                settings.registryKey(keyOf("${baseName}_slab")),
-                            ),
-                        ).also { registeredDirtBlockVariants.add(it) }
-                    }
-                    is MagmaBlock -> {
-                        register(
-                            "${baseName}_slab",
-                            MagmaSlab(
-                                settings.registryKey(keyOf("${baseName}_slab")),
-                            ),
-                        ).also {
-                            registeredMagmaBlockVariants.add(it)
+                // Platten-Variante registrieren
+                val slab =
+                    when (parent) {
+                        is GrassBlock -> {
+                            register(
+                                "${baseName}_slab",
+                                SnowySlabBlock(
+                                    settings.registryKey(keyOf("${baseName}_slab")),
+                                ),
+                            ).also { registeredGrassBlocks.add(it) }
+                        }
+                        Blocks.PODZOL, Blocks.MYCELIUM -> {
+                            register(
+                                "${baseName}_slab",
+                                SnowySlabBlock(
+                                    settings.registryKey(keyOf("${baseName}_slab")),
+                                ),
+                            )
+                        }
+                        is CryingObsidianBlock -> {
+                            register(
+                                "${baseName}_slab",
+                                CryingObsidianSlab(
+                                    settings.registryKey(keyOf("${baseName}_slab")),
+                                ),
+                            )
+                        }
+                        is DirtPathBlock -> {
+                            register(
+                                "${baseName}_slab",
+                                PathSlab(
+                                    settings.registryKey(keyOf("${baseName}_slab")),
+                                ),
+                            ).also {
+                                DIRT_PATH_SLAB = it
+                                registeredDirtBlockVariants.add(it)
+                            }
+                        }
+                        Blocks.DIRT -> {
+                            register(
+                                "${baseName}_slab",
+                                SlabBlock(
+                                    settings.registryKey(keyOf("${baseName}_slab")),
+                                ),
+                            ).also {
+                                DIRT_SLAB = it
+                                registeredDirtBlockVariants.add(it)
+                            }
+                        }
+                        is MagmaBlock -> {
+                            register(
+                                "${baseName}_slab",
+                                MagmaSlab(
+                                    settings.registryKey(keyOf("${baseName}_slab")),
+                                ),
+                            ).also {
+                                registeredMagmaBlockVariants.add(it)
+                            }
+                        }
+                        else -> {
+                            register(
+                                "${baseName}_slab",
+                                SlabBlock(
+                                    settings.registryKey(keyOf("${baseName}_slab")),
+                                ),
+                            ).also { if (parent == Blocks.DIRT) registeredDirtBlockVariants.add(it) }
                         }
                     }
-                    else -> {
-                        register(
-                            "${baseName}_slab",
-                            SlabBlock(
-                                settings.registryKey(keyOf("${baseName}_slab")),
-                            ),
-                        ).also { if (parent == Blocks.DIRT) registeredDirtBlockVariants.add(it) }
+
+                // Treppen-Variante registrieren
+                val stair =
+                    when (parent) {
+                        is GrassBlock ->
+                            register(
+                                "${baseName}_stairs",
+                                SnowyStairsBlock(
+                                    parent.defaultState,
+                                    settings.registryKey(keyOf("${baseName}_stairs")),
+                                ),
+                            ).also { registeredGrassBlocks.add(it) }
+
+                        Blocks.PODZOL, Blocks.MYCELIUM ->
+                            register(
+                                "${baseName}_stairs",
+                                SnowyStairsBlock(
+                                    parent.defaultState,
+                                    settings.registryKey(keyOf("${baseName}_stairs")),
+                                ),
+                            )
+                        is CryingObsidianBlock ->
+                            register(
+                                "${baseName}_stairs",
+                                CryingObsidianStair(
+                                    parent.defaultState,
+                                    settings.registryKey(keyOf("${baseName}_stairs")),
+                                ),
+                            )
+                        is MagmaBlock ->
+                            register(
+                                "${baseName}_stairs",
+                                MagmaStair(
+                                    parent.defaultState,
+                                    settings.registryKey(keyOf("${baseName}_stairs")),
+                                ),
+                            ).also { registeredMagmaBlockVariants.add(it) }
+                        is DirtPathBlock ->
+                            register(
+                                "${baseName}_stairs",
+                                PathStair(
+                                    parent.defaultState,
+                                    settings.registryKey(keyOf("${baseName}_stairs")),
+                                ),
+                            ).also {
+                                DIRT_PATH_STAIRS = it
+                                registeredDirtBlockVariants.add(it)
+                            }
+                        Blocks.DIRT ->
+                            register(
+                                "${baseName}_stairs",
+                                StairsBlock(
+                                    parent.defaultState,
+                                    settings.registryKey(keyOf("${baseName}_stairs")),
+                                ),
+                            ).also {
+                                DIRT_STAIRS = it
+                                registeredDirtBlockVariants.add(it)
+                            }
+                        else ->
+                            register(
+                                "${baseName}_stairs",
+                                StairsBlock(
+                                    parent.defaultState,
+                                    settings.registryKey(keyOf("${baseName}_stairs")),
+                                ),
+                            ).also { if (parent == Blocks.DIRT) registeredDirtBlockVariants.add(it) }
                     }
-                }
+                registeredStairs.add(stair)
+                registeredSlabs.add(slab)
+            }
 
-            // Treppen-Variante registrieren
-            val stair =
-                when (parent) {
-                    is GrassBlock ->
-                        register(
-                            "${baseName}_stairs",
-                            SnowyStairsBlock(
-                                parent.defaultState,
-                                settings.registryKey(keyOf("${baseName}_stairs")),
-                            ),
-                        ).also { registeredGrassBlocks.add(it) }
-
-                    Blocks.PODZOL, Blocks.MYCELIUM ->
-                        register(
-                            "${baseName}_stairs",
-                            SnowyStairsBlock(
-                                parent.defaultState,
-                                settings.registryKey(keyOf("${baseName}_stairs")),
-                            ),
-                        )
-                    is CryingObsidianBlock ->
-                        register(
-                            "${baseName}_stairs",
-                            CryingObsidianStair(
-                                parent.defaultState,
-                                settings.registryKey(keyOf("${baseName}_stairs")),
-                            ),
-                        )
-                    is MagmaBlock ->
-                        register(
-                            "${baseName}_stairs",
-                            MagmaStair(
-                                parent.defaultState,
-                                settings.registryKey(keyOf("${baseName}_stairs")),
-                            ),
-                        ).also { registeredMagmaBlockVariants.add(it) }
-                    is DirtPathBlock ->
-                        register(
-                            "${baseName}_stairs",
-                            PathStair(
-                                parent.defaultState,
-                                settings.registryKey(keyOf("${baseName}_stairs")),
-                            ),
-                        ).also { registeredDirtBlockVariants.add(it) }
-                    else ->
-                        register(
-                            "${baseName}_stairs",
-                            StairsBlock(
-                                parent.defaultState,
-                                settings.registryKey(keyOf("${baseName}_stairs")),
-                            ),
-                        ).also { if (parent == Blocks.DIRT) registeredDirtBlockVariants.add(it) }
-                }
-            registeredStairs.add(stair)
-            registeredSlabs.add(slab)
+            logger.info("Block variant registration completed")
         }
-
-        logger.info("Block variant registration completed")
     }
 
     /**

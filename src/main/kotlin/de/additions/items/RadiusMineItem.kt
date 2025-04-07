@@ -3,6 +3,7 @@ package de.additions.items
 import de.additions.Additions.logger
 import de.additions.blocks.BlockRegistry
 import de.additions.blocks.SnowyStairsBlock
+import de.additions.datagen.BlockTagGenerator
 import de.additions.datagen.ItemTagGenerator
 import de.additions.items.RadiusMineItem.Companion.RADIUS
 import de.additions.items.RadiusMineItem.Companion.materials
@@ -274,8 +275,6 @@ class RadiusMineItem(
             return initialResult // Don't process AoE on client or for trivial blocks
         }
 
-        val hand = miner.activeHand // Determine the hand used for damaging
-
         // Determine the AoE plane based on the direction the player is facing.
         when (miner.facing) {
             // Looking Up/Down: Mine in a horizontal (XZ) plane around the target block.
@@ -346,8 +345,11 @@ class RadiusMineItem(
         }
 
         // Define which blocks can be turned into paths
-        val pathableBlocks = BlockTags.DIRT // Using the DIRT tag (includes grass, dirt, podzol, etc.)
+        val pathableFullBlocks = BlockTags.DIRT // Using the DIRT tag (includes grass, dirt, podzol, etc.)
+        val pathableCustomBlocks = BlockTagGenerator.DirtLikeBlockTag
         var changedSomething = false
+
+        fun isInPathable(state: BlockState): Boolean = state.isIn(pathableFullBlocks) || state.isIn(pathableCustomBlocks)
 
         // Iterate through the horizontal plane defined by the RADIUS around the clicked block
         for (dx in -RADIUS..RADIUS) {
@@ -361,7 +363,7 @@ class RadiusMineItem(
                     // Conditions for creating a path:
                     // 1. Target block is pathable (e.g., in DIRT tag).
                     // 2. Space above is air.
-                    if (targetState.isIn(pathableBlocks) && blockAboveState.isAir) {
+                    if (isInPathable(targetState) && blockAboveState.isAir) {
                         val targetBlock = targetState.block
 
                         // Determine the desired path state
@@ -384,8 +386,6 @@ class RadiusMineItem(
                                 currentPos,
                                 SoundEvents.ITEM_SHOVEL_FLATTEN,
                                 SoundCategory.BLOCKS,
-                                1.0f, // Volume
-                                1.0f, // Pitch
                             )
 
                             // Perform changes only on the server
