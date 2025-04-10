@@ -66,10 +66,10 @@ public abstract class AdditionsShovelMixin {
      * @return The BlockState to actually store in `blockState2`, potentially modified by this mixin.
      */
     @ModifyVariable(
-          method = "useOnBlock",
-          at = @At(value = "STORE", ordinal = 0), // Target assignment to blockState2 after PATH_STATES.get()
-          name = "blockState2", // The name of the local variable in ShovelItem#useOnBlock
-          require = 1 // Ensure the target is found
+            method = "useOnBlock",
+            at = @At(value = "STORE", ordinal = 0),
+            index = 6,
+            require = 1
     )
     private BlockState injectCustomPathStates(BlockState originalBlockState2, ItemUsageContext context) {
        // Only intervene if vanilla lookup failed AND the feature is enabled
