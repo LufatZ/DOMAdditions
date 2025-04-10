@@ -1,100 +1,144 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-	id 'fabric-loom' version '1.10-SNAPSHOT'
-	id 'maven-publish'
-	id "org.jetbrains.kotlin.jvm" version "2.1.20"
+    id 'fabric-loom' version '1.+'
+    id 'maven-publish'
+    id "org.jetbrains.kotlin.jvm" version "2.1.20" // Ensure this Kotlin version matches the project needs
 }
 
+// ==========================================================================================
+// Project Properties
+// ==========================================================================================
+// defined in gradle.properties
+// ==========================================================================================
+
+// ==========================================================================================
+// Build Number Logic
+// ==========================================================================================
+// Manages an incremental build number, stored in 'build.number'.
+// Resets to 1 if 'mod_version' changes compared to the last build ('last.version').
 def buildNumberFile = file('build.number')
 def currentModVersion = project.mod_version
 def buildNumber = 1
 
-// Read previous version from a separate file to track version changes
 def versionFile = file('last.version')
-
 if (versionFile.exists()) {
-	def previousVersion = versionFile.text.trim()
-
-	if (buildNumberFile.exists()) {
-		// Reset build number if mod version has changed
-		if (previousVersion != currentModVersion) {
-			buildNumber = 1
-		} else {
-			buildNumber = Integer.parseInt(buildNumberFile.text.trim()) + 1
-		}
-	}
+    def previousVersion = versionFile.text.trim()
+    if (buildNumberFile.exists()) {
+       // Reset build number if mod version has changed
+       if (previousVersion != currentModVersion) {
+          buildNumber = 1
+       } else {
+          // Increment build number if mod version is the same
+          buildNumber = Integer.parseInt(buildNumberFile.text.trim()) + 1
+       }
+    }
 }
-
-// Write current build number
+// Write current build number for this build
 buildNumberFile.text = buildNumber.toString()
-
-// Write current version for next comparison
+// Write current mod version for the next build's comparison
 versionFile.text = currentModVersion
+// ==========================================================================================
 
-version = "${project.mod_version}.build${buildNumber}-${project.minecraft_version}"
+
+// ==========================================================================================
+// Version Configuration (SemVer Compliant)
+// ==========================================================================================
+// Sets the project version using the SemVer format: MAJOR.MINOR.PATCH-minecraft_version+build.BUILDNUMBER
+// Example Result: 0.14.2-1.21.5+build.188
+version = "${project.mod_version}-${project.minecraft_version}+build.${buildNumber}"
+// ==========================================================================================
 
 group = project.maven_group
 
 base {
-	archivesName = project.archives_base_name
+    archivesName = project.archives_base_name
 }
 
 repositories {
-	maven { url "https://maven.shedaniel.me" }
-	maven { url "https://maven.terraformersmc.com/" } // modmenu
-	maven { url "https://api.modrinth.com/maven" }    // modrinth
+    // Essential Minecraft/Fabric repositories
+    // And any other repositories the dependencies require
+    mavenCentral() // Generally good practice to include
+    maven { url "https://maven.fabricmc.net/" }
+    // Dependency specific repositories
+    maven { url "https://maven.shedaniel.me" }        // REI
+    maven { url "https://maven.terraformersmc.com/" } // ModMenu
+    maven { url "https://api.modrinth.com/maven" }    // Modrinth Maven (Jade, MidnightLib)
 }
 
 fabricApi {
-	configureDataGeneration() {
+    // Configure Fabric API features if needed, e.g., data generation
+    configureDataGeneration() {
+		// enable data generation for the mod
 		client = true
 	}
 }
 
 dependencies {
-	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
-	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
-	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-	modImplementation "net.fabricmc:fabric-language-kotlin:${project.fabric_kotlin_version}"
-	modRuntimeOnly "com.terraformersmc:modmenu:${project.modmenu_version}"                           // modmenu
-	modRuntimeOnly "maven.modrinth:jade:${project.jade}+fabric"                                     // jade (waila)
-	modImplementation "maven.modrinth:midnightlib:${project.midnightlib}-fabric"
-	// REI-API (Compile-Only)
-	//modCompileOnly "me.shedaniel:RoughlyEnoughItems-api-fabric:${project.rei}"
-	// REI Runtime (Runtime-Only)
-	//modRuntimeOnly "me.shedaniel:RoughlyEnoughItems-fabric:${project.rei}"
+    // Core Minecraft & Fabric dependencies
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+
+    // Fabric API and Kotlin Language Adapter
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+    modImplementation "net.fabricmc:fabric-language-kotlin:${project.fabric_kotlin_version}"
+
+    // Mod Dependencies
+    modRuntimeOnly "com.terraformersmc:modmenu:${project.modmenu_version}"       // ModMenu
+    modRuntimeOnly "maven.modrinth:jade:${project.jade}+fabric"                  // Jade (Waila alternative)
+    modImplementation "maven.modrinth:midnightlib:${project.midnightlib}-fabric" // MidnightLib (Library dependency)
+
+    // Optional: REI Integration (Compile-Only API, Runtime-Only Implementation)
+    // modCompileOnly "me.shedaniel:RoughlyEnoughItems-api-fabric:${project.rei}"
+    // modRuntimeOnly "me.shedaniel:RoughlyEnoughItems-fabric:${project.rei}"
 }
 
 processResources {
-	outputs.upToDateWhen { true }
-	inputs.property "version", project.version
-	filesMatching("fabric.mod.json") {
-		expand "version": project.version
-	}
+    // Ensure resources are always processed (useful for version injection)
+    outputs.upToDateWhen { false } // Force processing every time, safer for version changes
+    // Replace placeholders in fabric.mod.json
+    inputs.property "version", project.version // Make task sensitive to version changes
+    filesMatching("fabric.mod.json") {
+        expand "version": project.version
+    }
 }
 
-// Add a task to reset the build number if needed
+// ==========================================================================================
+// Build Number Utility Task
+// ==========================================================================================
+// Adds a task to manually reset the build number (e.g., ./gradlew resetBuildNumber)
 tasks.register('resetBuildNumber') {
-	doLast {
-		buildNumberFile.text = '0'
-		println "Build number reset to 0"
-	}
+    group = "Build Setup" // Assign task to a group in ./gradlew tasks
+    description = "Resets the build number counter to 0."
+    doLast {
+       buildNumberFile.text = '0'
+       println "Build number file ('${buildNumberFile.name}') reset to 0. It will start from 1 on the next build."
+    }
 }
+// ==========================================================================================
 
+
+// ==========================================================================================
+// Java / Kotlin Compilation Configuration
+// ==========================================================================================
 tasks.withType(JavaCompile).configureEach {
-	options.release.set(21)
+    // Set Java bytecode version compatibility
+    options.release.set(21) // Target Java 21
 }
 
 tasks.withType(KotlinCompile).configureEach {
-	kotlinOptions {
-		jvmTarget = "21"
-	}
+    // Configure Kotlin compiler options
+    kotlinOptions {
+       jvmTarget = "21" // Target JVM 21 for Kotlin code
+    }
 }
 
 java {
-	withSourcesJar()
-	sourceCompatibility = JavaVersion.VERSION_21
-	targetCompatibility = JavaVersion.VERSION_21
+    // Optional: Include source code in the resulting JARs
+    //withSourcesJar()
+
+    // Set Java language level compatibility for the project
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
 }

@@ -11,7 +11,18 @@ import net.minecraft.block.Block
 import net.minecraft.client.render.RenderLayer
 import net.minecraft.state.property.Properties
 
+/**
+ * Client-side initializer for the DayOfMind Additions mod.
+ * Handles client-specific tasks like setting block render layers,
+ * registering block color providers, and managing translations.
+ */
 object AdditionsClient : ClientModInitializer {
+    /**
+     * Initializes client-side features upon mod loading.
+     * Calls methods to set render layers for cutout textures,
+     * register block color providers for biome-specific tinting,
+     * and handles the download or clearing of translations based on configuration.
+     */
     override fun onInitializeClient() {
         textureCutOut()
         tintBlocks()
@@ -38,6 +49,10 @@ object AdditionsClient : ClientModInitializer {
         }
     }
 
+    /**
+     * Sets the render layer for blocks that require cutout textures.
+     * This includes grass blocks, chains, and lanterns to ensure transparency is handled correctly.
+     */
     private fun textureCutOut() {
         val lanterns: List<Block> = BlockRegistry.registeredLanterns.keys.toList()
         val blocksForTextureCutOut =
@@ -51,20 +66,36 @@ object AdditionsClient : ClientModInitializer {
         )
     }
 
+    /**
+     * Registers a color provider for grass blocks to apply biome-specific tinting.
+     * The color is determined by the biome's grass color, unless the block is snowy.
+     * It checks if the call is for particles (world/pos is null) and returns default color then.
+     * Otherwise, it only applies the tint if the tintIndex is 0 for block faces.
+     */
     private fun tintBlocks() {
         val blocksForTint = BlockRegistry.registeredGrassBlocks
 
         ColorProviderRegistry.BLOCK.register(
             { state, world, pos, tintIndex ->
-                if (state.contains(Properties.SNOWY) && state.get(Properties.SNOWY) == false || !state.contains(Properties.SNOWY)) {
-                    val biome =
-                        world?.let { worldInstance ->
-                            pos?.let { worldInstance.getBiomeFabric(it) }
-                        }
-                    biome?.value()?.getGrassColorAt(pos!!.x.toDouble(), pos.z.toDouble())
-                        ?: 0x91BD59
+                // Check if this call is for particles (world or pos will be null based on BlockColors.getParticleColor)
+                if (world == null || pos == null) {
+                    -1 // Return default color (no tint) for particles
+                } else if (tintIndex == 0) { // Otherwise, it's for rendering a block face in the world
+                    // Check if the block state has the SNOWY property and if it's false,
+                    // or if the block state does not have the SNOWY property at all.
+                    if (state.contains(Properties.SNOWY) && state.get(Properties.SNOWY) == false || !state.contains(Properties.SNOWY)) {
+                        // world and pos are guaranteed non-null here
+                        val biome = world.getBiomeFabric(pos) // Use Fabric API to get biome
+                        // Get the grass color from the biome, or use a default green if unavailable.
+                        biome?.value()?.getGrassColorAt(pos.x.toDouble(), pos.z.toDouble())
+                            ?: 0x91BD59 // Default grass color
+                    } else {
+                        // If snowy, use white color.
+                        0xFFFFFF // White
+                    }
                 } else {
-                    0xFFFFFF
+                    // If tintIndex is not 0 (and not a particle call), return default white color.
+                    -1 // Use -1 for default/no tint
                 }
             },
             *blocksForTint.toTypedArray(),

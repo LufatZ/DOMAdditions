@@ -1,61 +1,53 @@
 package de.additions
 
-import de.additions.blocks.BlockRegistry
-import de.additions.datagen.BlockTagGenerator
-import de.additions.datagen.ItemTagGenerator
-import de.additions.datagen.LootGenerator
-import de.additions.datagen.RecipeGenerator
-import de.additions.datagen.TranslationGenerator
+import de.additions.datagen.*
 import de.additions.datagen.models.ModelGenerator
 import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator
-import kotlin.apply
 
 /**
- * Comprehensive Data Generation System for the Additions Minecraft Mod
+ * Entry point for the Additions mod's data generation process.
  *
- * Purpose:
- * This object serves as the primary data generator for the Additions mod,
- * responsible for automatically generating block models, item models,
- * block states, and associated textures during the mod's build process.
+ * This object implements [DataGeneratorEntrypoint] to register various data providers
+ * that automatically generate assets like models, block states, recipes, loot tables,
+ * tags, and translations during the build process.
  *
- * Key Responsibilities:
- * - Automatically generate models for custom block variants (stairs, slabs, trapdoors, lanterns)
- * - Create appropriate item models for registered blocks
- * - Handle texture mapping for different block types
- * - Support special cases for texture generation (e.g., blocks with side and top textures)
+ * Based on Fabric's internal data generation runner, all providers are registered
+ * within the single `onInitializeDataGenerator` method, even if they depend
+ * on client-side classes like `ModelGenerator`. Fabric Loom's data generation
+ * environment is expected to handle the loading of necessary classes for these providers.
  *
- * Design Considerations:
- * - Uses Fabric Mod's data generation API for seamless integration
- * - Provides flexible texture and model generation for various block types
- * - Supports custom block variant generation with parent block references
- *
- * @see BlockRegistry for registered block collections
- * @see FabricDataGenerator for data generation framework
+ * @see FabricDataGenerator The main controller for data generation.
+ * @see ModelGenerator Provider for block/item models (client-specific dependency).
+ * @see LootGenerator Provider for block loot tables.
+ * @see BlockTagGenerator Provider for block tags.
+ * @see ItemTagGenerator Provider for item tags.
+ * @see RecipeGenerator Provider for crafting recipes.
+ * @see TranslationGenerator Provider for language translations.
  */
 object AdditionsDataGenerator : DataGeneratorEntrypoint {
-	/**
-	 * Entry point for initializing the data generator.
-	 *
-	 * This method sets up the data generation process by creating a data pack
-	 * and adding the ModelGenerator as a provider.
-	 *
-	 * @param generator The Fabric data generator responsible for creating mod resources
-	 */
-	override fun onInitializeDataGenerator(generator: FabricDataGenerator) {
-		generator.createPack().apply {
-			// Add the custom ModelGenerator to handle model and texture generation
-			addProvider(::ModelGenerator)
-			// Add the custom LootGenerator to handle loot table generation
-			addProvider(::LootGenerator)
-			// Add the custom BlockTagGenerator to handle block tag generation (e.g. mine able by...)
-			addProvider(::BlockTagGenerator)
-			// Add the custom ItemTagGenerator to handle item tag generation (e.g. stone blockItems...)
-			addProvider(::ItemTagGenerator)
-			// Add the custom RecipeGenerator to handle recipe generation for crafting
-			addProvider(::RecipeGenerator)
-			//
-			addProvider(::TranslationGenerator)
-		}
-	}
+    /**
+     * Registers all data providers for the mod.
+     *
+     * This method is called by Fabric during data generation setup. It registers
+     * all necessary providers, including those with client-side dependencies like
+     * the [ModelGenerator], within this single entry point based on how Fabric's
+     * internal runner appears to operate.
+     *
+     * @param generator The Fabric data generator instance, used to create data packs and register providers.
+     */
+    override fun onInitializeDataGenerator(generator: FabricDataGenerator) {
+        // Create a data pack associated with this generator run.
+        val pack: FabricDataGenerator.Pack = generator.createPack()
+
+        // Register all data providers here.
+        pack.addProvider(::ModelGenerator) // Generates block and item models (requires client classes).
+        pack.addProvider(::LootGenerator) // Generates block loot tables.
+        pack.addProvider(::BlockTagGenerator) // Generates block tags (e.g., mineable tags).
+        pack.addProvider(::ItemTagGenerator) // Generates item tags.
+        pack.addProvider(::RecipeGenerator) // Generates crafting recipes.
+        pack.addProvider(::TranslationGenerator) // Generates language files (.lang or .json).
+    }
+
+    // No onInitializeClientDataGenerator needed based on FabricDataGenHelper.java logic
 }

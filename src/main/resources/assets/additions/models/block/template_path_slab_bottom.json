@@ -1,6 +1,6 @@
 {   "parent": "block/block",
   "textures": {
-    "particle": "#side"
+    "particle": "#bottom"
   },
   "elements": [
     {   "from": [ 0, 0, 0 ],
