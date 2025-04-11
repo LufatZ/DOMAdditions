@@ -26,7 +26,7 @@ object AdditionsClient : ClientModInitializer {
     override fun onInitializeClient() {
         textureCutOut()
         tintBlocks()
-        val logging = AdditionsConfig.TranslationLogging || FabricLoader.getInstance().isDevelopmentEnvironment
+        val logging = AdditionsConfig.DetailedLogging || FabricLoader.getInstance().isDevelopmentEnvironment
         if (AdditionsConfig.EnabledTranslation) {
             val url =
                 when (AdditionsConfig.TranslationUrl) {

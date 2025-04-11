@@ -3,10 +3,12 @@ package de.additions.itemGroups
 import de.additions.Additions.MODID
 import de.additions.Additions.logger
 import de.additions.blocks.BlockRegistry
+import de.additions.config.AdditionsConfig
 import de.additions.items.ItemRegistry
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroupEntries
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents
+import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.block.Block
 import net.minecraft.item.Item
 import net.minecraft.item.ItemGroups
@@ -219,7 +221,9 @@ object ItemGroupRegistry {
             if (itemGroup.displayStacks.any { it.item == parentItem }) {
                 // Add the new item right after the parent item
                 itemGroup.addAfter(parentItem, item)
-                logger.info("Added $item to $itemGroup after $parentItem")
+                if (AdditionsConfig.DetailedLogging || FabricLoader.getInstance().isDevelopmentEnvironment) {
+                    logger.info("Added $item to $itemGroup after $parentItem")
+                }
             }
         }
     }

@@ -5,8 +5,11 @@ import eu.midnightdust.lib.config.MidnightConfig
 class AdditionsConfig : MidnightConfig() {
     companion object {
         enum class TranslationVersion {
-            CROWDIN,OXFATECH, CUSTOM
+            CROWDIN,
+            OXFATECH,
+            CUSTOM,
         }
+
         @JvmField
         @Comment(category = "about", centered = true)
         var DayOfMind: Comment? = null
@@ -49,11 +52,10 @@ class AdditionsConfig : MidnightConfig() {
 
         @JvmField
         @Entry(category = "features")
-        var TranslationLogging: Boolean = false
+        var DetailedLogging: Boolean = false
 
         @JvmField
         @Entry(category = "features")
         var EnabledTrapdoor: Boolean = true
-
     }
 }

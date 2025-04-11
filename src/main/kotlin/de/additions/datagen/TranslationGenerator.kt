@@ -1,3 +1,5 @@
+@file:Suppress("ktlint:standard:no-wildcard-imports")
+
 package de.additions.datagen
 
 import de.additions.Additions.logger
@@ -102,7 +104,7 @@ class TranslationGenerator(
     }
 
     private fun configTranslationbuilder() {
-        val configKey: String = "additions.midnightconfig"
+        val configKey = "additions.midnightconfig"
         add("$configKey.title", "DayOfMind Config")
         add("$configKey.category.about", "About DayOfMind")
         add("$configKey.category.features", "Features")
@@ -146,10 +148,10 @@ class TranslationGenerator(
         add("$configKey.enum.TranslationVersion.CROWDIN", "Crowdin")
         add("$configKey.enum.TranslationVersion.OXFATECH", "OxFaTech")
         add("$configKey.enum.TranslationVersion.CUSTOM", "Custom")
-        add("$configKey.TranslationLogging", "Translation Logging")
+        add("$configKey.DetailedLogging", "Detailed Logging")
         add(
-            "$configKey.TranslationLogging.tooltip",
-            "Enables detailed logging of the translation download. You probably don't want to enable this",
+            "$configKey.DetailedLogging.tooltip",
+            "Enables detailed logging of this mod, such as translation downloads. You probably don't want to enable this because of log spamming.",
         )
         add("$configKey.EnabledTrapdoor", "Enable Trapdoor")
         add("$configKey.EnabledTrapdoor.tooltip", "Enables the ability to craft more trapdoors")

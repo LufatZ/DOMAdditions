@@ -19,7 +19,7 @@ import net.minecraft.util.Identifier
 object ItemRegistry {
     val registeredItems: MutableList<ItemStack> = mutableListOf()
     private var addedItems: MutableMap<String, Item> = mutableMapOf()
-    private val detailedLogging = AdditionsConfig.TranslationLogging || FabricLoader.getInstance().isDevelopmentEnvironment
+    private val detailedLogging = AdditionsConfig.DetailedLogging || FabricLoader.getInstance().isDevelopmentEnvironment
 
     fun registerItems() {
         logger.info("Adding items")
