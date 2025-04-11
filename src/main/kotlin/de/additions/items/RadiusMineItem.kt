@@ -1,7 +1,10 @@
+@file:Suppress("ktlint:standard:no-wildcard-imports")
+
 package de.additions.items
 
 import de.additions.Additions.logger
-import de.additions.blocks.BlockRegistry
+import de.additions.blocks.BlockRegistry.DIRT_PATH_SLAB
+import de.additions.blocks.BlockRegistry.DIRT_PATH_STAIR
 import de.additions.blocks.SnowyStairsBlock
 import de.additions.datagen.BlockTagGenerator
 import de.additions.datagen.ItemTagGenerator
@@ -60,20 +63,6 @@ class RadiusMineItem(
 
         /** Cooldown in Ticks (20 Ticks = 1 Second) for the path creation ability. */
         private const val PATH_CREATION_COOLDOWN = 2
-
-        // --- Block Lookups for Path Creation ---
-        // Note: Relying on translation keys can be fragile if keys change or mods add similar keys.
-        // Consider using direct references or custom tags if possible for better stability.
-        private val PATH_STAIR: StairsBlock? =
-            BlockRegistry.registeredStairs
-                .firstOrNull {
-                    it.translationKey.lowercase().contains(".dirt_path_stair")
-                }?.let { it as? StairsBlock } // Safe cast
-        private val PATH_SLAB: SlabBlock? =
-            BlockRegistry.registeredSlabs
-                .firstOrNull {
-                    it.translationKey.lowercase().contains(".dirt_path_slab")
-                }?.let { it as? SlabBlock } // Safe cast
 
         /** Map to store the last usage time of the path creation ability per player UUID. */
         private val lastPathCreationTime = mutableMapOf<UUID, Long>()
@@ -371,8 +360,8 @@ class RadiusMineItem(
                             when (targetBlock) {
                                 Blocks.DIRT_PATH -> null // Already a path block, skip
                                 // Check if target is already a custom path stair/slab
-                                PATH_STAIR -> null
-                                PATH_SLAB -> null
+                                DIRT_PATH_STAIR -> null
+                                DIRT_PATH_SLAB -> null
                                 is StairsBlock -> tryCreatePathStairState(targetState) // Use helper
                                 is SlabBlock -> tryCreatePathSlabState(targetState) // Use helper
                                 else -> Blocks.DIRT_PATH.defaultState // Default to full path block
@@ -511,7 +500,7 @@ class RadiusMineItem(
      * Logs a warning and returns null if conversion fails or the target path stair block is not registered.
      */
     private fun tryCreatePathStairState(originalState: BlockState): BlockState? {
-        val pathStairBlock = PATH_STAIR ?: return null // Ensure path stair block exists
+        val pathStairBlock = DIRT_PATH_STAIR // Ensure path stair block exists
 
         return try {
             var newState = pathStairBlock.defaultState
@@ -549,7 +538,7 @@ class RadiusMineItem(
      * Logs a warning and returns null if conversion fails or the target path slab block is not registered.
      */
     private fun tryCreatePathSlabState(originalState: BlockState): BlockState? {
-        val pathSlabBlock = PATH_SLAB ?: return null // Ensure path slab block exists
+        val pathSlabBlock = DIRT_PATH_SLAB
 
         return try {
             var newState = pathSlabBlock.defaultState

@@ -141,7 +141,7 @@ public abstract class AdditionsShovelMixin {
            logger.info("Shovel Mixin: Attempting to transform {}", Registries.BLOCK.getId(source.getBlock()));
           // --- Retrieve required block instances (real or fallback) ---
           // These are guaranteed non-null by the BlockRegistry implementation.
-          Block dirtPathStairsBlock = BlockRegistry.INSTANCE.getDIRT_PATH_STAIRS();
+          Block dirtPathStairsBlock = BlockRegistry.INSTANCE.getDIRT_PATH_STAIR();
           Block dirtPathSlabBlock = BlockRegistry.INSTANCE.getDIRT_PATH_SLAB();
           Block dirtStairsBlock = BlockRegistry.INSTANCE.getDIRT_STAIRS();
           Block dirtSlabBlock = BlockRegistry.INSTANCE.getDIRT_SLAB();

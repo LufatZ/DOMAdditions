@@ -37,7 +37,7 @@ object BlockRegistry {
     private val registeredMagmaBlockVariants: MutableList<Block> = mutableListOf()
 
     @Suppress("ktlint:standard:property-naming")
-    var DIRT_PATH_STAIRS: Block = Blocks.OAK_STAIRS // Fallback-Block
+    var DIRT_PATH_STAIR: Block = Blocks.OAK_STAIRS // Fallback-Block
         private set
 
     @Suppress("ktlint:standard:property-naming")
@@ -378,7 +378,7 @@ object BlockRegistry {
                                     settings.registryKey(keyOf("${baseName}_stairs")),
                                 ),
                             ).also {
-                                DIRT_PATH_STAIRS = it
+                                DIRT_PATH_STAIR = it
                                 registeredDirtBlockVariants.add(it)
                             }
                         Blocks.DIRT ->
