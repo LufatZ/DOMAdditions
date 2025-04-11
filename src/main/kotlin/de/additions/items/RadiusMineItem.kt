@@ -141,16 +141,28 @@ class RadiusMineItem(
     }
 
     // --- Tooltip Configuration ---
-    private val tooltipKey: String = "tooltip.additions.radius_mine"
+    private val tooltipKeyDesc1: String = "tooltip.additions.radius_mine_1"
+    private val tooltipKeyDesc2: String = "tooltip.additions.radius_mine_2"
+    private val tooltipKeyArea: String = "tooltip.additions.radius_mine_area"
+    private val tooltipKeyEffective: String = "tooltip.additions.radius_blocks"
 
     // Provide a more descriptive tooltip text using the actual diameter.
-    private val tooltipDescription: String = "Mines blocks in a ${2 * RADIUS + 1}x${2 * RADIUS + 1} area."
+    private val tooltipDescriptionFirst: String = "Mines blocks in a below defined area."
+    private val tooltipDescriptionSecond: String = "Also can create paths in this area."
+    private val tooltipArea: String = "Mine Area:"
+    private val tooltipEffective: String = "Effective Blocks:"
     private val unknownMaterialErrorMsg = "Fallback -> Unknown material used in RadiusMineItem: $material"
 
     /** Provides tooltip data, useful for registration/data generation. */
-    fun getTooltipData(): Map<String, String> = mapOf(tooltipKey to tooltipDescription)
+    fun getTooltipData(): Map<String, String> =
+        mapOf(
+            tooltipKeyDesc1 to tooltipDescriptionFirst,
+            tooltipKeyDesc2 to tooltipDescriptionSecond,
+            tooltipKeyArea to tooltipArea,
+            tooltipKeyEffective to tooltipEffective,
+        )
 
-    // TODO: Migrate tooltip handling to DataComponentTypes.TOOLTIP or a custom component for modern approach.
+    // TODO: Migrate tooltip handling to DataComponentTypes.LORE or a custom component for modern approach.
     @Deprecated("Uses older tooltip system. Modern approach uses components.", ReplaceWith("Modern component-based tooltips"))
     override fun appendTooltip(
         stack: ItemStack,
@@ -159,7 +171,13 @@ class RadiusMineItem(
         consumer: Consumer<Text>,
         type: TooltipType,
     ) {
-        consumer.accept(Text.translatable(tooltipKey).formatted(Formatting.DARK_GREEN))
+        consumer.accept(Text.translatable("")) // placeholder for spacing
+        consumer.accept(Text.translatable(tooltipKeyDesc1).formatted(Formatting.WHITE))
+        consumer.accept(Text.translatable(tooltipKeyDesc2).formatted(Formatting.WHITE))
+        consumer.accept(Text.translatable(tooltipKeyArea).formatted(Formatting.AQUA))
+        consumer.accept(Text.literal(" -> ${2 * RADIUS + 1}x${2 * RADIUS + 1}"))
+        consumer.accept(Text.translatable(tooltipKeyEffective).formatted(Formatting.AQUA))
+        consumer.accept(Text.translatable(" -> %s", effectiveBlocks.name))
         super.appendTooltip(stack, context, display, consumer, type)
     }
 
