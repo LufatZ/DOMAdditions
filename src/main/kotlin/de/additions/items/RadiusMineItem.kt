@@ -13,7 +13,6 @@ import de.additions.items.RadiusMineItem.Companion.materials
 import net.minecraft.block.*
 import net.minecraft.component.DataComponentTypes
 import net.minecraft.component.type.ToolComponent
-import net.minecraft.component.type.TooltipDisplayComponent
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.*
@@ -33,26 +32,31 @@ import net.minecraft.util.math.Direction
 import net.minecraft.world.World
 import net.minecraft.world.event.GameEvent
 import java.util.*
-import java.util.function.Consumer
 
 /**
- * Represents a custom mining tool that breaks blocks in a defined radius (AoE) around the initially mined block.
- * It also includes AoE functionality similar to a shovel for creating paths.
+ * Represents a custom mining tool that breaks blocks in a defined radius (AoE) around the initially mined block (1.21.4 Version).
+ * Inherits from MiningToolItem to gain basic tool functionality.
+ * Also includes AoE functionality similar to a shovel for creating paths.
  *
- * Inherits from [Item] and relies on the [ToolComponent] (and potentially others like AttributeModifiers)
- * being correctly configured via [Item.Settings] during item registration (e.g., using `.pickaxe()`, `.shovel()`, or `.tool()` helpers).
- *
- * @property material The [ToolMaterial] defining base properties. Used here for helpers and potentially passed to Settings during registration.
- * @property effectiveBlocks A [TagKey]<[Block]> specifying which blocks the AoE mining effect applies to.
- * Should generally match the tag used when configuring the [ToolComponent] (e.g., [BlockTags.PICKAXE_MINEABLE]).
- * @param settings The base [Item.Settings] for this item. MUST be pre-configured with appropriate components
- * (like [DataComponentTypes.TOOL], [DataComponentTypes.ATTRIBUTE_MODIFIERS]) for base tool functionality.
+ * @property material The [ToolMaterial] defining base properties.
+ * @property effectiveBlocks A [TagKey]<[Block]> specifying which blocks this tool is primarily effective against. Passed to super constructor.
+ * @param attackDamage The base attack damage bonus for the tool. Passed to super constructor.
+ * @param attackSpeed The attack speed modifier for the tool. Passed to super constructor.
+ * @param settings The base [Item.Settings] for this item (must include maxDamage). Passed to super constructor after modification by ToolMaterial.
  */
 class RadiusMineItem(
     val material: ToolMaterial,
     val effectiveBlocks: TagKey<Block>,
+    attackDamage: Float,
+    attackSpeed: Float,
     settings: Settings,
-) : Item(settings) {
+) : MiningToolItem(
+        material,
+        effectiveBlocks,
+        attackDamage,
+        attackSpeed,
+        settings,
+    ) {
     companion object {
         /** Multiplier applied to vanilla tool durability values. Applied when defining the ToolMaterial instance. */
         private const val DURABILITY_MULTIPLIER = 10.0f
@@ -139,7 +143,7 @@ class RadiusMineItem(
             )
     }
 
-    // --- Tooltip Configuration ---
+    // --- Tooltip Configuration (appendTooltip is deprecated in later versions) ---
     private val tooltipKeyDesc1: String = "tooltip.additions.radius_mine_1"
     private val tooltipKeyDesc2: String = "tooltip.additions.radius_mine_2"
     private val tooltipKeyArea: String = "tooltip.additions.radius_mine_area"
@@ -161,23 +165,20 @@ class RadiusMineItem(
             tooltipKeyEffective to tooltipEffective,
         )
 
-    // TODO: Migrate tooltip handling to DataComponentTypes.LORE or a custom component for modern approach.
-    @Deprecated("Uses older tooltip system. Modern approach uses components.", ReplaceWith("Modern component-based tooltips"))
     override fun appendTooltip(
         stack: ItemStack,
-        context: TooltipContext,
-        display: TooltipDisplayComponent,
-        consumer: Consumer<Text>,
-        type: TooltipType,
+        context: TooltipContext?,
+        tooltip: MutableList<Text>,
+        options: TooltipType,
     ) {
-        consumer.accept(Text.translatable("")) // placeholder for spacing
-        consumer.accept(Text.translatable(tooltipKeyDesc1).formatted(Formatting.WHITE))
-        consumer.accept(Text.translatable(tooltipKeyDesc2).formatted(Formatting.WHITE))
-        consumer.accept(Text.translatable(tooltipKeyArea).formatted(Formatting.AQUA))
-        consumer.accept(Text.literal(" -> ${2 * RADIUS + 1}x${2 * RADIUS + 1}"))
-        consumer.accept(Text.translatable(tooltipKeyEffective).formatted(Formatting.AQUA))
-        consumer.accept(Text.translatable(" -> %s", effectiveBlocks.name))
-        super.appendTooltip(stack, context, display, consumer, type)
+        tooltip.add(Text.translatable(""))
+        tooltip.add(Text.translatable(tooltipKeyDesc1).formatted(Formatting.WHITE))
+        tooltip.add(Text.translatable(tooltipKeyDesc2).formatted(Formatting.WHITE))
+        tooltip.add(Text.translatable(tooltipKeyArea).formatted(Formatting.AQUA))
+        tooltip.add(Text.literal(" -> ${2 * RADIUS + 1}x${2 * RADIUS + 1}"))
+        tooltip.add(Text.translatable(tooltipKeyEffective).formatted(Formatting.AQUA))
+        tooltip.add(Text.translatable(" -> %s", Text.translatable(effectiveBlocks.id.toTranslationKey("tag.block"))))
+        super.appendTooltip(stack, context, tooltip, options)
     }
 
     // --- Material Helper Functions ---
@@ -508,7 +509,6 @@ class RadiusMineItem(
      * @param state The [BlockState] to check.
      * @param world The current [World].
      * @param targetPos The [BlockPos] of the block.
-     * @param miner The [LivingEntity] mining (potential for future checks).
      * @param toolData The [ToolComponent] of the item stack.
      * @return True if the block can be mined by this tool's AoE effect, false otherwise.
      */
@@ -516,7 +516,6 @@ class RadiusMineItem(
         state: BlockState,
         world: World,
         targetPos: BlockPos,
-        // Keep miner parameter
         toolData: ToolComponent,
     ): Boolean {
         // 1. Check if the tool is configured to mine this block type via the effectiveBlocks tag.

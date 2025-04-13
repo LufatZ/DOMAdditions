@@ -16,11 +16,17 @@ import net.minecraft.registry.RegistryKeys
 import net.minecraft.registry.tag.BlockTags
 import net.minecraft.util.Identifier
 
+/**
+ * Registers custom items for the mod (Original 1.21.4 Version).
+ */
 object ItemRegistry {
     val registeredItems: MutableList<ItemStack> = mutableListOf()
     private var addedItems: MutableMap<String, Item> = mutableMapOf()
     private val detailedLogging = AdditionsConfig.DetailedLogging || FabricLoader.getInstance().isDevelopmentEnvironment
 
+    /**
+     * Registers all custom items defined in this registry.
+     */
     fun registerItems() {
         logger.info("Adding items")
         addToolItems()
@@ -30,6 +36,10 @@ object ItemRegistry {
         ItemGroupRegistry.registerItemsAfterCommonParent(registeredItems, Items.DIAMOND_PICKAXE)
     }
 
+    /**
+     * Registers items present in the provided map into the game's item registry.
+     * @param items A map where keys are item names (used for ID) and values are Item instances.
+     */
     private fun registerAddedItems(items: Map<String, Item>) {
         items.forEach { (itemName, item) ->
             runCatching {
@@ -46,23 +56,35 @@ object ItemRegistry {
         }
     }
 
+    /**
+     * Creates instances of RadiusMineItem tools (Hammers and Big Shovels) for each defined material
+     * and adds them to the `addedItems` map for later registration. Uses 1.21.4 item instantiation.
+     */
     private fun addToolItems() {
         materials.forEach { (materialName, material) ->
             runCatching {
-                val shovelSettings = Item.Settings().shovel(material, 1.5f, -3.0f)
-                val hammerSettings = Item.Settings().pickaxe(material, 1f, -2.8f)
+                // Use basic Item.Settings() - durability etc. handled by MiningToolItem super constructor via applyToolSettings
+                val toolSettings = Item.Settings()
+                // Note: Add .group(ItemGroup.TOOLS) or similar here if needed in 1.21.4
 
+                // Instantiate RadiusMineItem correctly for 1.21.4, passing AD/AS explicitly
                 val bigShovel =
                     RadiusMineItem(
                         material,
                         BlockTags.SHOVEL_MINEABLE,
-                        shovelSettings.registryKey(RegistryKey.of(RegistryKeys.ITEM, Identifier.of(MODID, "big_${materialName}_shovel"))),
+                        1.5f, // Attack Damage
+                        -3.0f, // Attack Speed
+                        // Apply registry key if needed by settings setup in 1.21.4
+                        toolSettings.registryKey(RegistryKey.of(RegistryKeys.ITEM, Identifier.of(MODID, "big_${materialName}_shovel"))),
                     )
                 val hammer =
                     RadiusMineItem(
                         material,
                         BlockTags.PICKAXE_MINEABLE,
-                        hammerSettings.registryKey(RegistryKey.of(RegistryKeys.ITEM, Identifier.of(MODID, "${materialName}_hammer"))),
+                        1.0f, // Attack Damage
+                        -2.8f, // Attack Speed
+                        // Apply registry key if needed by settings setup in 1.21.4
+                        toolSettings.registryKey(RegistryKey.of(RegistryKeys.ITEM, Identifier.of(MODID, "${materialName}_hammer"))),
                     )
 
                 addedItems["big_${materialName}_shovel"] = bigShovel

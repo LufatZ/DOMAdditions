@@ -9,6 +9,7 @@ import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider
 import net.minecraft.block.Block
 import net.minecraft.block.Blocks
+import net.minecraft.client.data.TextureKey.FLOWERBED
 import net.minecraft.registry.RegistryKeys
 import net.minecraft.registry.RegistryWrapper
 import net.minecraft.registry.tag.BlockTags
@@ -85,7 +86,7 @@ class BlockTagGenerator(
                 HEAVY_CORE,
                 LANTERN,
                 DECORATED_POT,
-                IRON,
+                // IRON, 1.21.5 and later
             )
 
         // Groups typically mined fastest with an Axe
@@ -165,7 +166,7 @@ class BlockTagGenerator(
                 SPORE_BLOSSOM,
                 BAMBOO_SAPLING,
                 CHERRY_SAPLING,
-                LEAF_LITTER,
+                // LEAF_LITTER, and later
             )
 
         // Specific material groups for assigning extra tags (e.g., BlockTags.DIRT)

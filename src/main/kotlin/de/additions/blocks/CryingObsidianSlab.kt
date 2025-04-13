@@ -125,7 +125,7 @@ class CryingObsidianSlab(
         val blockState = world.getBlockState(blockPos)
         if (!blockState.isOpaque || !blockState.isSideSolidFullSquare(world, blockPos, direction.opposite)) {
             val (x, y, z) = calculateParticlePosition(direction, random, yBase, yRange)
-            world.addParticleClient(
+            world.addParticle(
                 ParticleTypes.DRIPPING_OBSIDIAN_TEAR,
                 pos.x + x,
                 pos.y + y,

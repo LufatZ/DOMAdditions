@@ -13,7 +13,7 @@ import de.additions.blocks.BlockRegistry.registeredTrapdoors
 import de.additions.blocks.BlockRegistry.trapdoorVariantsParents
 import de.additions.datagen.models.CustomStates.createCustomStairsBlockState
 import de.additions.datagen.models.CustomStates.createSnowySlabBlockState
-import de.additions.datagen.models.CustomStates.createStairsModelMap
+import de.additions.datagen.models.CustomStates.createStairsModelIdMap
 import de.additions.datagen.models.ModelGenerator.Companion.hasNoTexture
 import de.additions.datagen.models.ModelGenerator.Companion.hasSideAndTop
 import de.additions.datagen.models.ModelGenerator.Companion.removeBlock
@@ -112,7 +112,7 @@ object BlockModels {
         val chainItemModelId = Identifier.ofVanilla("item/chain")
 
         registeredChains.forEach { chain ->
-            generator.registerAxisRotated(chain, createWeightedVariant(chainModelId))
+            generator.registerAxisRotated(chain, chainModelId)
             generator.registerParentedItemModel(chain, chainItemModelId)
         }
     }
@@ -442,19 +442,19 @@ object BlockModels {
                 in snowyOvergrownBlocks ->
                     createCustomStairsBlockState(
                         stair,
-                        createStairsModelMap(
-                            createWeightedVariant(innerModel),
-                            createWeightedVariant(regularModel),
-                            createWeightedVariant(outerModel),
-                            createWeightedVariant(innerModelRotated),
-                            createWeightedVariant(regularModelRotated),
-                            createWeightedVariant(outerModelRotated),
-                            createWeightedVariant(innerSnowyModel),
-                            createWeightedVariant(regularSnowyModel),
-                            createWeightedVariant(outerSnowyModel),
-                            createWeightedVariant(innerSnowyModelRotated),
-                            createWeightedVariant(regularSnowyModelRotated),
-                            createWeightedVariant(outerSnowyModelRotated),
+                        createStairsModelIdMap(
+                            innerModel,
+                            regularModel,
+                            outerModel,
+                            innerModelRotated,
+                            regularModelRotated,
+                            outerModelRotated,
+                            innerSnowyModel,
+                            regularSnowyModel,
+                            outerSnowyModel,
+                            innerSnowyModelRotated,
+                            regularSnowyModelRotated,
+                            outerSnowyModelRotated,
                         ),
                         Properties.SNOWY,
                     )
@@ -462,22 +462,22 @@ object BlockModels {
                 is DirtPathBlock ->
                     createCustomStairsBlockState(
                         stair,
-                        createStairsModelMap(
-                            createWeightedVariant(innerModel),
-                            createWeightedVariant(regularModel),
-                            createWeightedVariant(outerModel),
-                            createWeightedVariant(innerModelRotated),
-                            createWeightedVariant(regularModelRotated),
-                            createWeightedVariant(outerModelRotated),
+                        createStairsModelIdMap(
+                            innerModel,
+                            regularModel,
+                            outerModel,
+                            innerModelRotated,
+                            regularModelRotated,
+                            outerModelRotated,
                         ),
                     )
 
                 else ->
                     createStairsBlockState(
                         stair,
-                        createWeightedVariant(innerModel),
-                        createWeightedVariant(regularModel),
-                        createWeightedVariant(outerModel),
+                        innerModel,
+                        regularModel,
+                        outerModel,
                     )
             },
         )
@@ -528,9 +528,9 @@ object BlockModels {
         generator.blockStateCollector?.accept(
             BlockStateModelGenerator.createTrapdoorBlockState(
                 trapdoor,
-                createWeightedVariant(topModel),
-                createWeightedVariant(bottomModel),
-                createWeightedVariant(openModel),
+                topModel,
+                bottomModel,
+                openModel,
             ),
         )
     }
@@ -574,18 +574,16 @@ object BlockModels {
             )
 
         val lanternModelhanging =
-            createWeightedVariant(
-                Model(
-                    Optional.of(Identifier.of(hangingTemplateModelId)),
-                    Optional.empty(),
-                    TextureKey.TEXTURE,
-                    TextureKey.PARTICLE,
-                ).upload(
-                    lantern,
-                    "_hanging",
-                    textureMap,
-                    generator.modelCollector,
-                ),
+            Model(
+                Optional.of(Identifier.of(hangingTemplateModelId)),
+                Optional.empty(),
+                TextureKey.TEXTURE,
+                TextureKey.PARTICLE,
+            ).upload(
+                lantern,
+                "_hanging",
+                textureMap,
+                generator.modelCollector,
             )
 
         if (parent == Blocks.IRON_BLOCK &&
@@ -593,19 +591,19 @@ object BlockModels {
             lantern !is BigRedstoneLantern &&
             lantern !is SmallRedstoneLantern
         ) {
-            val lanternStandingModel = createWeightedVariant(Identifier.ofVanilla("block/lantern"))
-            val lanternHangingModel = createWeightedVariant(Identifier.ofVanilla("block/lantern_hanging"))
+            val lanternStandingModel = Identifier.ofVanilla("block/lantern")
+            val lanternHangingModel = Identifier.ofVanilla("block/lantern_hanging")
             val lanternItemModelId = Identifier.ofVanilla("item/lantern")
             generator.registerParentedItemModel(lantern, lanternItemModelId)
             generator.blockStateCollector.accept(
-                VariantsBlockModelDefinitionCreator.of(lantern).with(
+                VariantsBlockStateSupplier.create(lantern).coordinate(
                     createBooleanModelMap(Properties.HANGING, lanternHangingModel, lanternStandingModel),
                 ),
             )
         } else {
             generator.blockStateCollector?.accept(
-                VariantsBlockModelDefinitionCreator.of(lantern).with(
-                    createBooleanModelMap(Properties.HANGING, lanternModelhanging, createWeightedVariant(lanternModelStanding)),
+                VariantsBlockStateSupplier.create(lantern).coordinate(
+                    createBooleanModelMap(Properties.HANGING, lanternModelhanging, lanternModelStanding),
                 ),
             )
             generateBlockItemModel(lantern, parent, lanternModelStanding, generator)
@@ -804,19 +802,19 @@ object BlockModels {
             if (parent in snowyOvergrownBlocks) {
                 createSnowySlabBlockState(
                     slab,
-                    createWeightedVariant(bottomModel),
-                    createWeightedVariant(topModel),
-                    createWeightedVariant(fullBlockModel),
-                    createWeightedVariant(snowyBottomModel),
-                    createWeightedVariant(snowyTopModel),
-                    createWeightedVariant(snowyFullBlockModel),
+                    bottomModel,
+                    topModel,
+                    fullBlockModel,
+                    snowyBottomModel,
+                    snowyTopModel,
+                    snowyFullBlockModel,
                 )
             } else {
                 createSlabBlockState(
                     slab,
-                    createWeightedVariant(bottomModel),
-                    createWeightedVariant(topModel),
-                    createWeightedVariant(fullBlockModel),
+                    bottomModel,
+                    topModel,
+                    fullBlockModel,
                 )
             },
         )
