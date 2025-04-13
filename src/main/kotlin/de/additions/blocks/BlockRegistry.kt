@@ -45,7 +45,7 @@ object BlockRegistry {
         private set
 
     @Suppress("ktlint:standard:property-naming")
-    var DIRT_STAIRS: Block = Blocks.OAK_STAIRS // Fallback-Block
+    var DIRT_STAIR: Block = Blocks.OAK_STAIRS // Fallback-Block
         private set
 
     @Suppress("ktlint:standard:property-naming")
@@ -389,7 +389,7 @@ object BlockRegistry {
                                     settings.registryKey(keyOf("${baseName}_stairs")),
                                 ),
                             ).also {
-                                DIRT_STAIRS = it
+                                DIRT_STAIR = it
                                 registeredDirtBlockVariants.add(it)
                             }
                         else ->

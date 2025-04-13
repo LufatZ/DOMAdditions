@@ -3,9 +3,9 @@
 package de.additions.items
 
 import de.additions.Additions.logger
+import de.additions.blocks.BlockRegistry
 import de.additions.blocks.BlockRegistry.DIRT_PATH_SLAB
 import de.additions.blocks.BlockRegistry.DIRT_PATH_STAIR
-import de.additions.blocks.SnowyStairsBlock
 import de.additions.datagen.BlockTagGenerator
 import de.additions.datagen.ItemTagGenerator
 import de.additions.items.RadiusMineItem.Companion.RADIUS
@@ -25,7 +25,6 @@ import net.minecraft.registry.tag.ItemTags
 import net.minecraft.registry.tag.TagKey
 import net.minecraft.sound.SoundCategory
 import net.minecraft.sound.SoundEvents
-import net.minecraft.state.property.Properties
 import net.minecraft.text.Text
 import net.minecraft.util.ActionResult
 import net.minecraft.util.Formatting
@@ -148,7 +147,7 @@ class RadiusMineItem(
 
     // Provide a more descriptive tooltip text using the actual diameter.
     private val tooltipDescriptionFirst: String = "Mines blocks in a below defined area."
-    private val tooltipDescriptionSecond: String = "Also can create paths in this area."
+    private val tooltipDescriptionSecond: String = "Also can create paths in this area. (and back to dirt while sneaking)"
     private val tooltipArea: String = "Mine Area:"
     private val tooltipEffective: String = "Effective Blocks:"
     private val unknownMaterialErrorMsg = "Fallback -> Unknown material used in RadiusMineItem: $material"
@@ -341,7 +340,6 @@ class RadiusMineItem(
         val initialPos = context.blockPos
         val player = context.player ?: return ActionResult.PASS
         val stack = context.stack ?: return ActionResult.PASS // Need stack for damage
-        val hand = context.hand
 
         // --- Cooldown Check ---
         val playerUuid = player.uuid
@@ -354,9 +352,12 @@ class RadiusMineItem(
         // Define which blocks can be turned into paths
         val pathableFullBlocks = BlockTags.DIRT // Using the DIRT tag (includes grass, dirt, podzol, etc.)
         val pathableCustomBlocks = BlockTagGenerator.DirtLikeBlockTag
+        val dirtCovertableBlocks = BlockTagGenerator.DirtPathVariantTag
         var changedSomething = false
 
         fun isInPathable(state: BlockState): Boolean = state.isIn(pathableFullBlocks) || state.isIn(pathableCustomBlocks)
+
+        fun isInDirtCovertable(state: BlockState): Boolean = state.isIn(dirtCovertableBlocks)
 
         // Iterate through the horizontal plane defined by the RADIUS around the clicked block
         for (dx in -RADIUS..RADIUS) {
@@ -370,18 +371,20 @@ class RadiusMineItem(
                     // Conditions for creating a path:
                     // 1. Target block is pathable (e.g., in DIRT tag).
                     // 2. Space above is air.
-                    if (isInPathable(targetState) && blockAboveState.isAir) {
+                    if (isInPathable(targetState) && blockAboveState.isAir && !player.isSneaking) {
                         val targetBlock = targetState.block
 
                         // Determine the desired path state
                         val pathState: BlockState? =
                             when (targetBlock) {
-                                Blocks.DIRT_PATH -> null // Already a path block, skip
                                 // Check if target is already a custom path stair/slab
+                                // this should not be necessary, but just in case
+                                Blocks.DIRT_PATH -> null
                                 DIRT_PATH_STAIR -> null
                                 DIRT_PATH_SLAB -> null
-                                is StairsBlock -> tryCreatePathStairState(targetState) // Use helper
-                                is SlabBlock -> tryCreatePathSlabState(targetState) // Use helper
+                                // copy states from the target block
+                                is StairsBlock -> DIRT_PATH_STAIR.getStateWithProperties(targetState)
+                                is SlabBlock -> DIRT_PATH_SLAB.getStateWithProperties(targetState)
                                 else -> Blocks.DIRT_PATH.defaultState // Default to full path block
                             }
 
@@ -411,6 +414,43 @@ class RadiusMineItem(
                                 stack.damage(1, player)
                                 changedSomething = true
                             }
+                        }
+                    } else if (isInDirtCovertable(targetState) && player.isSneaking) {
+                        // Check if the target block is a dirt-like block that can be converted
+                        val newState =
+                            when (targetState.block) {
+                                is StairsBlock -> BlockRegistry.DIRT_STAIR.getStateWithProperties(targetState)
+                                is SlabBlock -> BlockRegistry.DIRT_SLAB.getStateWithProperties(targetState)
+                                else -> Blocks.DIRT.getStateWithProperties(targetState)
+                            }
+
+                        // Play sound before changing state
+                        world.playSound(
+                            player,
+                            currentPos,
+                            SoundEvents.ITEM_SHOVEL_FLATTEN,
+                            SoundCategory.BLOCKS,
+                        )
+
+                        // Perform changes only on the server
+                        if (!world.isClient) {
+                            if (currentPos == player.blockPos) {
+                                // push up the player if the replaced block is below them
+                                player.teleport(player.x, player.y + 0.5, player.z, false)
+                            }
+                            // Set the block state
+                            world.setBlockState(currentPos, newState, Block.NOTIFY_LISTENERS or Block.FORCE_STATE)
+
+                            // Emit game event for observers (like sculk)
+                            world.emitGameEvent(
+                                GameEvent.BLOCK_CHANGE,
+                                currentPos,
+                                GameEvent.Emitter.of(player, newState), // Use player context
+                            )
+
+                            // Apply durability damage
+                            stack.damage(1, player)
+                            changedSomething = true
                         }
                     }
                 }
@@ -508,72 +548,5 @@ class RadiusMineItem(
             toolData.damagePerBlock() > 0 &&
             // Ensure the tool component defines damage
             sufficientMiningLevel
-    }
-
-    // --- Helper functions for path creation state conversion ---
-    // (Keep these as previously refactored for clarity)
-
-    /**
-     * Attempts to create a path stair state, preserving original properties if possible.
-     * Logs a warning and returns null if conversion fails or the target path stair block is not registered.
-     */
-    private fun tryCreatePathStairState(originalState: BlockState): BlockState? {
-        val pathStairBlock = DIRT_PATH_STAIR // Ensure path stair block exists
-
-        return try {
-            var newState = pathStairBlock.defaultState
-            // Copy common stair properties safely checking if they exist on the target
-            if (newState.contains(Properties.HORIZONTAL_FACING) && originalState.contains(Properties.HORIZONTAL_FACING)) {
-                newState = newState.with(Properties.HORIZONTAL_FACING, originalState.get(Properties.HORIZONTAL_FACING))
-            }
-            if (newState.contains(Properties.BLOCK_HALF) && originalState.contains(Properties.BLOCK_HALF)) {
-                newState = newState.with(Properties.BLOCK_HALF, originalState.get(Properties.BLOCK_HALF))
-            }
-            if (newState.contains(Properties.STAIR_SHAPE) && originalState.contains(Properties.STAIR_SHAPE)) {
-                newState = newState.with(Properties.STAIR_SHAPE, originalState.get(Properties.STAIR_SHAPE))
-            }
-            if (newState.contains(Properties.WATERLOGGED) && originalState.contains(Properties.WATERLOGGED)) {
-                newState = newState.with(Properties.WATERLOGGED, originalState.get(Properties.WATERLOGGED))
-            }
-
-            // Copy custom 'SNOWY' property if both blocks have it
-            if (originalState.contains(SnowyStairsBlock.SNOWY) && newState.contains(SnowyStairsBlock.SNOWY)) {
-                newState = newState.with(SnowyStairsBlock.SNOWY, originalState.get(SnowyStairsBlock.SNOWY))
-            }
-            newState // Return the configured state
-        } catch (e: IllegalArgumentException) {
-            // Catch cases where a property might exist on original but not target
-            logger.warn(
-                "[RadiusMineItem] Failed to copy stair properties during path conversion for state $originalState. Target: $pathStairBlock",
-                e,
-            )
-            null // Indicate failure
-        }
-    }
-
-    /**
-     * Attempts to create a path slab state, preserving original properties if possible.
-     * Logs a warning and returns null if conversion fails or the target path slab block is not registered.
-     */
-    private fun tryCreatePathSlabState(originalState: BlockState): BlockState? {
-        val pathSlabBlock = DIRT_PATH_SLAB
-
-        return try {
-            var newState = pathSlabBlock.defaultState
-            // Copy common slab properties safely
-            if (newState.contains(Properties.SLAB_TYPE) && originalState.contains(Properties.SLAB_TYPE)) {
-                newState = newState.with(Properties.SLAB_TYPE, originalState.get(Properties.SLAB_TYPE))
-            }
-            if (newState.contains(Properties.WATERLOGGED) && originalState.contains(Properties.WATERLOGGED)) {
-                newState = newState.with(Properties.WATERLOGGED, originalState.get(Properties.WATERLOGGED))
-            }
-            newState // Return the configured state
-        } catch (e: IllegalArgumentException) {
-            logger.warn(
-                "[RadiusMineItem] Failed to copy slab properties during path conversion for state $originalState. Target: $pathSlabBlock",
-                e,
-            )
-            null // Indicate failure
-        }
     }
 }

@@ -143,7 +143,7 @@ public abstract class AdditionsShovelMixin {
           // These are guaranteed non-null by the BlockRegistry implementation.
           Block dirtPathStairsBlock = BlockRegistry.INSTANCE.getDIRT_PATH_STAIR();
           Block dirtPathSlabBlock = BlockRegistry.INSTANCE.getDIRT_PATH_SLAB();
-          Block dirtStairsBlock = BlockRegistry.INSTANCE.getDIRT_STAIRS();
+          Block dirtStairsBlock = BlockRegistry.INSTANCE.getDIRT_STAIR();
           Block dirtSlabBlock = BlockRegistry.INSTANCE.getDIRT_SLAB();
 
           // Get default states (safe now, as blocks are non-null)
