@@ -3,7 +3,9 @@
 # DayOfMind Additions
 Welcome to **DayOfMind**, a sophisticated Minecraft mod project developed by OxfaTech, designed to enhance your gaming experience with thoughtfully crafted additions. Our focus is on aesthetic integration with vanilla Minecraft. 🌟
 ![fabric](https://img.shields.io/badge/environment-any-707070?style=flat-square)
-![fabric](https://img.shields.io/badge/fabric-1.21.4-707070?style=flat-square)
+![fabric](https://img.shields.io/badge/fabric-1.21.x-707070?style=flat-square)
+![fabric](https://img.shields.io/badge/fabric-1.20.x-707070?style=flat-square)
+![fabric](https://img.shields.io/badge/fabric-1.19.x-707070?style=flat-square)
 [![ko-fi](https://img.shields.io/badge/Ko--fi-FF5E5B?logo=ko-fi&logoColor=white)](https://ko-fi.com/R6R818TUQY)
 [![Crowdin](https://badges.crowdin.net/dayofmind-additions/localized.svg)](https://crowdin.com/project/dayofmind-additions)
 [![GitHub](https://img.shields.io/badge/GitHub-%23121011.svg?logo=github&logoColor=white)](https://github.com/LufatZ/DOMAdditions)
@@ -32,14 +34,15 @@ This mod is specifically designed for the Minecraft DayOfMind modpack, but can b
 ### ✨ Enhanced Lighting Blocks
 Our advanced lighting blocks introduces new lantern variants that complement vanilla Minecraft's aesthetic while providing new decoration options.
 
-| Lantern Type          | Material Base   | Special Properties           |
-|-----------------------|-----------------|------------------------------|
-| **Copper Lantern**    | Copper Block    | redstone compatible variants |
-| **Diamond Lantern**   | Diamond Block   | redstone compatible variants |
-| **Emerald Lantern**   | Emerald Block   | redstone compatible variants |
-| **Netherite Lantern** | Netherite Block | redstone compatible variants |
-| **Gold Lantern**      | Gold Block      | redstone compatible variants |
-| **Iron Lantern**      | Iron Block      | redstone compatible variants |
+| Lantern Type                             | Material Base   | Special Properties                |
+|------------------------------------------|-----------------|-----------------------------------|
+| **(small/normal/big) Copper Lantern**    | Copper Block    | also redstone compatible variants |
+| **(small/normal/big) Diamond Lantern**   | Diamond Block   | also redstone compatible variants |
+| **(small/normal/big) Emerald Lantern**   | Emerald Block   | also redstone compatible variants |
+| **(small/normal/big) Netherite Lantern** | Netherite Block | also redstone compatible variants |
+| **(small/normal/big) Gold Lantern**      | Gold Block      | also redstone compatible variants |
+| **(small/normal/big) Iron Lantern**      | Iron Block      | also redstone compatible variants |
+| **(small/normal/big) Amethyst Lantern**  | Amethyst Block  | also redstone compatible variants |
 
 
 ---
@@ -114,15 +117,30 @@ Advanced building options with new trapdoor variants for detailed construction.
 
 ## 📈 Development Roadmap
 
-| Feature                          | Status                   | Notes                           |
-|----------------------------------|--------------------------|---------------------------------|
-| **Data Generation System**       | ✅ Complete               | Unified block addition process  |
-| **Minecraft 1.21.4 Update**      | ✅ Complete               | Core features fully compatible  |
-| **Kotlin Migration**             | ✅ Complete               | Modern codebase implementation  |
-| **Translations Integration**     | ✅ Complete               | Community contributions welcome |
-| **Configuration System**         | ✅ Complete               | Enhanced customization options  |
-| **Special Block Features**       | 💡 ready for suggestions | e.g. damage on magma slabs      |
-| **Redstone Lantern Integration** | ✅ Complete               | Power lanterns with redstone    |
+| Feature                                            | Status                   | Notes                                       |
+|----------------------------------------------------|--------------------------|---------------------------------------------|
+| **Data Generation System**                         | ✅ Complete               | Unified block addition process              |
+| **Minecraft 1.21.5 Update**                        | ✅ Complete               | Core features fully compatible              |
+| **Kotlin Migration**                               | ✅ Complete               | Modern codebase implementation              |
+| **Translations Integration**                       | ✅ Complete               | Community contributions welcome             |
+| **Configuration System**                           | ✅ Complete               | Enhanced customization options              |
+| **Redstone Lantern Integration**                   | ✅ Complete               | Power lanterns with redstone                |
+| **Big Shovel Item**                                | ✅ Complete               | A shovel, but for a specific area           |
+| **Hammer Item**                                    | ✅ Complete               | A pickaxe, but for a specific area          |
+| **Radius Mine Hoe**                                | ⚒️ planned               | can convert multiple blocks to farmland     |
+| **Big Axe**                                        | ⚒️ planned               | is able to mine an entire tree              |
+| **Vertical Slabs**                                 | ⚒️ planned               | add vertical slabs to the game              |
+| **Runtime Data Generation**                        | ⚒️ planned               | add runtime data generation to the game     |
+| **Better server client config sync**               | ⚒️ planned               | add better server client config sync        |
+| **Wandering Musicant**                             | ⚒️ planned               | add a group wandering musicians to the game |
+| **Conquest/foundation/administration of villages** | ⚒️ planned               | add a new village system to the game        |
+| **Xaero integration**                              | ⚒️ planned               | add integration for Xaero's World Map       |
+| **Skill System**                                   | ⚒️ planned               | add a player skill system to the game       |
+| **Radius Mine upgrades**                           | ⚒️ planned               | add upgrades for the radius mine tools      |
+| **More Block Variants**                            | 💡 ready for suggestions | add more block variants to the game         |
+| **Special Block Features**                         | 💡 ready for suggestions | e.g. damage on magma slabs                  |
+| **Translation Improvements**                       | 💡 ready for suggestions | add more/better translations to the game    |
+
 
 ---
 
