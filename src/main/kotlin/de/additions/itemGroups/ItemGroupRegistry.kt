@@ -181,7 +181,7 @@ object ItemGroupRegistry {
         parentItem: Block,
     ) {
         val parentList = mutableListOf<Block>()
-        items.forEach { parentList.add(parentItem) }
+        items.forEach { _ -> parentList.add(parentItem) }
         registerBlocksInDefaultGroups(items, parentList)
     }
 
@@ -192,7 +192,7 @@ object ItemGroupRegistry {
         val parentList = mutableListOf<Item>()
         val items = mutableListOf<Item>()
         stacks.forEach { items.add(it.item) }
-        items.forEach { parentList.add(parentItem) }
+        items.forEach { _ -> parentList.add(parentItem) }
         registerItemsInDefaultGroups(items, parentList)
     }
 
