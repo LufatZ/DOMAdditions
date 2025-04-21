@@ -9,7 +9,6 @@ import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider
 import net.minecraft.block.Block
 import net.minecraft.block.Blocks
-import net.minecraft.client.data.TextureKey.FLOWERBED
 import net.minecraft.registry.RegistryKeys
 import net.minecraft.registry.RegistryWrapper
 import net.minecraft.registry.tag.BlockTags
@@ -162,7 +161,6 @@ class BlockTagGenerator(
                 SWEET_BERRY_BUSH,
                 AZALEA,
                 FLOWERING_AZALEA,
-                FLOWERBED,
                 SPORE_BLOSSOM,
                 BAMBOO_SAPLING,
                 CHERRY_SAPLING,
