@@ -142,3 +142,20 @@ java {
     sourceCompatibility = JavaVersion.VERSION_21
     targetCompatibility = JavaVersion.VERSION_21
 }
+
+// ==========================================================================================
+// Task Dependencies Configuration
+// ==========================================================================================
+// Ensure that runClient depends on runDatagen
+tasks.named("runClient").configure {
+    dependsOn(tasks.named("runDatagen"))
+}
+// Ensure that runServer also depends on runDatagen
+tasks.named("runServer").configure {
+    dependsOn(tasks.named("runDatagen"))
+}
+// Ensure that build also depends on runDatagen
+tasks.named("build").configure {
+    dependsOn(tasks.named("runDatagen"))
+}
+// ==========================================================================================
