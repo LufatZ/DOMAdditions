@@ -1,4 +1,4 @@
-![DayOfMind](https://www.bisecthosting.com/images/CF/DayofMind_revamp/bh_header.png)
+![DayOfMind](https://cdn.modrinth.com/data/o0NSWXiU/images/30dd4442f5da1001f240de08fb3e7130a56c8a87.jpeg)
 
 # DayOfMind Additions
 Welcome to **DayOfMind**, a sophisticated Minecraft mod project developed by OxfaTech, designed to enhance your gaming experience with thoughtfully crafted additions. Our focus is on aesthetic integration with vanilla Minecraft. 🌟
