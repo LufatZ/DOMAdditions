@@ -130,7 +130,11 @@ Advanced building options with new trapdoor variants for detailed construction.
 These items allow you to mine multiple blocks at once and also create Dirt Path from Dirt.
 
 ![tools 1](https://cdn.modrinth.com/data/AcxzUn56/images/799899ce71baf0ddeb4a3ef5cd59fcea9cc73df4.png)
-[![Massive Mining Mod Showcase](https://img.youtube.com/vi/VIDEO_ID/hqdefault.jpg)](http://www.youtube.com/watch?v=7UkGhGWrxFM)
+
+### Youtube Video
+
+[![Massive Mining Mod Showcase](https://i.ytimg.com/vi/7UkGhGWrxFM/hqdefault.jpg)](http://www.youtube.com/watch?v=7UkGhGWrxFM)
+
 ---
 
 ## 📈 Development Roadmap
@@ -223,5 +227,3 @@ Ready to level up your Minecraft experience? DayOfMind has you covered! 🚀
 And when it's time to host your server with BisectHosting, don't forget to use code [ 'DAYOFMIND' ](https://www.bisecthosting.com/clients/aff.php?aff=3251) for an awesome 25% discount! We're here to make your Minecraft journey extraordinary. 🌟🎮
 
 Join the DayOfMind adventure today with BisectHosting. Your Minecraft world will never be the same again!
-
-
