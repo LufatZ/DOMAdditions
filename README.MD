@@ -130,7 +130,7 @@ Advanced building options with new trapdoor variants for detailed construction.
 These items allow you to mine multiple blocks at once and also create Dirt Path from Dirt.
 
 ![tools 1](https://cdn.modrinth.com/data/AcxzUn56/images/799899ce71baf0ddeb4a3ef5cd59fcea9cc73df4.png)
-<iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/7UkGhGWrxFM?si=trkoT7RGb7SLxFl6" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+[![Massive Mining Mod Showcase](https://img.youtube.com/vi/VIDEO_ID/hqdefault.jpg)](http://www.youtube.com/watch?v=7UkGhGWrxFM)
 ---
 
 ## 📈 Development Roadmap
