@@ -11,7 +11,7 @@ Welcome to **DayOfMind**, a sophisticated Minecraft mod project developed by Oxf
 [![GitHub](https://img.shields.io/badge/GitHub-%23121011.svg?logo=github&logoColor=white)](https://github.com/LufatZ/DOMAdditions)
 [![Discord](https://img.shields.io/badge/Discord-%237289DA.svg?logo=discord&logoColor=white)](https://discord.gg/yRkqCvFcmz)
 [![Modrinth](https://img.shields.io/badge/Modrinth-0077DD?logo=modrinth&logoColor=white)](https://modrinth.com/mod/dayofmind-additions)
-[![CurseForge](https://img.shields.io/badge/CurseForge-551A8B?logo=curseforge&logoColor=white)](https://www.curseforge.com/minecraft/modpacks/day-of-mind)
+[![CurseForge](https://img.shields.io/badge/CurseForge-551A8B?logo=curseforge&logoColor=white)](https://www.curseforge.com/minecraft/mc-mods/dayofmind-additions)
 [![OxFaTech](https://img.shields.io/badge/OxFaTech-FF5E5B?logo=oxfatech&logoColor=white)](https://oxfatech.de)
 ---
 
@@ -30,6 +30,10 @@ DayOfMind Additions introduces carefully selected add-ons that expand Minecraft'
 This mod is specifically designed for the Minecraft DayOfMind modpack, but can be used in any other modpack.
 
 ---
+### ⚙️ Vanilla enhancements
+#### Shovel Tricks
+You can easily create a dirt path from blocks such as dirt or grass (as usual), but also back to dirt.
+![shovetrick](https://cdn.modrinth.com/data/AcxzUn56/images/884f12fefc2302b5c2527f68d67050cdbbca8f7e.gif)
 
 ### ✨ Enhanced Lighting Blocks
 Our advanced lighting blocks introduces new lantern variants that complement vanilla Minecraft's aesthetic while providing new decoration options.
@@ -44,6 +48,9 @@ Our advanced lighting blocks introduces new lantern variants that complement van
 | **(small/normal/big) Iron Lantern**      | Iron Block      | also redstone compatible variants |
 | **(small/normal/big) Amethyst Lantern**  | Amethyst Block  | also redstone compatible variants |
 
+| ![lantern 1](https://cdn.modrinth.com/data/AcxzUn56/images/3246a6880a7e8e7e2250df32788c9f327cc34d70.png) | ![lantern 2](https://cdn.modrinth.com/data/AcxzUn56/images/15e8a9bf9b6e0872cea9c08c39c9cd094f7df8da.png) |
+|----------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------|
+| ![lantern 3](https://cdn.modrinth.com/data/AcxzUn56/images/19f079230e71316273f7be389aaf163731a453b1.png) | ![lantern 3](https://cdn.modrinth.com/data/AcxzUn56/images/2a3530cf78dbb7939fb0aa81934586b264216d27.png) |
 
 ---
 
@@ -113,6 +120,17 @@ Advanced building options with new trapdoor variants for detailed construction.
 | **Crystal**       | Amethyst Block  | none (Suggestions welcome) |
 |                   | Quartz variants | none (Suggestions welcome) |
 
+| ![all blocks 1](https://cdn.modrinth.com/data/AcxzUn56/images/a414bb89c03f6b299838a60621ed76a463e69874.png) | ![all blocks 2](https://cdn.modrinth.com/data/AcxzUn56/images/31eca250c8f8ce940249a1a0365de776d2e5265c.png) |
+|-------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------|
+| ![all blocks 3](https://cdn.modrinth.com/data/AcxzUn56/images/8dafec0eae7c61f4d1d4622f8a0f90deb33cf574.png) |                                                                                                             |
+
+
+
+## Mine Tool Items
+These items allow you to mine multiple blocks at once and also create Dirt Path from Dirt.
+
+![tools 1](https://cdn.modrinth.com/data/AcxzUn56/images/799899ce71baf0ddeb4a3ef5cd59fcea9cc73df4.png)
+<iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/7UkGhGWrxFM?si=trkoT7RGb7SLxFl6" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 ---
 
 ## 📈 Development Roadmap
@@ -205,5 +223,3 @@ Ready to level up your Minecraft experience? DayOfMind has you covered! 🚀
 And when it's time to host your server with BisectHosting, don't forget to use code [ 'DAYOFMIND' ](https://www.bisecthosting.com/clients/aff.php?aff=3251) for an awesome 25% discount! We're here to make your Minecraft journey extraordinary. 🌟🎮
 
 Join the DayOfMind adventure today with BisectHosting. Your Minecraft world will never be the same again!
-
-
