@@ -3,6 +3,7 @@ package de.additions.datagen
 import de.additions.Additions.MODID
 import de.additions.Additions.logger
 import de.additions.blocks.BlockRegistry
+import de.additions.helper.IdentifierHelper
 import de.additions.items.ItemRegistry
 import de.additions.items.RadiusMineItem
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
@@ -90,12 +91,12 @@ class ItemTagGenerator(
         item: Item,
         key: TagKey<Item>
     ) {
-        getOrCreateTagBuilder(key).add(item)
+        getTagBuilder(key).add(IdentifierHelper.getId(item))
     }
     private fun addToTag(
         block: Block,
         key: TagKey<Item>
     ) {
-        addToTag(block.asItem(),key)
+        getTagBuilder(key).add(IdentifierHelper.getId(block))
     }
 }

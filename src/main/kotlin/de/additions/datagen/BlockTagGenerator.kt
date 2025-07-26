@@ -5,6 +5,7 @@ package de.additions.datagen
 import de.additions.Additions.MODID
 import de.additions.Additions.logger
 import de.additions.blocks.BlockRegistry
+import de.additions.helper.IdentifierHelper
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider
 import net.minecraft.block.Block
@@ -327,6 +328,6 @@ class BlockTagGenerator(
         block: Block,
         key: TagKey<Block>,
     ) {
-        getOrCreateTagBuilder(key).add(block)
+        getTagBuilder(key).add(IdentifierHelper.getId(block))
     }
 }

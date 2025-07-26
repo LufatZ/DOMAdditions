@@ -210,11 +210,11 @@ class RadiusMineItem(
     fun getMaterialIngredient(registryLookup: RegistryEntryLookup<Item>): Ingredient {
         val (tag, item) = getCraftingTagOrItem()
         return when {
-            tag != null -> Ingredient.fromTag(registryLookup.getOrThrow(tag))
+            tag != null -> Ingredient.ofTag(registryLookup.getOrThrow(tag))
             item != null -> Ingredient.ofItems(item) // Use ofItems for clarity with single item
             else -> {
                 logger.warn("$unknownMaterialErrorMsg (from getMaterialIngredient - fallback used)")
-                Ingredient.fromTag(registryLookup.getOrThrow(ItemTags.PLANKS)) // Fallback ingredient
+                Ingredient.ofTag(registryLookup.getOrThrow(ItemTags.PLANKS)) // Fallback ingredient
             }
         }
     }
