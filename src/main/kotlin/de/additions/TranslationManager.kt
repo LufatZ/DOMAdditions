@@ -150,8 +150,12 @@ object TranslationManager {
     /**
      * Downloads and processes translation files from a specified URL.
      *
+     * This function creates a temporary directory, downloads a zip file from the given URL,
+     * processes the translation files within the zip, and then cleans up the temporary directory.
+     *
      * @param url The URL to download the translation files from.
      * @param logging Whether to log detailed messages during the process.
+     * @throws Exception if there is an error during the download or processing of the translation files.
      */
     suspend fun downloadTranslations(url: String, logging: Boolean = false) {
         val tempDir = createTempDirectory(logging)
@@ -287,6 +291,13 @@ object TranslationManager {
 
     /**
      * Registers the downloaded translations as a built-in resource pack.
+     *
+     * This function adds the translation resource pack to the list of active resource packs
+     * in the Minecraft client's options. If the resource pack is already registered,
+     * it logs a message and does nothing.
+     *
+     * @param logging Whether to log detailed messages during the process.
+     * @throws Exception if there is an error registering the translation pack.
      */
     fun registerTranslationResourcePack(logging: Boolean) {
         try {
@@ -311,6 +322,15 @@ object TranslationManager {
         }
     }
 
+    /**
+     * Deletes the translation resource pack directory.
+     *
+     * This function recursively deletes the directory containing the translation files
+     * for the mod. This is useful for cleaning up old or unused translations.
+     *
+     * @param logging Whether to log detailed messages during the process.
+     * @throws Exception if there is an error deleting the translation pack.
+     */
     fun TranslationManager.clearTranslations(logging: Boolean) {
         try {
             File(Path.of(MinecraftClient.getInstance().runDirectory.path, "resourcepacks", MODID).toString()).deleteRecursively()

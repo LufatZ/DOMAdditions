@@ -14,10 +14,21 @@ import net.minecraft.world.World
 import net.minecraft.world.WorldView
 import net.minecraft.world.tick.ScheduledTickView
 
+/**
+ * Represents a stair block made of magma.
+ * It damages entities that step on it and creates bubble columns when interacting with water.
+ *
+ * @param blockstate The base block state of the stair.
+ * @param settings The settings for the block.
+ */
 class MagmaStair(
     blockstate: BlockState,
     settings: Settings,
 ) : StairsBlock(blockstate, settings) {
+    /**
+     * Called when an entity steps on the block.
+     * Damages living entities that are not immune to stepping effects.
+     */
     override fun onSteppedOn(
         world: World,
         pos: BlockPos,
@@ -34,6 +45,10 @@ class MagmaStair(
         super.onSteppedOn(world, pos, state, entity)
     }
 
+    /**
+     * Called when a scheduled tick occurs for the block.
+     * Updates bubble columns in the block above.
+     */
     override fun scheduledTick(
         state: BlockState,
         world: ServerWorld,
@@ -43,6 +58,10 @@ class MagmaStair(
         BubbleColumnBlock.update(world, pos.up(), state)
     }
 
+    /**
+     * Called when a neighboring block is updated.
+     * Schedules a block tick if water is placed on top of this block.
+     */
     override fun getStateForNeighborUpdate(
         state: BlockState,
         world: WorldView,
@@ -59,6 +78,10 @@ class MagmaStair(
         return super.getStateForNeighborUpdate(state, world, tickView, pos, direction, neighborPos, neighborState, random)
     }
 
+    /**
+     * Called when the block is added to the world.
+     * Schedules a block tick to handle initial interactions.
+     */
     override fun onBlockAdded(
         state: BlockState,
         world: World,

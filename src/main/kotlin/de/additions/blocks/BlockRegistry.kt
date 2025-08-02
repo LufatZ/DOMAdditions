@@ -1,6 +1,6 @@
 /**
- * Registry für zusätzliche Minecraft-Blöcke und deren Varianten.
- * Ermöglicht die automatische Registrierung von Treppen, Platten und Laternen-Varianten.
+ * Registry for additional Minecraft blocks and their variants.
+ * Enables automatic registration of stairs, slabs, and lantern variants.
  */
 @file:Suppress("ktlint:standard:no-wildcard-imports")
 
@@ -20,39 +20,65 @@ import net.minecraft.registry.RegistryKey
 import net.minecraft.registry.RegistryKeys
 import net.minecraft.util.Identifier
 
+/**
+ * Handles the registration of all custom blocks and their variants.
+ * This object manages the creation and registration of stairs, slabs, lanterns, trapdoors, and chains
+ * based on configuration settings and predefined parent blocks.
+ */
 object BlockRegistry {
-    /** Speichert alle registrierten Blöcke als ItemStacks für spätere Verwendung */
+    /** Stores all registered blocks as ItemStacks for later use, e.g., in item groups. */
     val registeredBlocks: MutableList<ItemStack> = mutableListOf()
 
+    /** List of all registered stair blocks. */
     @JvmStatic
     val registeredStairs: MutableList<Block> = mutableListOf()
 
+    /** List of all registered slab blocks. */
     @JvmStatic
     val registeredSlabs: MutableList<Block> = mutableListOf()
+
+    /** A map of registered lantern variants to their parent blocks. */
     val registeredLanterns: MutableMap<Block, Block> = mutableMapOf()
+
+    /** List of all registered trapdoor blocks. */
     val registeredTrapdoors: MutableList<Block> = mutableListOf()
+
+    /** List of all registered chain blocks. */
     val registeredChains: MutableList<Block> = mutableListOf()
+
+    /** List of all registered grass block variants (stairs and slabs). */
     val registeredGrassBlocks: MutableList<Block> = mutableListOf()
+
+    /** List of all registered dirt block variants. */
     private val registeredDirtBlockVariants: MutableList<Block> = mutableListOf()
+
+    /** List of all registered magma block variants. */
     private val registeredMagmaBlockVariants: MutableList<Block> = mutableListOf()
 
+    /** The registered dirt path stair block, with a fallback to oak stairs. */
     @Suppress("ktlint:standard:property-naming")
     var DIRT_PATH_STAIR: Block = Blocks.OAK_STAIRS // Fallback-Block
         private set
 
+    /** The registered dirt path slab block, with a fallback to oak slab. */
     @Suppress("ktlint:standard:property-naming")
     var DIRT_PATH_SLAB: Block = Blocks.OAK_SLAB // Fallback-Block
         private set
 
+    /** The registered dirt stair block, with a fallback to oak stairs. */
     @Suppress("ktlint:standard:property-naming")
     var DIRT_STAIR: Block = Blocks.OAK_STAIRS // Fallback-Block
         private set
 
+    /** The registered dirt slab block, with a fallback to oak slab. */
     @Suppress("ktlint:standard:property-naming")
     var DIRT_SLAB: Block = Blocks.OAK_SLAB // Fallback-Block
         private set
 
-    // Listen der Basis-Blöcke für Varianten
+    /**
+     * The list of parent blocks for which stair and slab variants will be created.
+     * This list is conditional on the `EnabledBlockVariants` configuration setting.
+     */
     @JvmStatic
     val blockVariantsParents: List<Block> =
         if (AdditionsConfig.EnabledBlockVariants) {
@@ -80,6 +106,11 @@ object BlockRegistry {
             logger.info("Block Variants disabled in configuration")
             listOf()
         }
+
+    /**
+     * The list of parent blocks for which lantern variants will be created.
+     * This list is conditional on the `EnabledLantern` configuration setting.
+     */
     private val lanternVariantsParents: List<Block> =
         if (AdditionsConfig.EnabledLantern) {
             listOf(
@@ -95,6 +126,11 @@ object BlockRegistry {
             logger.info("Lantern Variants disabled in configuration")
             listOf()
         }
+
+    /**
+     * The list of parent blocks for which trapdoor variants will be created.
+     * This list is conditional on the `EnabledTrapdoor` configuration setting.
+     */
     val trapdoorVariantsParents: List<Block> =
         if (AdditionsConfig.EnabledTrapdoor) {
             listOf(
@@ -161,11 +197,18 @@ object BlockRegistry {
             listOf()
         }
 
-    /** Get registered Magma Block variants for BubbleColumnBlockMixin */
+    /**
+     * Gets the list of registered magma block variants.
+     * Used by the BubbleColumnBlockMixin to create bubble columns.
+     * @return A list of magma block variants.
+     */
     @JvmStatic
     fun getRegisteredMagmaBlocks() = registeredMagmaBlockVariants.toList()
 
-    /** Zentraler Registrierungsaufruf für alle Blocktypen */
+    /**
+     * The main registration method for all custom blocks.
+     * This function orchestrates the registration of all block variants based on the configuration.
+     */
     fun registerAllBlocks() {
         logger.info("Initiating block registration process")
         registerBlockVariants()
@@ -174,7 +217,7 @@ object BlockRegistry {
         registerChains()
         logger.info("Block registration completed. Total registered blocks: ${registeredBlocks.size}")
 
-        // Füge alle registrierten Blöcke zu den Standard-Item-Gruppen hinzu
+        // Add all registered blocks to the default item groups
         ItemGroupRegistry.registerItemsAfterCommonParent(registeredLanterns.keys.toList(), Blocks.LANTERN)
         ItemGroupRegistry.registerItemsAfterCommonParent(registeredChains, Blocks.CHAIN)
         ItemGroupRegistry.registerBlocksInDefaultGroups(registeredTrapdoors, trapdoorVariantsParents)
@@ -183,13 +226,15 @@ object BlockRegistry {
     }
 
     /**
-     * Erstellt einen Registry-Key mit flexiblen Optionen.
-     * Unterstützt Vanilla- und Mod-spezifische Ressourcen.
+     * Creates a [RegistryKey] with flexible options.
+     * Supports both vanilla and mod-specific resources.
      *
-     * @param id Identifier des Ressourcen-Elements
-     * @param vanilla Gibt an, ob es sich um ein Vanilla-Element handelt
-     * @param type Der Typ der Registry (Block, Item, etc.)
-     * @return Der erstellte RegistryKey
+     * @param T The type of the registry entry (e.g., Block, Item).
+     * @param id The identifier string for the resource.
+     * @param vanilla Whether the resource is a vanilla Minecraft resource.
+     * @param type The specific [RegistryKey] for the registry type.
+     * @return The created [RegistryKey].
+     * @throws IllegalArgumentException if the type T is not supported.
      */
     private inline fun <reified T> keyOf(
         id: String,
@@ -217,11 +262,11 @@ object BlockRegistry {
     }
 
     /**
-     * Registriert einen Block und sein zugehöriges BlockItem.
+     * Registers a block and its corresponding [BlockItem].
      *
-     * @param id Identifier des Blocks ohne Namespace
-     * @param block Der zu registrierende Block
-     * @return Der registrierte Block
+     * @param id The identifier for the block (without namespace).
+     * @param block The block instance to register.
+     * @return The registered block instance.
      */
     private fun register(
         id: String,
@@ -232,12 +277,12 @@ object BlockRegistry {
         val blockKey = keyOf(id = id, type = RegistryKeys.BLOCK)
         val itemKey = keyOf(id = id, type = RegistryKeys.ITEM)
 
-        // Registriere Block und BlockItem
+        // Register the block and its BlockItem
         Registry.register(Registries.BLOCK, blockKey, block)
         val blockItem = BlockItem(block, Item.Settings().registryKey(itemKey))
         Registry.register(Registries.ITEM, itemKey, blockItem)
 
-        // Füge ItemStack zur Liste hinzu
+        // Add the ItemStack to the list for item groups
         registeredBlocks.add(ItemStack(blockItem))
 
         logger.debug("Successfully registered block and block item: $id")
@@ -245,16 +290,16 @@ object BlockRegistry {
     }
 
     /**
-     * Registriert Treppen- und Platten-Varianten für vorgegebene Basis-Blöcke.
+     * Registers stair and slab variants for the parent blocks defined in [blockVariantsParents].
      */
     private fun registerBlockVariants() {
         if (!AdditionsConfig.EnabledBlockVariants) {
             logger.info("Block Variants disabled, using fallback blocks for properties.")
-            // Hier musst du nichts tun, die Vars haben ja schon Fallbacks.
+            // Nothing to do here, the properties already have fallbacks.
             return
         } else {
             logger.info("Starting block variant registration")
-            // Varianten für jeden Basis-Block erstellen
+            // Create variants for each parent block
             blockVariantsParents.forEach { parent ->
                 val baseName =
                     Registries.BLOCK
@@ -265,7 +310,7 @@ object BlockRegistry {
 
                 logger.debug("Creating variants for base block: $baseName")
 
-                // Platten-Variante registrieren
+                // Register slab variant
                 val slab =
                     when (parent) {
                         is GrassBlock -> {
@@ -334,7 +379,7 @@ object BlockRegistry {
                         }
                     }
 
-                // Treppen-Variante registrieren
+                // Register stair variant
                 val stair =
                     when (parent) {
                         is GrassBlock ->
@@ -410,7 +455,8 @@ object BlockRegistry {
     }
 
     /**
-     * Registriert Laternen- und Ketten-Varianten für vorgegebene Basis-Blöcke.
+     * Registers lantern variants for the parent blocks defined in [lanternVariantsParents].
+     * This includes standard, big, small, and redstone-powered versions.
      */
     private fun registerLanternVariants() {
         logger.info("Starting lantern variant registration")
@@ -432,7 +478,7 @@ object BlockRegistry {
 
             logger.debug("Creating lantern variants for base block: $baseName")
 
-            // Laternen-Variante registrieren
+            // Register standard lantern variant
             if (baseBlock != Blocks.IRON_BLOCK) {
                 lantern =
                     register(
@@ -458,7 +504,7 @@ object BlockRegistry {
                     ),
                 )
 
-            // Redstone-Varianten Logging
+            // Register redstone variants if enabled
             if (AdditionsConfig.EnabledRedstoneLantern) {
                 logger.warn("Redstone Lanterns are enabled. Variant registration for: $baseName")
                 redstoneLantern =
@@ -509,7 +555,7 @@ object BlockRegistry {
     }
 
     /**
-     * Registriert Falltür-Varianten für vorgegebene Basis-Blöcke.
+     * Registers trapdoor variants for the parent blocks defined in [trapdoorVariantsParents].
      */
     private fun registerTrapdoorVariants() {
         logger.info("Starting trapdoor variant registration")
@@ -524,7 +570,7 @@ object BlockRegistry {
 
             logger.debug("Creating trapdoor variants for base block: $baseName")
 
-            // Falltür-Variante registrieren
+            // Register trapdoor variant
             val trapdoor =
                 register(
                     "${baseName}_trapdoor",
@@ -540,7 +586,7 @@ object BlockRegistry {
     }
 
     /**
-     * Register Chains
+     * Registers custom chain blocks.
      */
     private fun registerChains() {
         logger.info("Starting chain registration")

@@ -10,29 +10,18 @@ import net.minecraft.util.math.random.Random
 import net.minecraft.world.World
 
 /**
- * # Crying Obsidian Slab Block
+ * Represents a slab block variant of Crying Obsidian.
+ * This slab emits obsidian tear particles from its edges, with behavior dependent on the slab type.
  *
- * A custom slab block variant that emits obsidian tear particles from its edges.
- * Handles three slab types (bottom, top, double) with different emission rules.
- *
- * ## Particle Behavior:
- * - Double slabs: Particles in all directions except UP
- * - Bottom slabs: Particles below block (Y: 0.0-0.5)
- * - Top slabs: Particles above block (Y: 0.5-1.0)
- *
- * @property settings Block properties (hardness, sounds, etc)
+ * @param settings The settings for the block.
  */
 class CryingObsidianSlab(
     settings: Settings,
 ) : SlabBlock(settings) {
     /**
-     * Handles visual effects with 20% chance per tick.
-     * Delegates to type-specific handlers based on slab configuration.
-     *
-     * @param state Current block state containing slab type
-     * @param world The world instance
-     * @param pos Block position in world
-     * @param random Random number generator for particle placement
+     * Called periodically to display random particles.
+     * There is a 20% chance each tick for particles to spawn.
+     * The particle emission logic is delegated based on the slab type.
      */
     override fun randomDisplayTick(
         state: BlockState,
@@ -51,10 +40,7 @@ class CryingObsidianSlab(
 
     /**
      * Handles particle emission for double slabs.
-     *
-     * @param world World instance
-     * @param pos Block position
-     * @param random Random number generator
+     * Particles are emitted from the center seam in all directions except up.
      */
     private fun handleDoubleSlab(
         world: World,
@@ -69,10 +55,7 @@ class CryingObsidianSlab(
 
     /**
      * Handles particle emission for bottom slabs.
-     *
-     * @param world World instance
-     * @param pos Block position
-     * @param random Random number generator
+     * Particles are emitted from the lower half of the block in all directions except up.
      */
     private fun handleBottomSlab(
         world: World,
@@ -87,10 +70,7 @@ class CryingObsidianSlab(
 
     /**
      * Handles particle emission for top slabs.
-     *
-     * @param world World instance
-     * @param pos Block position
-     * @param random Random number generator
+     * Particles are emitted from the upper half of the block in all directions except down.
      */
     private fun handleTopSlab(
         world: World,
@@ -104,14 +84,10 @@ class CryingObsidianSlab(
     }
 
     /**
-     * Attempts particle spawn after checking adjacent block occlusion.
+     * Attempts to spawn a particle if the adjacent block side is not opaque.
      *
-     * @param world World instance
-     * @param pos Base block position
-     * @param direction Emission direction
-     * @param random Random number generator
-     * @param yBase Minimum Y position (0.0-1.0)
-     * @param yRange Maximum Y position (must be >= yBase)
+     * @param yBase The minimum Y position for the particle.
+     * @param yRange The maximum Y position for the particle.
      */
     private fun trySpawnParticle(
         world: World,
@@ -138,13 +114,12 @@ class CryingObsidianSlab(
     }
 
     /**
-     * Calculates particle positions along slab edges
+     * Calculates the precise position of a particle along the slab's edges.
      *
-     * @param direction The emission direction
-     * @param random Random number generator
-     * @param yBase Base Y position (0.0 for bottom, 0.5 for top)
-     * @param yRange Y position range (0.5 for bottom, 0.5 for top)
-     * @return Triple of X/Y/Z offsets within block space
+     * @param direction The direction of particle emission.
+     * @param yBase The base Y position (e.g., 0.0 for bottom, 0.5 for top).
+     * @param yRange The Y position range.
+     * @return A [Triple] containing the X, Y, and Z offsets within the block space.
      */
     private fun calculateParticlePosition(
         direction: Direction,

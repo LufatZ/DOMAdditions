@@ -9,6 +9,13 @@ import net.fabricmc.api.ModInitializer
 import net.fabricmc.loader.impl.FabricLoaderImpl
 import org.slf4j.LoggerFactory
 
+/**
+ * The main entry point for the Additions mod.
+ * This object handles the initialization of the mod, including:
+ * - Loading the configuration
+ * - Registering blocks, items, and item groups
+ * - Logging debug information in a development environment
+ */
 object Additions : ModInitializer {
     val logger = LoggerFactory.getLogger("additions")
     const val MODID = "additions"

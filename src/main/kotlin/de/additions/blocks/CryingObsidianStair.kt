@@ -11,32 +11,20 @@ import net.minecraft.util.math.random.Random
 import net.minecraft.world.World
 
 /**
- * # Crying Obsidian Stair Block
+ * Represents a stair block variant of Crying Obsidian.
+ * This stair emits obsidian tear particles from its edges, with behavior dependent on the stair's shape and orientation.
  *
- * A custom stair block that emits dripping obsidian tear particles from its edges, similar to crying obsidian.
- * Particles are spawned on the sides depending on the stair's shape and orientation.
- *
- * ## Key Features:
- * - Inherits properties from Minecraft's StairsBlock
- * - Client-side particle effects using `DRIPPING_OBSIDIAN_TEAR`
- * - Smart particle positioning based on stair geometry
- * - Prevents particles from spawning inside solid blocks
- *
- * @property baseBlockState The base block state this stair is modeled after
- * @property settings Block properties (hardness, sounds, etc)
+ * @param baseBlockState The base block state this stair is modeled after.
+ * @param settings The settings for the block.
  */
 class CryingObsidianStair(
     baseBlockState: BlockState,
     settings: Settings,
 ) : StairsBlock(baseBlockState, settings) {
     /**
-     * Handles per-tick visual effects (client-side only).
-     * Attempts to spawn particles with 20% chance each tick (1/5 probability).
-     *
-     * @param state Current block state containing stair properties
-     * @param world The world instance
-     * @param pos Block position in world
-     * @param random Random number generator for particle placement
+     * Called periodically to display random particles.
+     * There is a 20% chance each tick for particles to spawn.
+     * The particle emission logic is delegated based on the stair's properties.
      */
     override fun randomDisplayTick(
         state: BlockState,
@@ -56,12 +44,12 @@ class CryingObsidianStair(
     }
 
     /**
-     * Determines valid particle emission directions based on stair configuration
+     * Determines the valid directions for particle emission based on the stair's configuration.
      *
-     * @param facing The primary facing direction of the stair
-     * @param half Whether the stair is in upper/lower position
-     * @param shape The stair's geometric shape (straight/inner/outer)
-     * @return List of valid emission directions
+     * @param facing The primary facing direction of the stair.
+     * @param half Whether the stair is in the top or bottom half.
+     * @param shape The stair's geometric shape (e.g., straight, inner, outer).
+     * @return A list of valid emission directions.
      */
     private fun getValidDirections(
         facing: Direction,
@@ -74,13 +62,7 @@ class CryingObsidianStair(
         }
 
     /**
-     * Calculates emission directions for bottom-half stairs.
-     *
-     * @param facing Primary orientation direction
-     * @param shape Stair geometric configuration
-     * @return List containing:
-     *         - Always DOWN direction
-     *         - Shape-dependent horizontal directions
+     * Calculates the emission directions for a bottom-half stair.
      */
     private fun getBottomValidDirections(
         facing: Direction,
@@ -106,13 +88,7 @@ class CryingObsidianStair(
     }
 
     /**
-     * Calculates emission directions for top-half stairs.
-     *
-     * @param facing Primary orientation direction
-     * @param shape Stair geometric configuration
-     * @return List containing:
-     *         - Always UP direction
-     *         - Shape-dependent horizontal directions
+     * Calculates the emission directions for a top-half stair.
      */
     private fun getTopValidDirections(
         facing: Direction,
@@ -138,13 +114,9 @@ class CryingObsidianStair(
     }
 
     /**
-     * Attempts to spawn a particle in a specific direction after checking block occlusion.
+     * Attempts to spawn a particle if the adjacent block side is not opaque.
      *
-     * @param world The world instance
-     * @param pos Base block position
-     * @param direction Chosen emission direction
-     * @param random Random number generator
-     * @param half Stair half (top/bottom) for vertical positioning
+     * @param half The stair half (top/bottom) for vertical positioning.
      */
     private fun trySpawnParticle(
         world: World,
@@ -171,12 +143,11 @@ class CryingObsidianStair(
     }
 
     /**
-     * Calculates precise particle position within block boundaries.
+     * Calculates the precise position of a particle within the block's boundaries.
      *
-     * @param direction Emission direction
-     * @param random Random number generator
-     * @param half Stair half for vertical positioning
-     * @return Triple of X/Y/Z offsets (0.0-1.0 range)
+     * @param direction The direction of particle emission.
+     * @param half The stair half for vertical positioning.
+     * @return A [Triple] containing the X, Y, and Z offsets.
      */
     private fun calculateParticlePosition(
         direction: Direction,
@@ -197,11 +168,6 @@ class CryingObsidianStair(
 
     /**
      * Handles vertical (up/down) particle positioning.
-     *
-     * @param direction Vertical direction (UP/DOWN)
-     * @param random Random number generator
-     * @param half Stair half for position adjustment
-     * @return Position triple with constrained Y-values
      */
     private fun handleVerticalDirection(
         direction: Direction,
@@ -224,12 +190,6 @@ class CryingObsidianStair(
 
     /**
      * Handles horizontal particle positioning.
-     *
-     * @param direction Horizontal emission direction
-     * @param random Random number generator
-     * @param baseY Base Y-position based on stair half
-     * @param heightRange Vertical spread range
-     * @return Position triple with edge-aligned coordinates
      */
     private fun handleHorizontalDirection(
         direction: Direction,

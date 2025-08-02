@@ -1,5 +1,3 @@
-@file:Suppress("ktlint:standard:no-wildcard-imports")
-
 package de.additions.blocks
 
 import net.minecraft.block.Block
@@ -21,9 +19,10 @@ import net.minecraft.world.WorldView
 import net.minecraft.world.tick.ScheduledTickView
 
 /**
- * [SnowyStairsBlock] is an extended version of [StairsBlock] that serves as a grass-covered staircase.
+ * Represents a stair block that can be covered with snow, similar to a grass block.
+ * This block changes its appearance based on the block above it.
  *
- * @param blockstate The block state of the base block.
+ * @param blockstate The base block state for the stair.
  * @param settings The block settings (e.g., hardness, tool required).
  */
 class SnowyStairsBlock(
@@ -31,13 +30,14 @@ class SnowyStairsBlock(
     settings: Settings,
 ) : StairsBlock(blockstate, settings) {
     companion object {
+        /** A boolean property indicating whether the stair is covered with snow. */
         val SNOWY: BooleanProperty = Properties.SNOWY
     }
 
     init {
         this.defaultState =
             this.stateManager
-                .getDefaultState()
+                .defaultState
                 .with(FACING, Direction.NORTH)
                 .with(HALF, BlockHalf.BOTTOM)
                 .with(SHAPE, StairShape.STRAIGHT)
@@ -46,7 +46,7 @@ class SnowyStairsBlock(
     }
 
     /**
-     * Adds the snowy property to the block state properties.
+     * Appends the `SNOWY` property to the block's state manager.
      *
      * @param builder The state manager builder.
      */
@@ -56,17 +56,11 @@ class SnowyStairsBlock(
     }
 
     /**
-     * Sets the placement state of the block.
-     *
-     * This function sets the following properties for the block state:
-     * - `SNOWY`: Whether the block above is a snow block.
-     * - `FACING`: The direction the player is facing.
-     * - `HALF`: Whether the block occupies the top or bottom half of the block space.
-     * - `WATERLOGGED`: Whether the block is waterlogged.
-     * - `SHAPE`: The shape of the staircase based on neighboring blocks.
+     * Determines the block state upon placement.
+     * The `SNOWY` state is set based on whether a snow block is placed on top.
      *
      * @param ctx The item placement context.
-     * @return The block state with the snowy property set.
+     * @return The appropriate block state for placement.
      */
     override fun getPlacementState(ctx: ItemPlacementContext): BlockState {
         val snowyBlockState = ctx.world.getBlockState(ctx.blockPos.up())
@@ -91,15 +85,8 @@ class SnowyStairsBlock(
 
     /**
      * Updates the block state when a neighboring block changes.
+     * This is used to update the `SNOWY` state and the stair shape.
      *
-     * @param state The current block state.
-     * @param world The world view.
-     * @param tickView The scheduled tick view.
-     * @param pos The position of the block.
-     * @param direction The direction of the neighbor.
-     * @param neighborPos The position of the neighbor block.
-     * @param neighborState The state of the neighbor block.
-     * @param random The random number generator.
      * @return The updated block state.
      */
     override fun getStateForNeighborUpdate(
@@ -126,20 +113,20 @@ class SnowyStairsBlock(
     }
 
     /**
-     * Checks if the given block state is snow.
+     * Checks if the given block state is a snow block.
      *
      * @param state The block state to check.
-     * @return True if the block state is snow, false otherwise.
+     * @return `true` if the block state is in the `SNOW` tag, `false` otherwise.
      */
     private fun isSnow(state: BlockState): Boolean = state.isIn(BlockTags.SNOW)
 
     /**
-     * Determines the shape of the stair block based on neighboring blocks.
+     * Determines the shape of the stair block based on its neighbors.
      *
      * @param state The current block state.
      * @param world The world view.
      * @param pos The position of the block.
-     * @return The stair shape.
+     * @return The calculated [StairShape].
      */
     private fun getStairShape(
         state: BlockState,
@@ -148,7 +135,7 @@ class SnowyStairsBlock(
     ): StairShape {
         val direction = state.get(FACING)
         val blockState = world.getBlockState(pos.offset(direction))
-        if (blockState.block is StairsBlock && state.get(HALF) == blockState.get(HALF)) {
+        if (isStairs(blockState) && state.get(HALF) == blockState.get(HALF)) {
             val neighborDirection = blockState.get(FACING)
             if (neighborDirection.axis != direction.axis && isDifferentOrientation(state, world, pos, neighborDirection.opposite)) {
                 return if (neighborDirection == direction.rotateYCounterclockwise()) {
@@ -160,7 +147,7 @@ class SnowyStairsBlock(
         }
 
         val oppositeBlockState = world.getBlockState(pos.offset(direction.opposite))
-        if (oppositeBlockState.block is StairsBlock && state.get(HALF) == oppositeBlockState.get(HALF)) {
+        if (isStairs(oppositeBlockState) && state.get(HALF) == oppositeBlockState.get(HALF)) {
             val neighborDirection = oppositeBlockState.get(FACING)
             if (neighborDirection.axis != direction.axis && isDifferentOrientation(state, world, pos, neighborDirection)) {
                 return if (neighborDirection == direction.rotateYCounterclockwise()) {
@@ -175,13 +162,13 @@ class SnowyStairsBlock(
     }
 
     /**
-     * Checks if the orientation of the neighboring block is different.
+     * Checks if a neighboring stair has a different orientation.
      *
      * @param state The current block state.
      * @param world The world view.
      * @param pos The position of the block.
      * @param dir The direction to check.
-     * @return True if the orientation is different, false otherwise.
+     * @return `true` if the orientation is different, `false` otherwise.
      */
     private fun isDifferentOrientation(
         state: BlockState,
@@ -190,7 +177,7 @@ class SnowyStairsBlock(
         dir: Direction,
     ): Boolean {
         val neighborState = world.getBlockState(pos.offset(dir))
-        return neighborState.block !is StairsBlock ||
+        return !isStairs(neighborState) ||
             neighborState.get(FACING) != state.get(FACING) ||
             neighborState.get(HALF) != state.get(HALF)
     }

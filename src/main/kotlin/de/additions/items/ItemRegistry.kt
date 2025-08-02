@@ -16,11 +16,30 @@ import net.minecraft.registry.RegistryKeys
 import net.minecraft.registry.tag.BlockTags
 import net.minecraft.util.Identifier
 
+/**
+ * Manages the registration of all custom items for the mod.
+ * This object is responsible for creating, registering, and tracking all new items,
+ * ensuring they are correctly added to the game and creative item groups.
+ */
 object ItemRegistry {
+    /**
+     * A list of [ItemStack]s for all successfully registered items.
+     * This list is populated during registration and used to add the items to the appropriate creative tab.
+     */
     val registeredItems: MutableList<ItemStack> = mutableListOf()
+
+    /**
+     * A temporary map holding items that have been created but not yet registered.
+     * The key is the item's intended name (e.g., "big_diamond_shovel"), and the value is the [Item] instance.
+     */
     private var addedItems: MutableMap<String, Item> = mutableMapOf()
     private val detailedLogging = AdditionsConfig.DetailedLogging || FabricLoader.getInstance().isDevelopmentEnvironment
 
+    /**
+     * Initializes the item registration process.
+     * This function orchestrates the creation of tool items, registers them with the game,
+     * and then adds them to the creative item group.
+     */
     fun registerItems() {
         logger.info("Adding items")
         addToolItems()
@@ -30,6 +49,13 @@ object ItemRegistry {
         ItemGroupRegistry.registerItemsAfterCommonParent(registeredItems, Items.DIAMOND_PICKAXE)
     }
 
+    /**
+     * Registers the items held in the [addedItems] map.
+     * It iterates through the map, registers each item with Minecraft's item registry,
+     * and adds a corresponding [ItemStack] to the [registeredItems] list.
+     *
+     * @param items A map of item names to [Item] instances to be registered.
+     */
     private fun registerAddedItems(items: Map<String, Item>) {
         items.forEach { (itemName, item) ->
             runCatching {
@@ -46,6 +72,11 @@ object ItemRegistry {
         }
     }
 
+    /**
+     * Creates all tool items based on the defined materials.
+     * This function iterates through the [materials] list from [RadiusMineItem] and creates
+     * a "big shovel" and a "hammer" for each material, adding them to the [addedItems] map.
+     */
     private fun addToolItems() {
         materials.forEach { (materialName, material) ->
             runCatching {

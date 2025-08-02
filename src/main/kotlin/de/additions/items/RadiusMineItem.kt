@@ -508,7 +508,6 @@ class RadiusMineItem(
      * @param state The [BlockState] to check.
      * @param world The current [World].
      * @param targetPos The [BlockPos] of the block.
-     * @param miner The [LivingEntity] mining (potential for future checks).
      * @param toolData The [ToolComponent] of the item stack.
      * @return True if the block can be mined by this tool's AoE effect, false otherwise.
      */
