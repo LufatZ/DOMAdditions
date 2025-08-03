@@ -18,9 +18,9 @@ import de.additions.datagen.models.ModelGenerator.Companion.hasNoTexture
 import de.additions.datagen.models.ModelGenerator.Companion.hasSideAndTop
 import de.additions.datagen.models.ModelGenerator.Companion.removeBlock
 import de.additions.datagen.models.ModelGenerator.Companion.snowyOvergrownBlocks
-import de.additions.datagen.models.ModelHelper.configureBlockTextureMapping
-import de.additions.datagen.models.ModelHelper.extractCleanBlockIdentifier
-import de.additions.datagen.models.ModelHelper.generateBlockItemModel
+import de.additions.helper.ModelHelper.configureBlockTextureMapping
+import de.additions.helper.ModelHelper.extractCleanBlockIdentifier
+import de.additions.helper.ModelHelper.generateBlockItemModel
 import net.minecraft.block.Block
 import net.minecraft.block.Blocks
 import net.minecraft.block.DirtPathBlock

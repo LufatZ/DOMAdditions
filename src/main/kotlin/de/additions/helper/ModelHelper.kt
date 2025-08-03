@@ -1,5 +1,6 @@
-package de.additions.datagen.models
+package de.additions.helper
 
+import de.additions.datagen.models.ModelGenerator
 import net.minecraft.block.Block
 import net.minecraft.block.GrassBlock
 import net.minecraft.block.SnowBlock
@@ -86,7 +87,7 @@ object ModelHelper {
             block = top,
             top = hasSideAndTop && top !is SnowBlock,
             removeBlock = removeBlock,
-            bottom = parent in ModelGenerator.bottomAllSide
+            bottom = parent in ModelGenerator.Companion.bottomAllSide
         )
 
         val sideIdentifier = buildTextureIdentifier(

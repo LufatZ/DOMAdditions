@@ -8,6 +8,9 @@ package de.additions.blocks
 
 import de.additions.Additions.MODID
 import de.additions.Additions.logger
+import de.additions.blocks.BlockRegistry.blockVariantsParents
+import de.additions.blocks.BlockRegistry.lanternVariantsParents
+import de.additions.blocks.BlockRegistry.trapdoorVariantsParents
 import de.additions.config.AdditionsConfig
 import de.additions.itemGroups.ItemGroupRegistry
 import net.minecraft.block.*
@@ -223,6 +226,8 @@ object BlockRegistry {
         ItemGroupRegistry.registerBlocksInDefaultGroups(registeredTrapdoors, trapdoorVariantsParents)
         ItemGroupRegistry.registerBlocksInDefaultGroups(registeredSlabs, blockVariantsParents)
         ItemGroupRegistry.registerBlocksInDefaultGroups(registeredStairs, blockVariantsParents)
+
+        //blockDoesNNotWork()
     }
 
     /**
@@ -420,7 +425,7 @@ object BlockRegistry {
                                 "${baseName}_stairs",
                                 PathStair(
                                     parent.defaultState,
-                                    settings.registryKey(keyOf("${baseName}_stairs")),
+                                    settings.suffocates(Blocks::never).registryKey(keyOf("${baseName}_stairs")),
                                 ),
                             ).also {
                                 DIRT_PATH_STAIR = it
