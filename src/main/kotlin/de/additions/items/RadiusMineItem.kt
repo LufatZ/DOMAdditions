@@ -14,11 +14,9 @@ import net.fabricmc.fabric.api.event.player.AttackBlockCallback
 import net.minecraft.block.*
 import net.minecraft.component.DataComponentTypes
 import net.minecraft.component.type.ToolComponent
-import net.minecraft.component.type.TooltipDisplayComponent
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.*
-import net.minecraft.item.tooltip.TooltipType
 import net.minecraft.recipe.Ingredient
 import net.minecraft.registry.RegistryEntryLookup
 import net.minecraft.registry.tag.BlockTags
@@ -26,15 +24,12 @@ import net.minecraft.registry.tag.ItemTags
 import net.minecraft.registry.tag.TagKey
 import net.minecraft.sound.SoundCategory
 import net.minecraft.sound.SoundEvents
-import net.minecraft.text.Text
 import net.minecraft.util.ActionResult
-import net.minecraft.util.Formatting
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
 import net.minecraft.world.World
 import net.minecraft.world.event.GameEvent
 import java.util.*
-import java.util.function.Consumer
 
 /**
  * Represents a custom mining tool that breaks blocks in a defined radius (AoE) around the initially mined block.
@@ -85,7 +80,7 @@ class RadiusMineItem(
         private const val DURABILITY_MULTIPLIER = 10.0f
 
         /** The radius for the Area of Effect (AoE) mining and path creation (0=1x1, 1=3x3, 2=5x5 -> 5x5 area). */
-        private const val RADIUS = 2
+        const val RADIUS = 2
 
         /** Cooldown in Ticks (20 Ticks = 1 Second) for the path creation ability. */
         private const val PATH_CREATION_COOLDOWN = 2
@@ -166,46 +161,7 @@ class RadiusMineItem(
             )
     }
 
-    // --- Tooltip Configuration ---
-    private val tooltipKeyDesc1: String = "tooltip.additions.radius_mine_1"
-    private val tooltipKeyDesc2: String = "tooltip.additions.radius_mine_2"
-    private val tooltipKeyArea: String = "tooltip.additions.radius_mine_area"
-    private val tooltipKeyEffective: String = "tooltip.additions.radius_blocks"
-
-    // Provide a more descriptive tooltip text using the actual diameter.
-    private val tooltipDescriptionFirst: String = "Mines blocks in a below defined area."
-    private val tooltipDescriptionSecond: String = "Also can create paths in this area. (and back to dirt while sneaking)"
-    private val tooltipArea: String = "Mine Area:"
-    private val tooltipEffective: String = "Effective Blocks:"
     private val unknownMaterialErrorMsg = "Fallback -> Unknown material used in RadiusMineItem: $material"
-
-    /** Provides tooltip data, useful for registration/data generation. */
-    fun getTooltipData(): Map<String, String> =
-        mapOf(
-            tooltipKeyDesc1 to tooltipDescriptionFirst,
-            tooltipKeyDesc2 to tooltipDescriptionSecond,
-            tooltipKeyArea to tooltipArea,
-            tooltipKeyEffective to tooltipEffective,
-        )
-
-    // TODO: Migrate tooltip handling to DataComponentTypes.LORE or a custom component for modern approach.
-    @Deprecated("Uses older tooltip system. Modern approach uses components.")
-    override fun appendTooltip(
-        stack: ItemStack,
-        context: TooltipContext,
-        display: TooltipDisplayComponent,
-        consumer: Consumer<Text>,
-        type: TooltipType,
-    ) {
-        consumer.accept(Text.translatable("")) // placeholder for spacing
-        consumer.accept(Text.translatable(tooltipKeyDesc1).formatted(Formatting.WHITE))
-        consumer.accept(Text.translatable(tooltipKeyDesc2).formatted(Formatting.WHITE))
-        consumer.accept(Text.translatable(tooltipKeyArea).formatted(Formatting.AQUA))
-        consumer.accept(Text.literal(" -> ${2 * RADIUS + 1}x${2 * RADIUS + 1}"))
-        consumer.accept(Text.translatable(tooltipKeyEffective).formatted(Formatting.AQUA))
-        consumer.accept(Text.translatable(" -> %s", effectiveBlocks.name))
-        super.appendTooltip(stack, context, display, consumer, type)
-    }
 
     // --- Material Helper Functions ---
 

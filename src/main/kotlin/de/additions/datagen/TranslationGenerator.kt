@@ -5,7 +5,6 @@ package de.additions.datagen
 import de.additions.Additions.logger
 import de.additions.blocks.*
 import de.additions.items.ItemRegistry
-import de.additions.items.RadiusMineItem
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricLanguageProvider
 import net.minecraft.block.*
@@ -64,7 +63,10 @@ class TranslationGenerator(
 
         itemsTranslationBuilder(ItemRegistry.registeredItems)
 
-        toolTipTranslationBuilder(ItemRegistry.registeredItems)
+        add("tooltip.additions.radius_mine.shovel_description", "Mines a %s area of earth-like blocks.")
+        add("tooltip.additions.radius_mine.hammer_description", "Mines a %s area of stone-like blocks.")
+        add("tooltip.additions.radius_mine.path_creation_description", "Right-click to create a path.")
+        add("tooltip.additions.radius_mine.sneak_description", "Sneak-use for single block action.")
 
         add("itemGroup.additions.blocks", "DayOfMind Blocks")
         add("itemGroup.additions.items", "DayOfMind Items")
@@ -72,19 +74,6 @@ class TranslationGenerator(
         add("tag.item.additions.stones", "Stones")
         add("tag.item.additions.stones.tooltip", "All stone variants")
         add("item.minecraft.redstone_chain", "Redstone Chain")
-    }
-
-    private fun toolTipTranslationBuilder(items: MutableList<ItemStack>) {
-        items.forEach { stack ->
-            val item = stack.item
-
-            if (item is RadiusMineItem) {
-                val tooltip = item.getTooltipData()
-                tooltip.forEach { (key, desc) ->
-                    add(key, desc)
-                }
-            }
-        }
     }
 
     private fun itemsTranslationBuilder(stacks: MutableList<ItemStack>) {

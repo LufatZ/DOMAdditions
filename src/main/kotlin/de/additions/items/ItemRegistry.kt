@@ -4,8 +4,11 @@ import de.additions.Additions.MODID
 import de.additions.Additions.logger
 import de.additions.config.AdditionsConfig
 import de.additions.itemGroups.ItemGroupRegistry
+import de.additions.items.RadiusMineItem.Companion.RADIUS
 import de.additions.items.RadiusMineItem.Companion.materials
 import net.fabricmc.loader.api.FabricLoader
+import net.minecraft.component.DataComponentTypes
+import net.minecraft.component.type.LoreComponent
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.item.Items
@@ -14,6 +17,8 @@ import net.minecraft.registry.Registry
 import net.minecraft.registry.RegistryKey
 import net.minecraft.registry.RegistryKeys
 import net.minecraft.registry.tag.BlockTags
+import net.minecraft.text.Text
+import net.minecraft.util.Formatting
 import net.minecraft.util.Identifier
 
 /**
@@ -80,8 +85,35 @@ object ItemRegistry {
     private fun addToolItems() {
         materials.forEach { (materialName, material) ->
             runCatching {
-                val shovelSettings = Item.Settings().shovel(material, 1.5f, -3.0f)
-                val hammerSettings = Item.Settings().pickaxe(material, 1f, -2.8f)
+                val diameter = 2 * RADIUS + 1
+                val areaText = Text.literal("${diameter}x${diameter}").formatted(Formatting.GRAY)
+
+                val shovelLore =
+                    LoreComponent(
+                        listOf(
+                            Text.translatable("tooltip.additions.radius_mine.shovel_description", areaText)
+                                .formatted(Formatting.WHITE),
+                            Text.translatable("tooltip.additions.radius_mine.path_creation_description")
+                                .formatted(Formatting.WHITE),
+                            Text.translatable("tooltip.additions.radius_mine.sneak_description").formatted(Formatting.GRAY),
+                        ),
+                    )
+
+                val hammerLore =
+                    LoreComponent(
+                        listOf(
+                            Text.translatable("tooltip.additions.radius_mine.hammer_description", areaText)
+                                .formatted(Formatting.WHITE),
+                            Text.translatable("tooltip.additions.radius_mine.path_creation_description")
+                                .formatted(Formatting.WHITE),
+                            Text.translatable("tooltip.additions.radius_mine.sneak_description").formatted(Formatting.GRAY),
+                        ),
+                    )
+
+                val shovelSettings =
+                    Item.Settings().shovel(material, 1.5f, -3.0f).component(DataComponentTypes.LORE, shovelLore)
+                val hammerSettings =
+                    Item.Settings().pickaxe(material, 1f, -2.8f).component(DataComponentTypes.LORE, hammerLore)
 
                 val bigShovel =
                     RadiusMineItem(
