@@ -10,6 +10,7 @@ import de.additions.datagen.BlockTagGenerator
 import de.additions.datagen.ItemTagGenerator
 import de.additions.items.RadiusMineItem.Companion.RADIUS
 import de.additions.items.RadiusMineItem.Companion.materials
+import net.fabricmc.fabric.api.event.player.AttackBlockCallback
 import net.minecraft.block.*
 import net.minecraft.component.DataComponentTypes
 import net.minecraft.component.type.ToolComponent
@@ -54,6 +55,32 @@ class RadiusMineItem(
     settings: Settings,
 ) : Item(settings) {
     companion object {
+        init {
+            // Register the AttackBlockCallback to handle creative mode AoE mining.
+            AttackBlockCallback.EVENT.register { player, world, _, pos, _ ->
+                // Only run on the server and in creative mode.
+                // Survival is handled by postMine.
+                if (world.isClient || !player.isCreative) {
+                    return@register ActionResult.PASS
+                }
+
+                val stack = player.mainHandStack
+                val item = stack.item
+
+                // Check if the player is holding a RadiusMineItem.
+                if (item is RadiusMineItem) {
+                    val state = world.getBlockState(pos)
+
+                    item.postMine(stack, world, state, pos, player)
+                    // Let the original block be broken by the vanilla mechanic regardless.
+                    return@register ActionResult.PASS
+                }
+
+                // If not our tool, let the default action proceed.
+                ActionResult.PASS
+            }
+        }
+
         /** Multiplier applied to vanilla tool durability values. Applied when defining the ToolMaterial instance. */
         private const val DURABILITY_MULTIPLIER = 10.0f
 
@@ -162,7 +189,7 @@ class RadiusMineItem(
         )
 
     // TODO: Migrate tooltip handling to DataComponentTypes.LORE or a custom component for modern approach.
-    @Deprecated("Uses older tooltip system. Modern approach uses components.", ReplaceWith("Modern component-based tooltips"))
+    @Deprecated("Uses older tooltip system. Modern approach uses components.")
     override fun appendTooltip(
         stack: ItemStack,
         context: TooltipContext,
