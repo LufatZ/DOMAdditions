@@ -228,13 +228,23 @@ class RecipeGenerator(
                 Items.TORCH to "_from_torch",
                 Blocks.LANTERN.asItem() to "_from_lantern",
             )
-
+        val secondaryMaterial =
+            when (baseBlock) {
+                Blocks.NETHERITE_BLOCK -> Items.NETHERITE_INGOT
+                Blocks.COPPER_BLOCK -> Items.COPPER_INGOT
+                Blocks.IRON_BLOCK -> Items.IRON_INGOT
+                Blocks.GOLD_BLOCK -> Items.GOLD_INGOT
+                Blocks.DIAMOND_BLOCK -> Items.DIAMOND
+                Blocks.EMERALD_BLOCK -> Items.EMERALD
+                Blocks.AMETHYST_BLOCK -> Items.AMETHYST_SHARD
+                else -> baseBlock.asItem()
+            }
         for ((sourceItem, variantSuffix) in lanternSources) {
             createBlockRecipe(
                 lantern,
                 sourceItem,
                 1,
-                baseBlock.asItem(),
+                secondaryMaterial,
                 variantSuffix,
             )
         }
@@ -308,6 +318,7 @@ class RecipeGenerator(
         recipeVariant: String = "",
     ) {
         // Determine crafting pattern based on block type
+        // The order is important here, as Small/BigLantern are also instances of LanternBlock.
         val pattern =
             when (recipeBlock) {
                 is SlabBlock -> listOf("XXX") // Horizontal line for slabs
@@ -317,8 +328,13 @@ class RecipeGenerator(
                         "XX ",
                         "XXX",
                     )
-                is TrapdoorBlock -> listOf("XXX", "XXX") // 2-item horizontal line
-                is LanternBlock -> listOf("IX") // Special lantern pattern
+                is TrapdoorBlock -> listOf("XXX", "XXX") // 2-item horizontal line for trapdoors
+                // Redstone lanterns are a simple upgrade: normal lantern + redstone. The "IX" pattern creates a shapeless-like 2-item recipe.
+                // Custom lanterns with different sizes need unique recipes to avoid conflicts.
+                // 'I' is the frame material (e.g., iron ingot), 'X' is the light source (e.g., torch).
+                is SmallRedstoneLantern, is BigRedstoneLantern, is RedstoneLantern, is SmallLantern -> listOf("IX")
+                is BigLantern -> listOf("XI")
+                is LanternBlock -> listOf("X", "I")
                 else -> listOf("X") // Fallback: single item
             }
 
@@ -442,7 +458,7 @@ class RecipeGenerator(
         if (item is RadiusMineItem) {
             return when (item.effectiveBlocks.id) {
                 BlockTags.SHOVEL_MINEABLE.id -> listOf("XSX", "MSM", "XMX") // Shovel pattern
-                BlockTags.PICKAXE_MINEABLE.id -> listOf("MMX", "MSX", "XSX") // Pickaxe pattern
+                BlockTags.PICKAXE_MINEABLE.id -> listOf("XMX", "MSM", "XSX") // Pickaxe pattern
                 else -> {
                     logger.warn("Falling back to single item recipe, because no shape is defined for ${item.effectiveBlocks.id}")
                     listOf("X") // Fallback pattern
