@@ -154,25 +154,24 @@ class TranslationGenerator(
             val parentName = extractNameFromKey(parentBlockList[index].translationKey)
             val blockType =
                 when (block) {
-                    is StairsBlock -> "Stairs"
+                    is StairsBlock -> "Stair"
                     is SlabBlock -> "Slab"
                     is TrapdoorBlock -> "Trapdoor"
-                    is LanternBlock -> {
-                        var prefix = ""
-                        if (block is SmallLantern || block is SmallRedstoneLantern) {
-                            prefix += "Small "
-                        }
-                        if (block is BigLantern || block is BigRedstoneLantern) {
-                            prefix += "Big "
-                        }
-                        if (block is RedstoneLantern) {
-                            prefix += "Redstone "
-                        }
-                        prefix + "Lantern"
-                    }
+                    is LanternBlock -> "Lantern"
                     else -> "Block"
                 }
-            add(block.asItem().translationKey, "$parentName $blockType")
+            val prefix =
+                when (block) {
+                    is SmallLantern, is SmallRedstoneLantern -> "Small "
+                    is BigLantern, is BigRedstoneLantern -> "Big "
+                    else -> ""
+                }
+            val type =
+                when (block) {
+                    is RedstoneLantern -> "Redstone "
+                    else -> ""
+                }
+            add(block.asItem().translationKey, prefix + "$parentName " + type + blockType)
         }
     }
 }
