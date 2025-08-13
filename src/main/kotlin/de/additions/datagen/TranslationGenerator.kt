@@ -31,16 +31,40 @@ class TranslationGenerator(
         }
     }
 
-    private fun extractNameFromKey(translationKey: String): String =
-        translationKey
+    /**
+     * Erzeugt einen lesbaren Namen aus dem letzten Segment des translationKey.
+     * - Wandelt snake_case -> Title Case
+     * - Entfernt ggf. "Block"/"Item" Reste
+     * - Für ITEM-Keys: Normalisiert Materialbezeichnungen **nur für Werkzeuge**:
+     *   "Wood" -> "Wooden", "Gold" -> "Golden" (nur wenn das Item ein Werkzeug/Typ ist)
+     *
+     * Rationale: Vanilla verwendet unlogische, aber etablierte Patterns (z.B. "Wooden Shovel",
+     * "Golden Shovel" bei Tools; bei Blöcken bleibt "Gold" z.B. "Block of Gold").
+     */
+    private fun extractNameFromKey(translationKey: String): String {
+        val base = translationKey
             .split(".")
             .last()
             .split("_")
             .joinToString(" ") {
                 it.replaceFirstChar { it.uppercase() }
-            }.replace("Block", "")
-            .replace("Item", "")
+            }.replace(Regex("\\bBlock\\b"), "")
+            .replace(Regex("\\bItem\\b"), "")
             .trim()
+
+        if (translationKey.startsWith("item.")) {
+            val toolSuffixes = setOf("Shovel", "Hammer", "Pickaxe", "Axe", "Sword", "Hoe", "Spade", "Pick")
+            val lastWord = base.split(" ").lastOrNull() ?: ""
+
+            if (toolSuffixes.contains(lastWord)) {
+                return base
+                    .replace(Regex("\\bWood\\b"), "Wooden")
+                    .replace(Regex("\\bGold\\b"), "Golden")
+            }
+        }
+
+        return base
+    }
 
     override fun generateTranslations(
         registryLookup: RegistryWrapper.WrapperLookup,
@@ -65,8 +89,8 @@ class TranslationGenerator(
 
         add("tooltip.additions.radius_mine.shovel_description", "Mines a %s area of earth-like blocks.")
         add("tooltip.additions.radius_mine.hammer_description", "Mines a %s area of stone-like blocks.")
-        add("tooltip.additions.radius_mine.path_creation_description", "Right-click to create a path.")
-        add("tooltip.additions.radius_mine.sneak_description", "Sneak-use for single block action.")
+        add("tooltip.additions.radius_mine.path_creation_description", "Use to create a path.")
+        add("tooltip.additions.radius_mine.sneak_description", "Sneak-use to change path to dirt.")
 
         add("itemGroup.additions.blocks", "DayOfMind Blocks")
         add("itemGroup.additions.items", "DayOfMind Items")
@@ -108,24 +132,24 @@ class TranslationGenerator(
             "The settings listed here are fully developed and can be used safely.",
         )
         add("$configKey.EnabledInstruments.tooltip", "Enables the ability to craft instruments")
-        add("$configKey.EnabledShovelMixin", "Enable Shovel Mixin")
+        add("$configKey.EnabledShovelMixin", "Enable Shovel Path Toggle")
         add(
             "$configKey.EnabledShovelMixin.tooltip",
-            "Enables the ability to switch grass and dirt paths with a shovel",
+            "Allows toggling between Grass Block and Dirt Path with a shovel",
         )
         add("$configKey.EnabledBlockVariants", "Enable Block Variants")
         add(
             "$configKey.EnabledBlockVariants.tooltip",
             "Enables the ability to craft more block variants (stairs, slabs)",
         )
-        add("$configKey.EnabledLantern", "Enable Lantern")
+        add("$configKey.EnabledLantern", "Enable Lanterns")
         add("$configKey.EnabledLantern.tooltip", "Enables the ability to craft more lanterns")
-        add("$configKey.EnabledRedstoneLantern", "Enable Redstone Lantern")
+        add("$configKey.EnabledRedstoneLantern", "Enable Redstone Lanterns")
         add(
             "$configKey.EnabledRedstoneLantern.tooltip",
             "Enables the ability to craft redstone lanterns",
         )
-        add("$configKey.EnabledTranslation", "Enable Translation")
+        add("$configKey.EnabledTranslation", "Enable Translations")
         add(
             "$configKey.EnabledTranslation.tooltip",
             "Enables the automatic download of translations",
@@ -142,7 +166,7 @@ class TranslationGenerator(
             "$configKey.DetailedLogging.tooltip",
             "Enables detailed logging of this mod, such as translation downloads. You probably don't want to enable this because of log spamming.",
         )
-        add("$configKey.EnabledTrapdoor", "Enable Trapdoor")
+        add("$configKey.EnabledTrapdoor", "Enable Trapdoors")
         add("$configKey.EnabledTrapdoor.tooltip", "Enables the ability to craft more trapdoors")
     }
 
@@ -150,11 +174,13 @@ class TranslationGenerator(
         blockList: List<Block>,
         parentBlockList: List<Block>,
     ) {
+        val nounMaterials = setOf("Gold", "Iron", "Copper", "Diamond", "Emerald", "Netherite") // ggf. erweitern
+
         blockList.forEachIndexed { index, block ->
             val parentName = extractNameFromKey(parentBlockList[index].translationKey)
             val blockType =
                 when (block) {
-                    is StairsBlock -> "Stair"
+                    is StairsBlock -> "Stairs" //Strictly speaking, this is not logical. The reason is linguistic habit: ‘Stairs’ is often a singular word in English, similar to ‘scissors’.
                     is SlabBlock -> "Slab"
                     is TrapdoorBlock -> "Trapdoor"
                     is LanternBlock -> "Lantern"
@@ -171,7 +197,12 @@ class TranslationGenerator(
                     is RedstoneLantern -> "Redstone "
                     else -> ""
                 }
-            add(block.asItem().translationKey, prefix + "$parentName " + type + blockType)
+            val name = if (blockType in listOf("Stairs", "Slab", "Trapdoor") && parentName in nounMaterials) {
+                prefix + type + blockType.dropLast(if (blockType.endsWith("s")) 1 else 0) + " of " + parentName
+            } else {
+                prefix + parentName + " " + type + blockType
+            }
+            add(block.asItem().translationKey, name)
         }
     }
 }
