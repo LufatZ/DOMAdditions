@@ -8,6 +8,7 @@ import de.additions.items.RadiusMineItem
 import eu.midnightdust.lib.config.MidnightConfig
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback
+import net.fabricmc.loader.api.FabricLoader
 import net.fabricmc.loader.impl.FabricLoaderImpl
 import net.minecraft.component.DataComponentTypes
 import net.minecraft.util.ActionResult
@@ -21,8 +22,9 @@ import org.slf4j.LoggerFactory
  * - Logging debug information in a development environment
  */
 object Additions : ModInitializer {
-    val logger = LoggerFactory.getLogger("additions")
     const val MODID = "additions"
+    val logger = LoggerFactory.getLogger(MODID)
+    val logging = AdditionsConfig.DetailedLogging || FabricLoader.getInstance().isDevelopmentEnvironment
 
     override fun onInitialize() {
         logger.info("Enjoy DayOfMind")

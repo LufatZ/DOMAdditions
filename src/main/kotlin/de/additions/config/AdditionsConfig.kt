@@ -4,11 +4,6 @@ import eu.midnightdust.lib.config.MidnightConfig
 
 class AdditionsConfig : MidnightConfig() {
     companion object {
-        enum class TranslationVersion {
-            CROWDIN,
-            OXFATECH,
-            CUSTOM,
-        }
 
         @JvmField
         @Comment(category = "about", centered = true)
@@ -44,11 +39,7 @@ class AdditionsConfig : MidnightConfig() {
 
         @JvmField
         @Entry(category = "features")
-        var TranslationUrl: TranslationVersion = TranslationVersion.OXFATECH
-
-        @JvmField
-        @Entry(category = "features")
-        var TranslationUrlCustom: String = "https://example.com/translationFileName.zip"
+        var TranslationCounter: Int = 3
 
         @JvmField
         @Entry(category = "features")

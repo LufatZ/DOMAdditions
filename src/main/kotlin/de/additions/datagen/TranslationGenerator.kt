@@ -32,14 +32,14 @@ class TranslationGenerator(
     }
 
     /**
-     * Erzeugt einen lesbaren Namen aus dem letzten Segment des translationKey.
-     * - Wandelt snake_case -> Title Case
-     * - Entfernt ggf. "Block"/"Item" Reste
-     * - Für ITEM-Keys: Normalisiert Materialbezeichnungen **nur für Werkzeuge**:
-     *   "Wood" -> "Wooden", "Gold" -> "Golden" (nur wenn das Item ein Werkzeug/Typ ist)
+     * Creates a readable name from the last segment of the translationKey.
+     * - Converts snake_case -> Title Case
+     * - Removes any remaining “Block”/“Item”
+     * - For ITEM keys: Normalizes material names **only for tools**:
+     *   “Wood” -> “Wooden”, ‘Gold’ -> “Golden” (only if the item is a tool/type)
      *
-     * Rationale: Vanilla verwendet unlogische, aber etablierte Patterns (z.B. "Wooden Shovel",
-     * "Golden Shovel" bei Tools; bei Blöcken bleibt "Gold" z.B. "Block of Gold").
+     * Rationale: Vanilla uses illogical but established patterns (e.g. “Wooden Shovel”,
+     * “Golden Shovel” for tools; for blocks, ‘Gold’ remains “Block of Gold”, for example).
      */
     private fun extractNameFromKey(translationKey: String): String {
         val base = translationKey
@@ -153,6 +153,11 @@ class TranslationGenerator(
         add(
             "$configKey.EnabledTranslation.tooltip",
             "Enables the automatic download of translations",
+        )
+        add("$configKey.TranslationCounter", "Starts for translation download")
+        add(
+            "$configKey.TranslationCounter.tooltip",
+            "enter the number of game starts at which you'd like to pause translation updates.",
         )
         add("$configKey.TranslationUrl", "Translation Source")
         add("$configKey.TranslationUrl.tooltip", "Select the source of the translations")
