@@ -4,14 +4,10 @@ import de.additions.Additions.MODID
 import de.additions.Additions.logger
 import de.additions.items.ItemRegistry.registeredItems
 import de.additions.items.RadiusMineItem
-import net.minecraft.client.data.ItemModelGenerator
-import net.minecraft.client.data.ItemModels
-import net.minecraft.client.data.Model
-import net.minecraft.client.data.TextureKey
-import net.minecraft.client.data.TextureMap
+import net.minecraft.client.data.*
 import net.minecraft.registry.tag.BlockTags
 import net.minecraft.util.Identifier
-import java.util.Optional
+import java.util.*
 
 object ItemModelsGenerator {
 
@@ -51,6 +47,7 @@ object ItemModelsGenerator {
         val templateModelId = when(item.effectiveBlocks) {
             BlockTags.PICKAXE_MINEABLE -> Identifier.of(MODID, "item/template_hammer")
             BlockTags.SHOVEL_MINEABLE -> Identifier.of(MODID, "item/template_shovel")
+            BlockTags.AXE_MINEABLE -> Identifier.of(MODID, "item/template_axe")
             else -> Identifier.of(MODID, "item/template_hammer").also {
                 logger.warn("Unknown effective block tag: ${item.effectiveBlocks}")
             }

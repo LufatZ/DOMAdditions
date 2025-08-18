@@ -2,11 +2,12 @@ package de.additions.items
 
 import de.additions.Additions.MODID
 import de.additions.Additions.logger
-import de.additions.config.AdditionsConfig
+import de.additions.Additions.logging
 import de.additions.itemGroups.ItemGroupRegistry
+import de.additions.items.ItemRegistry.addedItems
+import de.additions.items.ItemRegistry.registeredItems
 import de.additions.items.RadiusMineItem.Companion.RADIUS
 import de.additions.items.RadiusMineItem.Companion.materials
-import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.component.DataComponentTypes
 import net.minecraft.component.type.LoreComponent
 import net.minecraft.item.Item
@@ -38,7 +39,6 @@ object ItemRegistry {
      * The key is the item's intended name (e.g., "big_diamond_shovel"), and the value is the [Item] instance.
      */
     private var addedItems: MutableMap<String, Item> = mutableMapOf()
-    private val detailedLogging = AdditionsConfig.DetailedLogging || FabricLoader.getInstance().isDevelopmentEnvironment
 
     /**
      * Initializes the item registration process.
@@ -67,7 +67,7 @@ object ItemRegistry {
                 Registry.register(Registries.ITEM, RegistryKey.of(RegistryKeys.ITEM, Identifier.of(MODID, itemName)), item)
                 registeredItems.add(ItemStack(item))
             }.onSuccess {
-                if (detailedLogging) {
+                if (logging) {
                     logger.info("Registered added item: $itemName")
                 }
             }.onFailure { e ->
@@ -109,11 +109,23 @@ object ItemRegistry {
                             Text.translatable("tooltip.additions.radius_mine.sneak_description").formatted(Formatting.GRAY),
                         ),
                     )
+                val axeLore =
+                    LoreComponent(
+                        listOf(
+                            Text.translatable("tooltip.additions.radius_mine.axe_description", areaText)
+                                .formatted(Formatting.WHITE),
+                            Text.translatable("tooltip.additions.radius_mine.stripped_wood_creation_description")
+                                .formatted(Formatting.WHITE),
+                            Text.translatable("tooltip.additions.radius_mine.sneak_description").formatted(Formatting.GRAY),
+                        ),
+                    )
 
                 val shovelSettings =
                     Item.Settings().shovel(material, 1.5f, -3.0f).component(DataComponentTypes.LORE, shovelLore)
                 val hammerSettings =
                     Item.Settings().pickaxe(material, 1f, -2.8f).component(DataComponentTypes.LORE, hammerLore)
+                val axeSettings =
+                    Item.Settings().axe(material, 6f, -3.2f).component(DataComponentTypes.LORE, axeLore)
 
                 val bigShovel =
                     RadiusMineItem(
@@ -127,11 +139,18 @@ object ItemRegistry {
                         BlockTags.PICKAXE_MINEABLE,
                         hammerSettings.registryKey(RegistryKey.of(RegistryKeys.ITEM, Identifier.of(MODID, "${materialName}_hammer"))),
                     )
+                val axe =
+                    RadiusMineItem(
+                        material,
+                        BlockTags.AXE_MINEABLE,
+                        axeSettings.registryKey(RegistryKey.of(RegistryKeys.ITEM, Identifier.of(MODID, "big_${materialName}_axe"))),
+                    )
 
                 addedItems["big_${materialName}_shovel"] = bigShovel
                 addedItems["${materialName}_hammer"] = hammer
+                addedItems["big_${materialName}_axe"] = axe
 
-                if (detailedLogging) {
+                if (logging) {
                     logger.info("Added big shovel and hammer for material: $materialName - not registered yet")
                 }
             }.onFailure { e ->

@@ -17,12 +17,7 @@ import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider
 import net.minecraft.advancement.criterion.InventoryChangedCriterion
 import net.minecraft.advancement.criterion.RecipeUnlockedCriterion
-import net.minecraft.block.Block
-import net.minecraft.block.Blocks
-import net.minecraft.block.LanternBlock
-import net.minecraft.block.SlabBlock
-import net.minecraft.block.StairsBlock
-import net.minecraft.block.TrapdoorBlock
+import net.minecraft.block.*
 import net.minecraft.data.recipe.RecipeExporter
 import net.minecraft.data.recipe.RecipeGenerator
 import net.minecraft.data.recipe.ShapedRecipeJsonBuilder
@@ -459,6 +454,7 @@ class RecipeGenerator(
             return when (item.effectiveBlocks.id) {
                 BlockTags.SHOVEL_MINEABLE.id -> listOf("XSX", "MSM", "XMX") // Shovel pattern
                 BlockTags.PICKAXE_MINEABLE.id -> listOf("XMX", "MSM", "XSX") // Pickaxe pattern
+                BlockTags.AXE_MINEABLE.id -> listOf("MMX", "MSX", "XSX") // Pickaxe pattern
                 else -> {
                     logger.warn("Falling back to single item recipe, because no shape is defined for ${item.effectiveBlocks.id}")
                     listOf("X") // Fallback pattern
