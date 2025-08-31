@@ -6,13 +6,13 @@ import de.additions.Additions.MODID
 import de.additions.Additions.logger
 import de.additions.blocks.*
 import de.additions.items.ItemRegistry
-import de.additions.items.RadiusMineItem
-import de.additions.items.RadiusMineItem.Companion.C_DIAMOND
-import de.additions.items.RadiusMineItem.Companion.C_GOLD
-import de.additions.items.RadiusMineItem.Companion.C_IRON
-import de.additions.items.RadiusMineItem.Companion.C_NETHERITE
-import de.additions.items.RadiusMineItem.Companion.C_STONE
-import de.additions.items.RadiusMineItem.Companion.C_WOOD
+import de.additions.items.ToolItem
+import de.additions.items.ToolItem.Companion.C_DIAMOND
+import de.additions.items.ToolItem.Companion.C_GOLD
+import de.additions.items.ToolItem.Companion.C_IRON
+import de.additions.items.ToolItem.Companion.C_NETHERITE
+import de.additions.items.ToolItem.Companion.C_STONE
+import de.additions.items.ToolItem.Companion.C_WOOD
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider
 import net.minecraft.advancement.criterion.InventoryChangedCriterion
@@ -42,7 +42,7 @@ import java.util.concurrent.CompletableFuture
  * Key Responsibilities:
  * - Generate recipes for decorative blocks (stairs, slabs, trapdoors)
  * - Create recipes for normal and redstone lantern variants
- * - Generate tool recipes for RadiusMineItem instances
+ * - Generate tool recipes for ToolItem instances
  * - Handle recipe variants with different base materials
  * - Create vanilla override recipes like the name tag
  *
@@ -388,7 +388,7 @@ class RecipeGenerator(
      */
     private fun createItemRecipe(item: Item) {
         // Skip if not a supported item type
-        if (item !is RadiusMineItem) {
+        if (item !is ToolItem) {
             logger.warn(
                 "Can't create recipe for $item because there is no preset for it. " +
                     "If this item can't be crafted, ignore this warning.",
@@ -405,7 +405,7 @@ class RecipeGenerator(
         // Get item registry lookup
         val itemLookup = lookUp.getOrThrow(RegistryKeys.ITEM)
 
-        // Create shaped recipe for the radius mining tool
+        // Create shaped recipe for mining tools
         ShapedRecipeJsonBuilder
             .create(
                 itemLookup,
@@ -450,7 +450,7 @@ class RecipeGenerator(
      * @return List of strings representing the crafting pattern
      */
     private fun getItemRecipeShape(item: Item): List<String> {
-        if (item is RadiusMineItem) {
+        if (item is ToolItem) {
             return when (item.effectiveBlocks.id) {
                 BlockTags.SHOVEL_MINEABLE.id -> listOf("XSX", "MSM", "XMX") // Shovel pattern
                 BlockTags.PICKAXE_MINEABLE.id -> listOf("XMX", "MSM", "XSX") // Pickaxe pattern
@@ -473,7 +473,7 @@ class RecipeGenerator(
      * @return Ingredient representing the additional crafting material
      */
     private fun getAdditionalMaterial(item: Item): Ingredient? {
-        if (item is RadiusMineItem) {
+        if (item is ToolItem) {
             return when (item.material) {
                 C_WOOD -> Ingredient.ofItems(Items.STRING)
                 C_STONE -> Ingredient.ofItems(Items.DEEPSLATE)
@@ -493,11 +493,11 @@ class RecipeGenerator(
     /**
      * Adds a crafting criterion based on having the material used in the tool.
      *
-     * @param item The RadiusMineItem to add criterion for
+     * @param item The ToolItem to add criterion for
      * @param itemLookup The item registry lookup
      */
     private fun ShapedRecipeJsonBuilder.addMaterialCriterion(
-        item: RadiusMineItem,
+        item: ToolItem,
         itemLookup: RegistryWrapper<Item>,
     ) {
         criterion(

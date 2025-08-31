@@ -4,10 +4,10 @@ import de.additions.Additions.MODID
 import de.additions.Additions.logger
 import de.additions.Additions.logging
 import de.additions.itemGroups.ItemGroupRegistry
-import de.additions.items.ItemRegistry.addedItems
-import de.additions.items.ItemRegistry.registeredItems
 import de.additions.items.RadiusMineItem.Companion.RADIUS
-import de.additions.items.RadiusMineItem.Companion.materials
+import de.additions.items.ToolItem.Companion.MiningTypes
+import de.additions.items.ToolItem.Companion.ToolTypes
+import de.additions.items.ToolItem.Companion.materials
 import net.minecraft.component.DataComponentTypes
 import net.minecraft.component.type.LoreComponent
 import net.minecraft.item.Item
@@ -24,139 +24,169 @@ import net.minecraft.util.Identifier
 
 /**
  * Manages the registration of all custom items for the mod.
- * This object is responsible for creating, registering, and tracking all new items,
- * ensuring they are correctly added to the game and creative item groups.
+ *
+ * This object serves as the central registry for all custom items, handling their creation,
+ * registration with Minecraft's item registry, and integration into the game's creative tabs.
+ * It supports both radius mining tools and vein mining tools across different materials.
  */
 object ItemRegistry {
     /**
-     * A list of [ItemStack]s for all successfully registered items.
-     * This list is populated during registration and used to add the items to the appropriate creative tab.
+     * A mutable list of [ItemStack]s for all successfully registered items.
+     *
+     * This collection is populated during the registration process and serves as a reference
+     * for adding items to creative tabs. Each ItemStack represents a registered custom tool
+     * that will be available to players in creative mode.
      */
     val registeredItems: MutableList<ItemStack> = mutableListOf()
 
     /**
-     * A temporary map holding items that have been created but not yet registered.
-     * The key is the item's intended name (e.g., "big_diamond_shovel"), and the value is the [Item] instance.
-     */
-    private var addedItems: MutableMap<String, Item> = mutableMapOf()
-
-    /**
-     * Initializes the item registration process.
-     * This function orchestrates the creation of tool items, registers them with the game,
-     * and then adds them to the creative item group.
+     * Initializes the complete item registration process.
+     *
+     * This is the main entry point for item registration. It orchestrates the creation
+     * of all custom tool items, registers them with Minecraft's item registry, and
+     * integrates them into the appropriate creative item group. The process includes:
+     * 1. Creating tool items with their respective properties
+     * 2. Registering items with the game
+     * 3. Adding items to the creative tab after the diamond pickaxe
      */
     fun registerItems() {
         logger.info("Adding items")
         addToolItems()
         logger.info("Registering added items")
-        registerAddedItems(addedItems)
         logger.info("Finished item registration with ${registeredItems.size} items")
         ItemGroupRegistry.registerItemsAfterCommonParent(registeredItems, Items.DIAMOND_PICKAXE)
     }
 
     /**
-     * Registers the items held in the [addedItems] map.
-     * It iterates through the map, registers each item with Minecraft's item registry,
-     * and adds a corresponding [ItemStack] to the [registeredItems] list.
+     * Registers tool items for all available materials with specified properties.
      *
-     * @param items A map of item names to [Item] instances to be registered.
+     * This function creates and registers tools for each material defined in the materials map.
+     * It handles the complete registration process including setting up tool properties,
+     * tooltips, effective blocks, and registry keys.
+     *
+     * @param placeholderId The template ID string where "%material" will be replaced with material names
+     * @param tooltip The [LoreComponent] containing the tool's tooltip/description text
+     * @param damage The base attack damage value for the tool
+     * @param speed The attack speed modifier for the tool (negative values make it slower)
+     * @param type The [ToolTypes] enum defining what kind of tool this is (shovel, pickaxe, axe, hoe)
+     * @param miningType The [MiningTypes] enum defining the mining behavior (radius or vein mining)
      */
-    private fun registerAddedItems(items: Map<String, Item>) {
-        items.forEach { (itemName, item) ->
+    private fun registerToolItems(placeholderId: String, tooltip: LoreComponent, damage: Float, speed: Float, type: ToolTypes, miningType: MiningTypes) {
+        materials.forEach { (materialName, material) ->
             runCatching {
-                Registry.register(Registries.ITEM, RegistryKey.of(RegistryKeys.ITEM, Identifier.of(MODID, itemName)), item)
-                registeredItems.add(ItemStack(item))
-            }.onSuccess {
+                // Generate the unique item ID by replacing the material placeholder
+                val id = placeholderId.replace("%material", materialName)
+
+                // Select the appropriate tool function based on tool type
+                val toolFunction = when (type) {
+                    ToolTypes.SHOVEL -> Item.Settings::shovel
+                    ToolTypes.PICKAXE -> Item.Settings::pickaxe
+                    ToolTypes.AXE -> Item.Settings::axe
+                    ToolTypes.HOE -> Item.Settings::hoe
+                }
+
+                // Select the appropriate tool class based on mining type
+                val toolClass = when (miningType) {
+                    MiningTypes.RADIUS_MINING -> ::RadiusMineItem
+                    MiningTypes.VEIN_MINING -> ::VeinMineItem
+                }
+
+                // Determine which blocks this tool can effectively mine
+                val effectiveBlocks = when (type) {
+                    ToolTypes.SHOVEL -> BlockTags.SHOVEL_MINEABLE
+                    ToolTypes.PICKAXE -> BlockTags.PICKAXE_MINEABLE
+                    ToolTypes.AXE -> BlockTags.AXE_MINEABLE
+                    ToolTypes.HOE -> BlockTags.HOE_MINEABLE
+                }
+
+                // Configure the tool settings with material properties, damage, speed, and tooltip
+                val toolSettings = toolFunction(Item.Settings(), material, damage, speed)
+                    .component(DataComponentTypes.LORE, tooltip)
+
+                // Create the registry key for this specific tool
+                val registryKey = RegistryKey.of(RegistryKeys.ITEM, Identifier.of(MODID, id))
+
+                // Instantiate the tool with all configured properties
+                val tool = toolClass(material, effectiveBlocks, toolSettings.registryKey(registryKey))
+
+                // Register the tool with Minecraft's item registry
+                Registry.register(Registries.ITEM, RegistryKey.of(RegistryKeys.ITEM, Identifier.of(MODID, id)), tool)
+
+                // Add the tool to our list of registered items for creative tab integration
+                registeredItems.add(ItemStack(tool))
+
+                // Log successful registration if logging is enabled
                 if (logging) {
-                    logger.info("Registered added item: $itemName")
+                    logger.info("registered tool item: $id")
                 }
             }.onFailure { e ->
-                logger.error("Failed to register added item: $itemName")
+                // Log any registration failures with material context and full stack trace
+                logger.error("Failed to register tool items for material: $materialName")
                 logger.error(e.stackTraceToString())
             }
         }
     }
 
     /**
-     * Creates all tool items based on the defined materials.
-     * This function iterates through the [materials] list from [RadiusMineItem] and creates
-     * a "big shovel" and a "hammer" for each material, adding them to the [addedItems] map.
+     * Creates and registers all custom tool items with their specific properties.
+     *
+     * This function defines and creates three types of custom tools:
+     * 1. Big Shovels - Radius mining shovels that mine in a 5x5 area and can create paths
+     * 2. Hammers - Radius mining pickaxes that mine in a 5x5 area and can create paths
+     * 3. Big Axes - Vein mining axes that can strip wood and mine connected blocks
+     *
+     * Each tool type is created for all available materials with appropriate damage,
+     * speed, and tooltip configurations. The tooltips include localized descriptions
+     * of the tool's special abilities and usage instructions.
      */
     private fun addToolItems() {
-        materials.forEach { (materialName, material) ->
-            runCatching {
-                val diameter = 2 * RADIUS + 1
-                val areaText = Text.literal("${diameter}x${diameter}").formatted(Formatting.GRAY)
+        // Calculate the mining area dimensions based on the radius constant
+        val diameter = 2 * RADIUS + 1
+        val areaText = Text.literal("${diameter}x${diameter}").formatted(Formatting.GRAY)
 
-                val shovelLore =
-                    LoreComponent(
-                        listOf(
-                            Text.translatable("tooltip.additions.radius_mine.shovel_description", areaText)
-                                .formatted(Formatting.WHITE),
-                            Text.translatable("tooltip.additions.radius_mine.path_creation_description")
-                                .formatted(Formatting.WHITE),
-                            Text.translatable("tooltip.additions.radius_mine.sneak_description").formatted(Formatting.GRAY),
-                        ),
-                    )
+        // Create tooltip for big shovels with area mining and path creation abilities
+        val shovelLore =
+            LoreComponent(
+                listOf(
+                    Text.translatable("tooltip.additions.radius_mine.shovel_description", areaText)
+                        .formatted(Formatting.WHITE),
+                    Text.translatable("tooltip.additions.radius_mine.path_creation_description")
+                        .formatted(Formatting.WHITE),
+                    Text.translatable("tooltip.additions.radius_mine.sneak_description").formatted(Formatting.GRAY),
+                ),
+            )
 
-                val hammerLore =
-                    LoreComponent(
-                        listOf(
-                            Text.translatable("tooltip.additions.radius_mine.hammer_description", areaText)
-                                .formatted(Formatting.WHITE),
-                            Text.translatable("tooltip.additions.radius_mine.path_creation_description")
-                                .formatted(Formatting.WHITE),
-                            Text.translatable("tooltip.additions.radius_mine.sneak_description").formatted(Formatting.GRAY),
-                        ),
-                    )
-                val axeLore =
-                    LoreComponent(
-                        listOf(
-                            Text.translatable("tooltip.additions.radius_mine.axe_description", areaText)
-                                .formatted(Formatting.WHITE),
-                            Text.translatable("tooltip.additions.radius_mine.stripped_wood_creation_description")
-                                .formatted(Formatting.WHITE),
-                            Text.translatable("tooltip.additions.radius_mine.sneak_description").formatted(Formatting.GRAY),
-                        ),
-                    )
+        // Create tooltip for hammers with area mining and path creation abilities
+        val hammerLore =
+            LoreComponent(
+                listOf(
+                    Text.translatable("tooltip.additions.radius_mine.hammer_description", areaText)
+                        .formatted(Formatting.WHITE),
+                    Text.translatable("tooltip.additions.radius_mine.path_creation_description")
+                        .formatted(Formatting.WHITE),
+                    Text.translatable("tooltip.additions.radius_mine.sneak_description").formatted(Formatting.GRAY),
+                ),
+            )
 
-                val shovelSettings =
-                    Item.Settings().shovel(material, 1.5f, -3.0f).component(DataComponentTypes.LORE, shovelLore)
-                val hammerSettings =
-                    Item.Settings().pickaxe(material, 1f, -2.8f).component(DataComponentTypes.LORE, hammerLore)
-                val axeSettings =
-                    Item.Settings().axe(material, 6f, -3.2f).component(DataComponentTypes.LORE, axeLore)
+        // Create tooltip for big axes with vein mining and wood stripping abilities
+        val axeLore =
+            LoreComponent(
+                listOf(
+                    Text.translatable("tooltip.additions.radius_mine.axe_description", areaText)
+                        .formatted(Formatting.WHITE),
+                    Text.translatable("tooltip.additions.radius_mine.stripped_wood_creation_description")
+                        .formatted(Formatting.WHITE),
+                    Text.translatable("tooltip.additions.radius_mine.sneak_description").formatted(Formatting.GRAY),
+                ),
+            )
 
-                val bigShovel =
-                    RadiusMineItem(
-                        material,
-                        BlockTags.SHOVEL_MINEABLE,
-                        shovelSettings.registryKey(RegistryKey.of(RegistryKeys.ITEM, Identifier.of(MODID, "big_${materialName}_shovel"))),
-                    )
-                val hammer =
-                    RadiusMineItem(
-                        material,
-                        BlockTags.PICKAXE_MINEABLE,
-                        hammerSettings.registryKey(RegistryKey.of(RegistryKeys.ITEM, Identifier.of(MODID, "${materialName}_hammer"))),
-                    )
-                val axe =
-                    RadiusMineItem(
-                        material,
-                        BlockTags.AXE_MINEABLE,
-                        axeSettings.registryKey(RegistryKey.of(RegistryKeys.ITEM, Identifier.of(MODID, "big_${materialName}_axe"))),
-                    )
+        // Register big shovels: moderate damage (1.5), slow speed (-3.0), radius mining
+        registerToolItems("big_%material_shovel", shovelLore, 1.5f, -3.0f, ToolTypes.SHOVEL, MiningTypes.RADIUS_MINING)
 
-                addedItems["big_${materialName}_shovel"] = bigShovel
-                addedItems["${materialName}_hammer"] = hammer
-                addedItems["big_${materialName}_axe"] = axe
+        // Register hammers: lower damage (1.0), slightly faster than shovels (-2.8), radius mining
+        registerToolItems("%material_hammer", hammerLore, 1f, -2.8f, ToolTypes.PICKAXE, MiningTypes.RADIUS_MINING)
 
-                if (logging) {
-                    logger.info("Added big shovel and hammer for material: $materialName - not registered yet")
-                }
-            }.onFailure { e ->
-                logger.error("Failed to create tool items for material: $materialName")
-                logger.error(e.stackTraceToString())
-            }
-        }
+        // Register big axes: high damage (6.0), slowest speed (-3.2), vein mining for tree cutting
+        registerToolItems("big_%material_axe", axeLore, 6f, -3.2f, ToolTypes.AXE, MiningTypes.VEIN_MINING)
     }
 }

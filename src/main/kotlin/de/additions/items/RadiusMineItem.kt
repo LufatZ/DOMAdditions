@@ -2,25 +2,21 @@
 
 package de.additions.items
 
-import de.additions.Additions.logger
 import de.additions.blocks.BlockRegistry
 import de.additions.blocks.BlockRegistry.DIRT_PATH_SLAB
 import de.additions.blocks.BlockRegistry.DIRT_PATH_STAIR
 import de.additions.datagen.BlockTagGenerator
-import de.additions.datagen.ItemTagGenerator
 import de.additions.items.RadiusMineItem.Companion.RADIUS
-import de.additions.items.RadiusMineItem.Companion.materials
-import net.fabricmc.fabric.api.event.player.AttackBlockCallback
 import net.minecraft.block.*
 import net.minecraft.component.DataComponentTypes
 import net.minecraft.component.type.ToolComponent
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.item.*
-import net.minecraft.recipe.Ingredient
-import net.minecraft.registry.RegistryEntryLookup
+import net.minecraft.item.Item
+import net.minecraft.item.ItemStack
+import net.minecraft.item.ItemUsageContext
+import net.minecraft.item.ToolMaterial
 import net.minecraft.registry.tag.BlockTags
-import net.minecraft.registry.tag.ItemTags
 import net.minecraft.registry.tag.TagKey
 import net.minecraft.sound.SoundCategory
 import net.minecraft.sound.SoundEvents
@@ -44,197 +40,20 @@ import java.util.*
  * @param settings The base [Item.Settings] for this item. MUST be pre-configured with appropriate components
  * (like [DataComponentTypes.TOOL], [DataComponentTypes.ATTRIBUTE_MODIFIERS]) for base tool functionality.
  */
-class RadiusMineItem(
-    val material: ToolMaterial,
-    val effectiveBlocks: TagKey<Block>,
+class RadiusMineItem(material: ToolMaterial,
+    effectiveBlocks: TagKey<Block>,
     settings: Settings,
-) : Item(settings) {
-    companion object {
-        init {
-            // Register the AttackBlockCallback to handle creative mode AoE mining.
-            AttackBlockCallback.EVENT.register { player, world, _, pos, _ ->
-                // Only run on the server and in creative mode.
-                // Survival is handled by postMine.
-                if (world.isClient || !player.isCreative) {
-                    return@register ActionResult.PASS
-                }
+) : ToolItem(material, effectiveBlocks, settings) {
+companion object {
+    /** The radius for the Area of Effect (AoE) mining and path creation (0=1x1, 1=3x3, 2=5x5 -> 5x5 area). */
+    const val RADIUS = 2
 
-                val stack = player.mainHandStack
-                val item = stack.item
+    /** Cooldown in Ticks (20 Ticks = 1 Second) for the path creation ability. */
+    private const val PATH_CREATION_COOLDOWN = 2
 
-                // Check if the player is holding a RadiusMineItem.
-                if (item is RadiusMineItem) {
-                    val state = world.getBlockState(pos)
-
-                    item.postMine(stack, world, state, pos, player)
-                    // Let the original block be broken by the vanilla mechanic regardless.
-                    return@register ActionResult.PASS
-                }
-
-                // If not our tool, let the default action proceed.
-                ActionResult.PASS
-            }
-        }
-
-        /** Multiplier applied to vanilla tool durability values. Applied when defining the ToolMaterial instance. */
-        private const val DURABILITY_MULTIPLIER = 10.0f
-
-        /** The radius for the Area of Effect (AoE) mining and path creation (0=1x1, 1=3x3, 2=5x5 -> 5x5 area). */
-        const val RADIUS = 2
-
-        /** Cooldown in Ticks (20 Ticks = 1 Second) for the path creation ability. */
-        private const val PATH_CREATION_COOLDOWN = 2
-
-        /** Map to store the last usage time of the path creation ability per player UUID. */
-        private val lastPathCreationTime = mutableMapOf<UUID, Long>()
-
-        // --- Custom Tool Materials with Multiplied Durability ---
-        val C_WOOD =
-            ToolMaterial(
-                BlockTags.INCORRECT_FOR_WOODEN_TOOL, // Use vanilla tag directly
-                (ToolMaterial.WOOD.durability() * DURABILITY_MULTIPLIER).toInt(), // Use vanilla instance and method
-                ToolMaterial.WOOD.speed(),
-                ToolMaterial.WOOD.attackDamageBonus(),
-                ToolMaterial.WOOD.enchantmentValue(),
-                ToolMaterial.WOOD.repairItems(), // Use vanilla tag directly
-            )
-
-        val C_STONE =
-            ToolMaterial(
-                BlockTags.INCORRECT_FOR_STONE_TOOL,
-                (ToolMaterial.STONE.durability() * DURABILITY_MULTIPLIER).toInt(),
-                ToolMaterial.STONE.speed(),
-                ToolMaterial.STONE.attackDamageBonus(),
-                ToolMaterial.STONE.enchantmentValue(),
-                ToolMaterial.STONE.repairItems(),
-            )
-
-        val C_IRON =
-            ToolMaterial(
-                BlockTags.INCORRECT_FOR_IRON_TOOL,
-                (ToolMaterial.IRON.durability() * DURABILITY_MULTIPLIER).toInt(),
-                ToolMaterial.IRON.speed(),
-                ToolMaterial.IRON.attackDamageBonus(),
-                ToolMaterial.IRON.enchantmentValue(),
-                ToolMaterial.IRON.repairItems(),
-            )
-
-        val C_DIAMOND =
-            ToolMaterial(
-                BlockTags.INCORRECT_FOR_DIAMOND_TOOL,
-                (ToolMaterial.DIAMOND.durability() * DURABILITY_MULTIPLIER).toInt(),
-                ToolMaterial.DIAMOND.speed(),
-                ToolMaterial.DIAMOND.attackDamageBonus(),
-                ToolMaterial.DIAMOND.enchantmentValue(),
-                ToolMaterial.DIAMOND.repairItems(),
-            )
-
-        val C_GOLD =
-            ToolMaterial(
-                BlockTags.INCORRECT_FOR_GOLD_TOOL,
-                (ToolMaterial.GOLD.durability() * DURABILITY_MULTIPLIER).toInt(),
-                ToolMaterial.GOLD.speed(),
-                ToolMaterial.GOLD.attackDamageBonus(),
-                ToolMaterial.GOLD.enchantmentValue(),
-                ToolMaterial.GOLD.repairItems(),
-            )
-
-        val C_NETHERITE =
-            ToolMaterial(
-                BlockTags.INCORRECT_FOR_NETHERITE_TOOL,
-                (ToolMaterial.NETHERITE.durability() * DURABILITY_MULTIPLIER).toInt(),
-                ToolMaterial.NETHERITE.speed(),
-                ToolMaterial.NETHERITE.attackDamageBonus(),
-                ToolMaterial.NETHERITE.enchantmentValue(),
-                ToolMaterial.NETHERITE.repairItems(),
-            )
-
-        /** Map associating string identifiers with their corresponding custom [ToolMaterial] instances. Useful for registration or data generation. */
-        val materials: Map<String, ToolMaterial> =
-            mapOf(
-                "wood" to C_WOOD,
-                "stone" to C_STONE,
-                "iron" to C_IRON,
-                "diamond" to C_DIAMOND,
-                "gold" to C_GOLD,
-                "netherite" to C_NETHERITE,
-            )
-    }
-
-    private val unknownMaterialErrorMsg = "Fallback -> Unknown material used in RadiusMineItem: $material"
-
-    // --- Material Helper Functions ---
-
-    /**
-     * Determines the appropriate crafting ingredient (tag or specific item) based on the tool's material.
-     * Logs a warning if the material is unrecognized.
-     * @return A [Pair] where the first element is a [TagKey]<[Item]>? and the second is an [Item]?. One should be non-null.
-     */
-    fun getCraftingTagOrItem(): Pair<TagKey<Item>?, Item?> =
-        when (material) {
-            C_WOOD -> Pair(ItemTags.PLANKS, null)
-            C_STONE -> Pair(ItemTagGenerator.stonesTag, null) // Used in ItemTagGenerator
-            C_IRON -> Pair(null, Items.IRON_INGOT)
-            C_DIAMOND -> Pair(null, Items.DIAMOND)
-            C_GOLD -> Pair(null, Items.GOLD_INGOT)
-            C_NETHERITE -> Pair(null, Items.NETHERITE_INGOT)
-            else -> {
-                logger.warn("$unknownMaterialErrorMsg (from getCraftingTagOrItem)")
-                Pair(ItemTags.PLANKS, null) // Fallback to Planks tag
-            }
-        }
-
-    /**
-     * Creates a crafting [Ingredient] based on the tool's material using the result from [getCraftingTagOrItem].
-     * Requires a [RegistryEntryLookup] for resolving tags. Logs a warning for unknown materials.
-     * @param registryLookup A lookup provider for resolving registry entries like Item Tags.
-     * @return The corresponding crafting [Ingredient].
-     */
-    fun getMaterialIngredient(registryLookup: RegistryEntryLookup<Item>): Ingredient {
-        val (tag, item) = getCraftingTagOrItem()
-        return when {
-            tag != null -> Ingredient.ofTag(registryLookup.getOrThrow(tag))
-            item != null -> Ingredient.ofItems(item) // Use ofItems for clarity with single item
-            else -> {
-                logger.warn("$unknownMaterialErrorMsg (from getMaterialIngredient - fallback used)")
-                Ingredient.ofTag(registryLookup.getOrThrow(ItemTags.PLANKS)) // Fallback ingredient
-            }
-        }
-    }
-
-    /**
-     * Gets a representative block associated with the tool's material.
-     * Useful for visual elements in recipes or GUIs. Logs a warning for unknown materials.
-     * @return The representative [Block].
-     */
-    fun getMaterialBlock(): Block =
-        when (material) {
-            C_WOOD -> Blocks.OAK_LOG // Keep example consistent
-            C_STONE -> Blocks.STONE
-            C_IRON -> Blocks.IRON_BLOCK
-            C_DIAMOND -> Blocks.DIAMOND_BLOCK
-            C_GOLD -> Blocks.GOLD_BLOCK
-            C_NETHERITE -> Blocks.NETHERITE_BLOCK
-            else -> {
-                logger.warn("$unknownMaterialErrorMsg (from getMaterialBlock)")
-                Blocks.OAK_PLANKS // Fallback block
-            }
-        }
-
-    /**
-     * Gets the string identifier (e.g., "wood", "stone") for the tool's material based on the [materials] map.
-     * Logs a warning if the material is not found in the map.
-     * @return The material name as a [String], or "unknown" if not found.
-     */
-    fun getMaterialName(): String =
-        materials.entries.firstOrNull { it.value == material }?.key
-            ?: run {
-                logger.warn("$unknownMaterialErrorMsg (from getMaterialName)")
-                "unknown" // Fallback name
-            }
-
-    // --- Core Functionality ---
-
+    /** Map to store the last usage time of the path creation ability per player UUID. */
+    private val lastPathCreationTime = mutableMapOf<UUID, Long>()
+}
     /**
      * Called after a block is successfully mined. Implements the radius mining logic.
      * Breaks additional blocks within the defined [RADIUS] around the original block, in a plane relative to the miner's facing direction.

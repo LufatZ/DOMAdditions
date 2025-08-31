@@ -3,7 +3,7 @@ package de.additions.datagen.models
 import de.additions.Additions.MODID
 import de.additions.Additions.logger
 import de.additions.items.ItemRegistry.registeredItems
-import de.additions.items.RadiusMineItem
+import de.additions.items.ToolItem
 import net.minecraft.client.data.*
 import net.minecraft.registry.tag.BlockTags
 import net.minecraft.util.Identifier
@@ -17,22 +17,22 @@ object ItemModelsGenerator {
     fun ItemModelGenerator?.generateItemsModels() {
         registeredItems.forEach { stack ->
             when (val item = stack.item) {
-                is RadiusMineItem -> generateRadiusMineToolModel(this, item)
+                is ToolItem -> generateMineToolModel(this, item)
                 else -> logger.warn("Unknown item type: $item")
             }
         }
     }
 
     /**
-     * Generates the item model for a RadiusMineItem.
+     * Generates the item model for a ToolItem.
      *
      * The model is based on a template (template_hammer/template_shovel) and replaces texture placeholders
      * "1" (material) and "particle" with dynamic textures derived from the item's material.
      *
      * @param generator The ItemModelGenerator instance (can be null)
-     * @param item The RadiusMineItem to generate the model for
+     * @param item The ToolItem to generate the model for
      */
-    private fun generateRadiusMineToolModel(generator: ItemModelGenerator?, item: RadiusMineItem) {
+    private fun generateMineToolModel(generator: ItemModelGenerator?, item: ToolItem) {
         // Get the name of the material block (e.g., "gold_block")
         val materialBlock = item.getMaterialBlock()
             .defaultState

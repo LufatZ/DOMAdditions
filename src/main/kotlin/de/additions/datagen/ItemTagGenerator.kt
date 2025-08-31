@@ -5,7 +5,13 @@ import de.additions.Additions.logger
 import de.additions.blocks.BlockRegistry
 import de.additions.helper.IdentifierHelper
 import de.additions.items.ItemRegistry
-import de.additions.items.RadiusMineItem
+import de.additions.items.ToolItem
+import de.additions.items.ToolItem.Companion.C_DIAMOND
+import de.additions.items.ToolItem.Companion.C_GOLD
+import de.additions.items.ToolItem.Companion.C_IRON
+import de.additions.items.ToolItem.Companion.C_NETHERITE
+import de.additions.items.ToolItem.Companion.C_STONE
+import de.additions.items.ToolItem.Companion.C_WOOD
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider
 import net.minecraft.block.Block
@@ -47,7 +53,7 @@ class ItemTagGenerator(
 
         ItemRegistry.registeredItems.forEach{ stack ->
             val item = stack.item
-            if (item is RadiusMineItem) {
+            if (item is ToolItem) {
                 // Check mineable type
                 when (item.effectiveBlocks) {
                     BlockTags.SHOVEL_MINEABLE -> addToTag(item, ItemTags.SHOVELS)
@@ -56,12 +62,12 @@ class ItemTagGenerator(
 
                 // Check material type
                 when (item.material) {
-                    RadiusMineItem.C_WOOD -> addToTag(item, ItemTags.WOODEN_TOOL_MATERIALS)
-                    RadiusMineItem.C_STONE -> addToTag(item, ItemTags.STONE_TOOL_MATERIALS)
-                    RadiusMineItem.C_IRON -> addToTag(item, ItemTags.IRON_TOOL_MATERIALS)
-                    RadiusMineItem.C_DIAMOND -> addToTag(item, ItemTags.DIAMOND_TOOL_MATERIALS)
-                    RadiusMineItem.C_GOLD -> addToTag(item, ItemTags.GOLD_TOOL_MATERIALS)
-                    RadiusMineItem.C_NETHERITE -> addToTag(item, ItemTags.NETHERITE_TOOL_MATERIALS)
+                    C_WOOD -> addToTag(item, ItemTags.WOODEN_TOOL_MATERIALS)
+                    C_STONE -> addToTag(item, ItemTags.STONE_TOOL_MATERIALS)
+                    C_IRON -> addToTag(item, ItemTags.IRON_TOOL_MATERIALS)
+                    C_DIAMOND -> addToTag(item, ItemTags.DIAMOND_TOOL_MATERIALS)
+                    C_GOLD -> addToTag(item, ItemTags.GOLD_TOOL_MATERIALS)
+                    C_NETHERITE -> addToTag(item, ItemTags.NETHERITE_TOOL_MATERIALS)
                 }
             } else {
                 logger.warn("no item tag preset for $item")
