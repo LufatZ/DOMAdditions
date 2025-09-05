@@ -287,8 +287,9 @@ class VeinMineItem(
         while (positionsToCheck.isNotEmpty() && blocksMinedCount < MAX_VEIN_SIZE) {
             val currentPos = positionsToCheck.removeFirst()
 
-            // Skip positions we have already processed.
-            if (!visitedPositions.add(currentPos)) {
+            // Skip positions we have already processed and blocks that are not vein mineable.
+            if (!visitedPositions.add(currentPos) ||
+                (world.getBlockState(currentPos).block !is ExperienceDroppingBlock && effectiveBlocks == BlockTags.PICKAXE_MINEABLE)) {
                 continue
             }
 

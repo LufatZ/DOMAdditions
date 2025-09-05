@@ -178,6 +178,13 @@ object ItemRegistry {
                         .formatted(Formatting.WHITE),
                 ),
             )
+        val pickaxeLore =
+            LoreComponent(
+                listOf(
+                    Text.translatable("tooltip.additions.radius_mine.pickaxe_description", areaText)
+                        .formatted(Formatting.WHITE)
+                ),
+            )
 
         // Register big shovels: moderate damage (1.5), slow speed (-3.0), radius mining
         registerToolItems("big_%material_shovel", shovelLore, 1.5f, -3.0f, ToolTypes.SHOVEL, MiningTypes.RADIUS_MINING)
@@ -187,5 +194,8 @@ object ItemRegistry {
 
         // Register big axes: high damage (6.0), slowest speed (-3.2), vein mining for tree cutting
         registerToolItems("big_%material_axe", axeLore, 6f, -3.2f, ToolTypes.AXE, MiningTypes.VEIN_MINING)
+
+        // Register big axes: high damage (6.0), slowest speed (-3.2), vein mining for tree cutting
+        registerToolItems("vein_%material_pickaxe", pickaxeLore, 1.5f, -3.0f, ToolTypes.PICKAXE, MiningTypes.VEIN_MINING)
     }
 }

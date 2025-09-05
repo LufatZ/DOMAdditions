@@ -159,6 +159,7 @@ These items allow you to mine multiple blocks at once and also create Dirt Path 
 | **Hammer Item**                                    | ✅ Complete               | A pickaxe, but for a specific area                             |
 | **Fast Leave Decay**                               | ✅ Complete               | Leaves decay quickly, and a configuration has been integrated. |
 | **Big Axe**                                        | ✅ Complete               | is able to mine an entire tree                                 |
+| **Vein Mine Pickaxe**                              | ✅ Complete               | is able to mine all ore blocks at once.                        |
 | **Radius Mine Hoe**                                | ⚒️ planned               | can convert multiple blocks to farmland                        |
 | **Vertical Slabs**                                 | ⚒️ planned               | add vertical slabs to the game                                 |
 | **Runtime Data Generation**                        | ⚒️ planned               | add runtime data generation to the game                        |

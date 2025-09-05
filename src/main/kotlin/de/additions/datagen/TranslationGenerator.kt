@@ -91,6 +91,7 @@ class TranslationGenerator(
         add("tooltip.additions.radius_mine.hammer_description", "Mines a %s area of stone-like blocks.")
         add("tooltip.additions.radius_mine.axe_description", "Strips logs in a %s area.")
         add("tooltip.additions.radius_mine.stripped_wood_creation_description", "Fells an entire tree at once.")
+        add("tooltip.additions.radius_mine.stripped_wood_creation_description", "Mines all ore blocks at once.")
         add("tooltip.additions.radius_mine.path_creation_description", "Use to create a path.")
         add("tooltip.additions.radius_mine.sneak_description", "Sneak-use to change path to dirt.")
 

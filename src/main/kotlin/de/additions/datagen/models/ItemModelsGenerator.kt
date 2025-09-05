@@ -3,6 +3,7 @@ package de.additions.datagen.models
 import de.additions.Additions.MODID
 import de.additions.Additions.logger
 import de.additions.items.ItemRegistry.registeredItems
+import de.additions.items.RadiusMineItem
 import de.additions.items.ToolItem
 import net.minecraft.client.data.*
 import net.minecraft.registry.tag.BlockTags
@@ -45,7 +46,9 @@ object ItemModelsGenerator {
 
         // Determine template model based on effective blocks
         val templateModelId = when(item.effectiveBlocks) {
-            BlockTags.PICKAXE_MINEABLE -> Identifier.of(MODID, "item/template_hammer")
+            BlockTags.PICKAXE_MINEABLE ->
+                if (item is RadiusMineItem) Identifier.of(MODID, "item/template_hammer")
+                else Identifier.of(MODID, "item/template_pickaxe")
             BlockTags.SHOVEL_MINEABLE -> Identifier.of(MODID, "item/template_shovel")
             BlockTags.AXE_MINEABLE -> Identifier.of(MODID, "item/template_axe")
             else -> Identifier.of(MODID, "item/template_hammer").also {

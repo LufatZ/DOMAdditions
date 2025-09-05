@@ -13,6 +13,7 @@ import de.additions.items.ToolItem.Companion.C_IRON
 import de.additions.items.ToolItem.Companion.C_NETHERITE
 import de.additions.items.ToolItem.Companion.C_STONE
 import de.additions.items.ToolItem.Companion.C_WOOD
+import de.additions.items.VeinMineItem
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider
 import net.minecraft.advancement.criterion.InventoryChangedCriterion
@@ -452,9 +453,11 @@ class RecipeGenerator(
     private fun getItemRecipeShape(item: Item): List<String> {
         if (item is ToolItem) {
             return when (item.effectiveBlocks.id) {
-                BlockTags.SHOVEL_MINEABLE.id -> listOf("XSX", "MSM", "XMX") // Shovel pattern
-                BlockTags.PICKAXE_MINEABLE.id -> listOf("XMX", "MSM", "XSX") // Pickaxe pattern
-                BlockTags.AXE_MINEABLE.id -> listOf("MMX", "MSX", "XSX") // Pickaxe pattern
+                BlockTags.SHOVEL_MINEABLE.id -> listOf(" S ", "MSM", "XMX") // Shovel pattern
+                BlockTags.PICKAXE_MINEABLE.id ->
+                    if (item is VeinMineItem) listOf("XMX", "MSM", " S ") // Pickaxe pattern
+                    else listOf("MMM", "XSX", " S ")
+                BlockTags.AXE_MINEABLE.id -> listOf("MMX", "MSX", " S ") // Pickaxe pattern
                 else -> {
                     logger.warn("Falling back to single item recipe, because no shape is defined for ${item.effectiveBlocks.id}")
                     listOf("X") // Fallback pattern
@@ -476,11 +479,11 @@ class RecipeGenerator(
         if (item is ToolItem) {
             return when (item.material) {
                 C_WOOD -> Ingredient.ofItems(Items.STRING)
-                C_STONE -> Ingredient.ofItems(Items.DEEPSLATE)
-                C_IRON -> Ingredient.ofItems(Items.COPPER_BLOCK)
-                C_DIAMOND -> Ingredient.ofItems(Items.AMETHYST_BLOCK)
-                C_GOLD -> Ingredient.ofItems(Items.GOLD_BLOCK)
-                C_NETHERITE -> Ingredient.ofItems(Items.CRYING_OBSIDIAN)
+                C_STONE -> Ingredient.ofItems(Items.LEAD)
+                C_IRON -> Ingredient.ofItems(Items.AMETHYST_SHARD)
+                C_DIAMOND -> Ingredient.ofItems(Items.QUARTZ)
+                C_GOLD -> Ingredient.ofItems(Items.QUARTZ)
+                C_NETHERITE -> Ingredient.ofItems(Items.NETHERITE_SCRAP)
                 else -> {
                     logger.warn("Unknown material for additional recipe components: ${item.material}")
                     null
