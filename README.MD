@@ -35,6 +35,14 @@ This mod is specifically designed for the Minecraft DayOfMind modpack, but can b
 You can easily create a dirt path from blocks such as dirt or grass (as usual), but also back to dirt.
 ![shovetrick](https://cdn.modrinth.com/data/AcxzUn56/images/884f12fefc2302b5c2527f68d67050cdbbca8f7e.gif)
 
+#### Fast Leaf Decay
+This feature significantly speeds up the decay of leaves, providing a more realistic and efficient wood-cutting experience. The decay rate is configurable, allowing you to tailor it to your preferences.
+
+| Setting Key         | Description                                     | Default Value |
+|---------------------|-------------------------------------------------|---------------|
+| `EnableFastLeafDecay` | Enables or disables the fast leaf decay feature. | `true`        |
+| `LeafDecayDelay`      | Sets the delay for leaf decay in ticks.         | `5`           |
+
 ### ✨ Enhanced Lighting Blocks
 Our advanced lighting blocks introduces new lantern variants that complement vanilla Minecraft's aesthetic while providing new decoration options.
 
@@ -139,29 +147,30 @@ These items allow you to mine multiple blocks at once and also create Dirt Path 
 
 ## 📈 Development Roadmap
 
-| Feature                                            | Status                   | Notes                                       |
-|----------------------------------------------------|--------------------------|---------------------------------------------|
-| **Data Generation System**                         | ✅ Complete               | Unified block addition process              |
-| **Minecraft 1.21.5 Update**                        | ✅ Complete               | Core features fully compatible              |
-| **Kotlin Migration**                               | ✅ Complete               | Modern codebase implementation              |
-| **Translations Integration**                       | ✅ Complete               | Community contributions welcome             |
-| **Configuration System**                           | ✅ Complete               | Enhanced customization options              |
-| **Redstone Lantern Integration**                   | ✅ Complete               | Power lanterns with redstone                |
-| **Big Shovel Item**                                | ✅ Complete               | A shovel, but for a specific area           |
-| **Hammer Item**                                    | ✅ Complete               | A pickaxe, but for a specific area          |
-| **Radius Mine Hoe**                                | ⚒️ planned               | can convert multiple blocks to farmland     |
-| **Big Axe**                                        | ⚒️ planned               | is able to mine an entire tree              |
-| **Vertical Slabs**                                 | ⚒️ planned               | add vertical slabs to the game              |
-| **Runtime Data Generation**                        | ⚒️ planned               | add runtime data generation to the game     |
-| **Better server client config sync**               | ⚒️ planned               | add better server client config sync        |
-| **Wandering Musicant**                             | ⚒️ planned               | add a group wandering musicians to the game |
-| **Conquest/foundation/administration of villages** | ⚒️ planned               | add a new village system to the game        |
-| **Xaero integration**                              | ⚒️ planned               | add integration for Xaero's World Map       |
-| **Skill System**                                   | ⚒️ planned               | add a player skill system to the game       |
-| **Radius Mine upgrades**                           | ⚒️ planned               | add upgrades for the radius mine tools      |
-| **More Block Variants**                            | 💡 ready for suggestions | add more block variants to the game         |
-| **Special Block Features**                         | 💡 ready for suggestions | e.g. damage on magma slabs                  |
-| **Translation Improvements**                       | 💡 ready for suggestions | add more/better translations to the game    |
+| Feature                                            | Status                   | Notes                                                          |
+|----------------------------------------------------|--------------------------|----------------------------------------------------------------|
+| **Data Generation System**                         | ✅ Complete               | Unified block addition process                                 |
+| **Minecraft 1.21.5 Update**                        | ✅ Complete               | Core features fully compatible                                 |
+| **Kotlin Migration**                               | ✅ Complete               | Modern codebase implementation                                 |
+| **Translations Integration**                       | ✅ Complete               | Community contributions welcome                                |
+| **Configuration System**                           | ✅ Complete               | Enhanced customization options                                 |
+| **Redstone Lantern Integration**                   | ✅ Complete               | Power lanterns with redstone                                   |
+| **Big Shovel Item**                                | ✅ Complete               | A shovel, but for a specific area                              |
+| **Hammer Item**                                    | ✅ Complete               | A pickaxe, but for a specific area                             |
+| **Fast Leave Decay**                               | ✅ Complete               | Leaves decay quickly, and a configuration has been integrated. |
+| **Big Axe**                                        | ✅ Complete               | is able to mine an entire tree                                 |
+| **Radius Mine Hoe**                                | ⚒️ planned               | can convert multiple blocks to farmland                        |
+| **Vertical Slabs**                                 | ⚒️ planned               | add vertical slabs to the game                                 |
+| **Runtime Data Generation**                        | ⚒️ planned               | add runtime data generation to the game                        |
+| **Better server client config sync**               | ⚒️ planned               | add better server client config sync                           |
+| **Wandering Musicant**                             | ⚒️ planned               | add a group wandering musicians to the game                    |
+| **Conquest/foundation/administration of villages** | ⚒️ planned               | add a new village system to the game                           |
+| **Xaero integration**                              | ⚒️ planned               | add integration for Xaero's World Map                          |
+| **Skill System**                                   | ⚒️ planned               | add a player skill system to the game                          |
+| **Radius Mine upgrades**                           | ⚒️ planned               | add upgrades for the radius mine tools                         |
+| **More Block Variants**                            | 💡 ready for suggestions | add more block variants to the game                            |
+| **Special Block Features**                         | 💡 ready for suggestions | e.g. damage on magma slabs                                     |
+| **Translation Improvements**                       | 💡 ready for suggestions | add more/better translations to the game                       |
 
 
 ---

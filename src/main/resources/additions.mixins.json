@@ -3,11 +3,12 @@
   "package": "de.additions.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "AdditionsLeavesMixin",
     "AdditionsShovelMixin",
     "BubbleColumnBlockMixin"
   ],
   "injectors": {
     "defaultRequire": 1
-	},
+  },
   "refmap": "additions-refmap.json"
 }

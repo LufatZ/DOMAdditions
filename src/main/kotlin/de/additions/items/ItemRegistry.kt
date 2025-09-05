@@ -4,8 +4,8 @@ import de.additions.Additions.MODID
 import de.additions.Additions.logger
 import de.additions.Additions.logging
 import de.additions.itemGroups.ItemGroupRegistry
-import de.additions.items.RadiusMineItem.Companion.RADIUS
 import de.additions.items.ToolItem.Companion.MiningTypes
+import de.additions.items.ToolItem.Companion.RADIUS
 import de.additions.items.ToolItem.Companion.ToolTypes
 import de.additions.items.ToolItem.Companion.materials
 import net.minecraft.component.DataComponentTypes
@@ -176,7 +176,6 @@ object ItemRegistry {
                         .formatted(Formatting.WHITE),
                     Text.translatable("tooltip.additions.radius_mine.stripped_wood_creation_description")
                         .formatted(Formatting.WHITE),
-                    Text.translatable("tooltip.additions.radius_mine.sneak_description").formatted(Formatting.GRAY),
                 ),
             )
 

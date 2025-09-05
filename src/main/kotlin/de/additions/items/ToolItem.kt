@@ -5,10 +5,14 @@ import de.additions.datagen.ItemTagGenerator
 import de.additions.items.ToolItem.Companion.materials
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback
 import net.minecraft.block.Block
+import net.minecraft.block.BlockState
 import net.minecraft.block.Blocks
 import net.minecraft.component.DataComponentTypes
 import net.minecraft.component.type.ToolComponent
+import net.minecraft.entity.LivingEntity
+import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.Item
+import net.minecraft.item.ItemStack
 import net.minecraft.item.Items
 import net.minecraft.item.ToolMaterial
 import net.minecraft.recipe.Ingredient
@@ -17,6 +21,8 @@ import net.minecraft.registry.tag.BlockTags
 import net.minecraft.registry.tag.ItemTags
 import net.minecraft.registry.tag.TagKey
 import net.minecraft.util.ActionResult
+import net.minecraft.util.math.BlockPos
+import net.minecraft.world.World
 
 /**
  * Represents a custom mining tool that breaks blocks in a defined radius (AoE) around the initially mined block.
@@ -62,6 +68,9 @@ open class ToolItem(
                 ActionResult.PASS
             }
         }
+
+        /** The radius for the Area of Effect (AoE) mining and path creation (0=1x1, 1=3x3, 2=5x5 -> 5x5 area). */
+        const val RADIUS = 2
 
         internal enum class ToolTypes {
             PICKAXE,AXE,SHOVEL,HOE
@@ -217,4 +226,85 @@ open class ToolItem(
                 logger.warn("$unknownMaterialErrorMsg (from getMaterialName)")
                 "unknown" // Fallback name
             }
+
+    /**
+     * Helper function to attempt breaking a block at a specific position during the AoE mining process.
+     * Checks if the block is suitable and applies damage to the tool.
+     *
+     * @param targetPos The [BlockPos] of the block to potentially break.
+     * @param world The current [World].
+     * @param miner The [LivingEntity] performing the mining action.
+     * @param stack The [ItemStack] being used.
+     * @param toolData The [ToolComponent] containing tool properties like damage per block.
+     */
+    internal fun tryBreakBlock(
+        targetPos: BlockPos,
+        world: World,
+        miner: LivingEntity,
+        stack: ItemStack,
+        toolData: ToolComponent,
+    ) {
+        val targetState = world.getBlockState(targetPos)
+
+        // Check if the block is suitable for AoE mining with this tool
+        // Pass 'miner' to isSuitableForMining in case future checks need player abilities etc.
+        if (isSuitableForMining(targetState, world, targetPos, toolData)) {
+            // Break the block, triggering drops and effects (true = drops enabled).
+            val blockBroken = world.breakBlock(targetPos, true, miner)
+
+            // If the block was successfully broken, apply durability damage.
+            if (blockBroken) {
+                // Use the ToolComponent's damagePerBlock value.
+                stack.damage(toolData.damagePerBlock(), miner as PlayerEntity?)
+            }
+        }
+    }
+
+    /**
+     * Checks if a given block state is suitable for being mined by this tool in an AoE fashion.
+     * Considers tool material tier, block tags, hardness, and tool configuration.
+     *
+     * @param state The [BlockState] to check.
+     * @param world The current [World].
+     * @param targetPos The [BlockPos] of the block.
+     * @param toolData The [ToolComponent] of the item stack.
+     * @return True if the block can be mined by this tool's AoE effect, false otherwise.
+     */
+    internal fun isSuitableForMining(
+        state: BlockState,
+        world: World,
+        targetPos: BlockPos,
+        // Keep miner parameter
+        toolData: ToolComponent,
+    ): Boolean {
+        // 1. Check if the tool is configured to mine this block type via the effectiveBlocks tag.
+        if (!toolData.isCorrectForDrops(state)) { // Use ToolComponent's check which considers the effectiveBlocks tag
+            // Or if effectiveBlocks tag is different from toolData rules: if (!state.isIn(effectiveBlocks)) return false
+            return false
+        }
+
+        // 2. Check vanilla tool material tier requirements.
+        // This logic correctly reflects standard Minecraft tool progression.
+        val sufficientMiningLevel =
+            when (material) {
+                // Using the constants defined in this class's companion object
+                C_NETHERITE, C_DIAMOND -> true
+                C_IRON -> !state.isIn(BlockTags.NEEDS_DIAMOND_TOOL)
+                C_STONE ->
+                    !state.isIn(BlockTags.NEEDS_IRON_TOOL) &&
+                            !state.isIn(BlockTags.NEEDS_DIAMOND_TOOL)
+                C_WOOD, C_GOLD ->
+                    !state.isIn(BlockTags.NEEDS_STONE_TOOL) &&
+                            !state.isIn(BlockTags.NEEDS_IRON_TOOL) &&
+                            !state.isIn(BlockTags.NEEDS_DIAMOND_TOOL)
+                else -> false // Unknown material cannot mine
+            }
+
+        // 3. Check other conditions: Not air, has hardness > 0, tool deals damage, and meets material level.
+        return !state.isAir &&
+                state.getHardness(world, targetPos) > 0.0f &&
+                toolData.damagePerBlock() > 0 &&
+                // Ensure the tool component defines damage
+                sufficientMiningLevel
+    }
 }

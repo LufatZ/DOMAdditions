@@ -48,5 +48,13 @@ class AdditionsConfig : MidnightConfig() {
         @JvmField
         @Entry(category = "features")
         var EnabledTrapdoor: Boolean = true
+
+        @JvmField
+        @Entry(category = "features")
+        var EnableFastLeafDecay: Boolean = true
+
+        @JvmField
+        @Entry(category = "features")
+        var LeafDecayDelay: Int = 5
     }
 }
