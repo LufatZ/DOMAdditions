@@ -193,6 +193,8 @@ internal object ModTranslations {
             {
                 "pack": {
                     "pack_format": $currentPackFormat,
+                    "min_format": $currentPackFormat,
+                    "max_format": $currentPackFormat,
                     "description": "§7Community translations from crowdin for $MODID"
                 }
             }
