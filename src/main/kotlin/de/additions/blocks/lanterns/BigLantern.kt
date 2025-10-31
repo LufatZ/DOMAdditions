@@ -1,6 +1,7 @@
-package de.additions.blocks
+package de.additions.blocks.lanterns
 
 import net.minecraft.block.BlockState
+import net.minecraft.block.LanternBlock
 import net.minecraft.block.ShapeContext
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.shape.VoxelShape
@@ -8,16 +9,16 @@ import net.minecraft.util.shape.VoxelShapes
 import net.minecraft.world.BlockView
 
 /**
- * Represents a larger version of a redstone-powered lantern block.
- * This lantern has a custom, more detailed shape and lights up when powered by redstone.
+ * Represents a larger version of a lantern block.
+ * This lantern has a custom, more detailed shape compared to the default lantern.
  *
  * @param settings The settings for the block.
  */
-class BigRedstoneLantern(
+open class BigLantern(
     settings: Settings?,
-) : RedstoneLantern(settings) {
+) : LanternBlock(settings) {
     companion object {
-        /** The outline shape for a hanging big redstone lantern. */
+        /** The outline shape for a hanging big lantern. */
         val BIG_HANGING_SHAPE: VoxelShape =
             VoxelShapes.union(
                 createCuboidShape(5.0, 11.0, 5.0, 11.0, 12.0, 11.0),
@@ -31,7 +32,7 @@ class BigRedstoneLantern(
                 createCuboidShape(3.0, 1.0, 3.0, 13.0, 2.0, 13.0),
                 createCuboidShape(4.0, 0.0, 4.0, 12.0, 1.0, 12.0),
             )
-        /** The outline shape for a standing big redstone lantern. */
+        /** The outline shape for a standing big lantern. */
         val BIG_STANDING_SHAPE: VoxelShape =
             VoxelShapes.union(
                 createCuboidShape(5.0, 11.0, 5.0, 11.0, 12.0, 11.0),

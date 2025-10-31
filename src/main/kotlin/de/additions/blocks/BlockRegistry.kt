@@ -11,6 +11,7 @@ import de.additions.Additions.logger
 import de.additions.blocks.BlockRegistry.blockVariantsParents
 import de.additions.blocks.BlockRegistry.lanternVariantsParents
 import de.additions.blocks.BlockRegistry.trapdoorVariantsParents
+import de.additions.blocks.lanterns.*
 import de.additions.config.AdditionsConfig
 import de.additions.itemGroups.ItemGroupRegistry
 import net.minecraft.block.*
@@ -222,7 +223,7 @@ object BlockRegistry {
 
         // Add all registered blocks to the default item groups
         ItemGroupRegistry.registerItemsAfterCommonParent(registeredLanterns.keys.toList(), Blocks.LANTERN)
-        ItemGroupRegistry.registerItemsAfterCommonParent(registeredChains, Blocks.CHAIN)
+        ItemGroupRegistry.registerItemsAfterCommonParent(registeredChains, Blocks.IRON_CHAIN)
         ItemGroupRegistry.registerBlocksInDefaultGroups(registeredTrapdoors, trapdoorVariantsParents)
         ItemGroupRegistry.registerBlocksInDefaultGroups(registeredSlabs, blockVariantsParents)
         ItemGroupRegistry.registerBlocksInDefaultGroups(registeredStairs, blockVariantsParents)
@@ -473,6 +474,11 @@ object BlockRegistry {
             var bigRedstoneLantern: Block? = null
             var smallLantern: Block? = null
             var smallRedstoneLantern: Block? = null
+            var copperSmallLanternSet: CopperBlockSet? = null
+            var copperBigLanternSet: CopperBlockSet? = null
+            var copperSmallRedstoneLanternSet: CopperBlockSet? = null
+            var copperBigRedstoneLanternSet: CopperBlockSet? = null
+            var copperRedstoneLanternSet: CopperBlockSet? = null
 
             val baseName =
                 Registries.BLOCK
@@ -482,78 +488,168 @@ object BlockRegistry {
             val lanternSettings = AbstractBlock.Settings.copy(Blocks.LANTERN)
 
             logger.debug("Creating lantern variants for base block: $baseName")
+            if (baseBlock != Blocks.COPPER_BLOCK) {
+                // Register standard lantern variant
+                if (baseBlock != Blocks.IRON_BLOCK) {
+                    lantern =
+                        register(
+                            "${baseName}_lantern",
+                            LanternBlock(
+                                lanternSettings.registryKey(keyOf("${baseName}_lantern")),
+                            ),
+                        )
+                }
 
-            // Register standard lantern variant
-            if (baseBlock != Blocks.IRON_BLOCK) {
-                lantern =
+                bigLantern =
                     register(
-                        "${baseName}_lantern",
-                        LanternBlock(
-                            lanternSettings.registryKey(keyOf("${baseName}_lantern")),
+                        "${baseName}_big_lantern",
+                        BigLantern(
+                            lanternSettings.registryKey(keyOf("${baseName}_big_lantern")),
                         ),
                     )
-            }
+                smallLantern =
+                    register(
+                        "${baseName}_small_lantern",
+                        SmallLantern(
+                            lanternSettings.registryKey(keyOf("${baseName}_small_lantern")),
+                        ),
+                    )
+            } else {
 
-            bigLantern =
-                register(
+                // Standard Laterns not needed (already added by default minecraft)
+                // Große Laternen
+                copperBigLanternSet = CopperBlockSet.create(
                     "${baseName}_big_lantern",
-                    BigLantern(
-                        lanternSettings.registryKey(keyOf("${baseName}_big_lantern")),
-                    ),
-                )
-            smallLantern =
-                register(
-                    "${baseName}_small_lantern",
-                    SmallLantern(
-                        lanternSettings.registryKey(keyOf("${baseName}_small_lantern")),
-                    ),
+                    { id, factory, settings ->
+                        register(id, factory.apply(settings.registryKey(keyOf(id))))
+                    },
+                    { settings -> BigLantern(settings) },
+                    { oxidationLevel, settings -> BigOxidizableLantern(oxidationLevel, settings) },
+                    { _ -> lanternSettings }
                 )
 
+                // Kleine Laternen
+                copperSmallLanternSet = CopperBlockSet.create(
+                    "${baseName}_small_lantern",
+                    { id, factory, settings ->
+                        register(id, factory.apply(settings.registryKey(keyOf(id))))
+                    },
+                    { settings -> SmallLantern(settings) },
+                    { oxidationLevel, settings -> SmallOxidizableLantern(oxidationLevel, settings) },
+                    { _ -> lanternSettings }
+                )
+            }
             // Register redstone variants if enabled
             if (AdditionsConfig.EnabledRedstoneLantern) {
                 logger.warn("Redstone Lanterns are enabled. Variant registration for: $baseName")
-                redstoneLantern =
-                    register(
-                        "${baseName}_redstone_lantern",
-                        RedstoneLantern(
-                            lanternSettings.registryKey(keyOf("${baseName}_redstone_lantern")).luminance(
-                                Blocks.createLightLevelFromLitBlockState(
-                                    15,
+                if (baseBlock != Blocks.COPPER_BLOCK) {
+                    redstoneLantern =
+                        register(
+                            "${baseName}_redstone_lantern",
+                            RedstoneLantern(
+                                lanternSettings.registryKey(keyOf("${baseName}_redstone_lantern")).luminance(
+                                    Blocks.createLightLevelFromLitBlockState(
+                                        15,
+                                    ),
                                 ),
                             ),
-                        ),
-                    )
-                bigRedstoneLantern =
-                    register(
+                        )
+                    bigRedstoneLantern =
+                        register(
+                            "${baseName}_big_redstone_lantern",
+                            BigRedstoneLantern(
+                                lanternSettings.registryKey(keyOf("${baseName}_big_redstone_lantern")).luminance(
+                                    Blocks.createLightLevelFromLitBlockState(
+                                        15,
+                                    ),
+                                ),
+                            ),
+                        )
+                    smallRedstoneLantern =
+                        register(
+                            "${baseName}_small_redstone_lantern",
+                            SmallRedstoneLantern(
+                                lanternSettings.registryKey(keyOf("${baseName}_small_redstone_lantern")).luminance(
+                                    Blocks.createLightLevelFromLitBlockState(
+                                        15,
+                                    ),
+                                ),
+                            ),
+                        )
+                } else {
+                    // Big Lantern
+                    copperBigRedstoneLanternSet = CopperBlockSet.create(
                         "${baseName}_big_redstone_lantern",
-                        BigRedstoneLantern(
-                            lanternSettings.registryKey(keyOf("${baseName}_big_redstone_lantern")).luminance(
-                                Blocks.createLightLevelFromLitBlockState(
-                                    15,
-                                ),
-                            ),
-                        ),
+                        { id, factory, settings ->
+                            register(id, factory.apply(settings.registryKey(keyOf(id))))
+                        },
+                        { settings ->
+                            BigRedstoneLantern(settings.luminance(
+                                Blocks.createLightLevelFromLitBlockState(15)))
+                        },
+                        { oxidationLevel, settings ->
+                            BigOxidizableRedstoneLantern(
+                                oxidationLevel,
+                                settings.luminance(Blocks.createLightLevelFromLitBlockState(15))
+                            )
+                        },
+                        { _ -> lanternSettings }
                     )
-                smallRedstoneLantern =
-                    register(
+
+                    // Small Lantern
+                    copperSmallRedstoneLanternSet = CopperBlockSet.create(
                         "${baseName}_small_redstone_lantern",
-                        SmallRedstoneLantern(
-                            lanternSettings.registryKey(keyOf("${baseName}_small_redstone_lantern")).luminance(
-                                Blocks.createLightLevelFromLitBlockState(
-                                    15,
-                                ),
-                            ),
-                        ),
+                        { id, factory, settings ->
+                            register(id, factory.apply(settings.registryKey(keyOf(id))))
+                        },
+                        { settings ->
+                            SmallRedstoneLantern(settings.luminance(
+                                Blocks.createLightLevelFromLitBlockState(15)))
+                        },
+                        { oxidationLevel, settings ->
+                            smallOxidizableRedstoneLantern(
+                                oxidationLevel,
+                                settings.luminance(Blocks.createLightLevelFromLitBlockState(15))
+                            )
+                        },
+                        { _ -> lanternSettings }
                     )
+
+                    // Default Lantern
+                    copperRedstoneLanternSet = CopperBlockSet.create(
+                        "${baseName}_redstone_lantern",
+                        { id, factory, settings ->
+                            register(id, factory.apply(settings.registryKey(keyOf(id))))
+                        },
+                        { settings ->
+                            RedstoneLantern(settings.luminance(
+                                Blocks.createLightLevelFromLitBlockState(15)))
+                        },
+                        { oxidationLevel, settings ->
+                            OxidizableRedstoneLantern(
+                                oxidationLevel,
+                                settings.luminance(Blocks.createLightLevelFromLitBlockState(15))
+                            )
+                        },
+                        { _ -> lanternSettings }
+                    )
+                }
             } else {
                 logger.debug("Redstone Lanterns disabled for $baseName")
             }
             lantern?.let { registeredLanterns[it] = baseBlock }
             redstoneLantern?.let { registeredLanterns[it] = baseBlock }
-            bigLantern.let { registeredLanterns[it] = baseBlock }
+            bigLantern?.let { registeredLanterns[it] = baseBlock }
             bigRedstoneLantern?.let { registeredLanterns[it] = baseBlock }
-            smallLantern.let { registeredLanterns[it] = baseBlock }
+            smallLantern?.let { registeredLanterns[it] = baseBlock }
             smallRedstoneLantern?.let { registeredLanterns[it] = baseBlock }
+
+            // Add all copper lantern variants to the map
+            copperBigLanternSet?.forEach { block -> registeredLanterns[block] = baseBlock }
+            copperSmallLanternSet?.forEach { block -> registeredLanterns[block] = baseBlock }
+            copperBigRedstoneLanternSet?.forEach { block -> registeredLanterns[block] = baseBlock }
+            copperSmallRedstoneLanternSet?.forEach { block -> registeredLanterns[block] = baseBlock }
+            copperRedstoneLanternSet?.forEach { block -> registeredLanterns[block] = baseBlock }
         }
 
         logger.info("Lantern variant registration completed")
@@ -595,9 +691,19 @@ object BlockRegistry {
      */
     private fun registerChains() {
         logger.info("Starting chain registration")
-        val chainSettings = AbstractBlock.Settings.copy(Blocks.CHAIN)
+        val chainSettings = AbstractBlock.Settings.copy(Blocks.IRON_CHAIN)
         val chain = register("redstone_chain", RedstoneChainBlock(chainSettings.registryKey(keyOf("redstone_chain"))))
+        val copperChain = CopperBlockSet.create(
+            "copper_redstone_chain",
+            { id, factory, settings ->
+                register(id, factory.apply(settings.registryKey(keyOf(id))))
+            },
+            { settings -> RedstoneChainBlock(settings) },
+            { oxidationLevel, settings -> OxidizableRedstoneChainBlock(oxidationLevel, settings) },
+            { _ -> chainSettings }
+        )
         registeredChains.add(chain)
+        copperChain.forEach { block -> registeredChains.add(block) }
         logger.info("Chain registration completed")
     }
 }

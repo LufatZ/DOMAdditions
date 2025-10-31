@@ -90,8 +90,8 @@ dependencies {
     modImplementation "maven.modrinth:midnightlib:${project.midnightlib}-fabric" // MidnightLib (Library dependency)
 
     // Optional: REI Integration (Compile-Only API, Runtime-Only Implementation)
-    modCompileOnly "me.shedaniel:RoughlyEnoughItems-api-fabric:${project.rei}"
-    modRuntimeOnly "me.shedaniel:RoughlyEnoughItems-fabric:${project.rei}"
+    // modCompileOnly "me.shedaniel:RoughlyEnoughItems-api-fabric:${project.rei}"
+    // modRuntimeOnly "me.shedaniel:RoughlyEnoughItems-fabric:${project.rei}"
 }
 
 processResources {

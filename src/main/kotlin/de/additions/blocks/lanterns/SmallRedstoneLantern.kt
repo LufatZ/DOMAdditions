@@ -1,4 +1,4 @@
-package de.additions.blocks
+package de.additions.blocks.lanterns
 
 import net.minecraft.block.BlockState
 import net.minecraft.block.ShapeContext
@@ -13,7 +13,7 @@ import net.minecraft.world.BlockView
  *
  * @param settings The settings for the block.
  */
-class SmallRedstoneLantern(
+open class SmallRedstoneLantern(
     settings: Settings?,
 ) : RedstoneLantern(settings) {
     companion object {

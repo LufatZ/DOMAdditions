@@ -114,7 +114,7 @@ class VeinMineItem(
             tryStrip(world, targetPos, player, world.getBlockState(targetPos))?.let { newState ->
                 world.setBlockState(targetPos, newState, 11) // Set block state with updates
                 world.emitGameEvent(GameEvent.BLOCK_CHANGE, targetPos, GameEvent.Emitter.of(player, newState))
-                stack.damage(1, player, LivingEntity.getSlotForHand(context.hand))
+                stack.damage(1, player, context.hand)
             }
         }
 
@@ -153,7 +153,7 @@ class VeinMineItem(
         tryStrip(world, pos, player, world.getBlockState(pos))?.let { newState ->
             world.setBlockState(pos, newState, 11)
             world.emitGameEvent(GameEvent.BLOCK_CHANGE, pos, GameEvent.Emitter.of(player, newState))
-            stack.damage(1, player, LivingEntity.getSlotForHand(context.hand))
+            stack.damage(1, player, context.hand)
         }
 
         return ActionResult.SUCCESS

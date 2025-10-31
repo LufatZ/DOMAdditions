@@ -1,4 +1,4 @@
-package de.additions.blocks
+package de.additions.blocks.lanterns
 
 import net.minecraft.block.BlockState
 import net.minecraft.block.LanternBlock
@@ -14,7 +14,7 @@ import net.minecraft.world.BlockView
  *
  * @param settings The settings for the block.
  */
-class SmallLantern(
+open class SmallLantern(
     settings: Settings?,
 ) : LanternBlock(settings) {
     companion object {

@@ -25,7 +25,7 @@ import net.minecraft.world.block.WireOrientation
  *
  * @param settings The settings for the block.
  */
-class RedstoneChainBlock(
+open class RedstoneChainBlock(
     settings: Settings,
 ) : ChainBlock(settings) {
     init {

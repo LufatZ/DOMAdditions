@@ -11,6 +11,11 @@ import de.additions.blocks.BlockRegistry.registeredSlabs
 import de.additions.blocks.BlockRegistry.registeredStairs
 import de.additions.blocks.BlockRegistry.registeredTrapdoors
 import de.additions.blocks.BlockRegistry.trapdoorVariantsParents
+import de.additions.blocks.lanterns.BigLantern
+import de.additions.blocks.lanterns.BigRedstoneLantern
+import de.additions.blocks.lanterns.RedstoneLantern
+import de.additions.blocks.lanterns.SmallLantern
+import de.additions.blocks.lanterns.SmallRedstoneLantern
 import de.additions.datagen.models.CustomStates.createCustomStairsBlockState
 import de.additions.datagen.models.CustomStates.createSnowySlabBlockState
 import de.additions.datagen.models.CustomStates.createStairsModelMap
@@ -27,6 +32,7 @@ import net.minecraft.block.DirtPathBlock
 import net.minecraft.block.GrassBlock
 import net.minecraft.client.data.*
 import net.minecraft.client.data.BlockStateModelGenerator.*
+import net.minecraft.registry.Registries
 import net.minecraft.state.property.Properties
 import net.minecraft.util.Identifier
 import java.util.*
@@ -108,10 +114,31 @@ object BlockModels {
      * Generates models for all chain variants.
      */
     private fun generateChainModels() {
-        val chainModelId = Identifier.ofVanilla("block/chain")
-        val chainItemModelId = Identifier.ofVanilla("item/chain")
 
         registeredChains.forEach { chain ->
+            val id = Registries.BLOCK.getId(chain).path
+            val chainModelId =
+                if (id.contains("copper"))
+                    when {
+                        id.contains("oxidized_") -> Identifier.ofVanilla("block/oxidized_copper_chain")
+                        id.contains("weathered_") -> Identifier.ofVanilla("block/weathered_copper_chain")
+                        id.contains("exposed_") -> Identifier.ofVanilla("block/exposed_copper_chain")
+                        else -> Identifier.ofVanilla("block/copper_chain")
+                    } else {
+                    Identifier.ofVanilla("block/iron_chain")
+                }
+            val chainItemModelId =
+                if (id.contains("copper"))
+                    when {
+                        id.contains("oxidized_") -> Identifier.ofVanilla("item/oxidized_copper_chain")
+                        id.contains("weathered_") -> Identifier.ofVanilla("item/weathered_copper_chain")
+                        id.contains("exposed_") -> Identifier.ofVanilla("item/exposed_copper_chain")
+                        else -> Identifier.ofVanilla("item/copper_chain")
+                    } else {
+                    Identifier.ofVanilla("item/iron_chain")
+                }
+
+
             generator.registerAxisRotated(chain, createWeightedVariant(chainModelId))
             generator.registerParentedItemModel(chain, chainItemModelId)
         }
@@ -542,10 +569,35 @@ object BlockModels {
         lantern: Block,
         parent: Block,
     ) {
+        // Bestimme die richtige Textur basierend auf Oxidationsstufe
+        val textureBlock = when {
+            parent == Blocks.COPPER_BLOCK -> {
+                val lanternId = Registries.BLOCK.getId(lantern).path
+                when {
+                    lanternId.contains("oxidized_") -> Blocks.OXIDIZED_COPPER
+                    lanternId.contains("weathered_") -> Blocks.WEATHERED_COPPER
+                    lanternId.contains("exposed_") -> Blocks.EXPOSED_COPPER
+                    else -> Blocks.COPPER_BLOCK
+                }
+            }
+            else -> parent
+        }
+
         val textureMap =
             TextureMap().apply {
-                put(TextureKey.TEXTURE, Identifier.of("block/${extractCleanBlockIdentifier(parent)}"))
-                put(TextureKey.PARTICLE, Identifier.of("block/lantern"))
+                put(TextureKey.TEXTURE, Identifier.of("block/${extractCleanBlockIdentifier(textureBlock)}"))
+                put(TextureKey.PARTICLE, Identifier.of(
+                    if (parent != Blocks.COPPER_BLOCK) "block/lantern"
+                    else {
+                        val lanternId = Registries.BLOCK.getId(lantern).path
+                        when {
+                            lanternId.contains("oxidized_") -> "block/oxidized_copper_lantern"
+                            lanternId.contains("weathered_") -> "block/weathered_copper_lantern"
+                            lanternId.contains("exposed_") -> "block/exposed_copper_lantern"
+                            else -> "block/copper_lantern"
+                        }
+                    }
+                ))
             }
         val standingTemplateModelId =
             when (lantern) {
@@ -596,6 +648,20 @@ object BlockModels {
             val lanternStandingModel = createWeightedVariant(Identifier.ofVanilla("block/lantern"))
             val lanternHangingModel = createWeightedVariant(Identifier.ofVanilla("block/lantern_hanging"))
             val lanternItemModelId = Identifier.ofVanilla("item/lantern")
+            generator.registerParentedItemModel(lantern, lanternItemModelId)
+            generator.blockStateCollector.accept(
+                VariantsBlockModelDefinitionCreator.of(lantern).with(
+                    createBooleanModelMap(Properties.HANGING, lanternHangingModel, lanternStandingModel),
+                ),
+            )
+        } else if (parent == Blocks.COPPER_BLOCK &&
+            lantern is RedstoneLantern &&
+            lantern !is BigRedstoneLantern &&
+            lantern !is SmallRedstoneLantern
+        ) {
+            val lanternStandingModel = createWeightedVariant(Identifier.ofVanilla("block/copper_lantern"))
+            val lanternHangingModel = createWeightedVariant(Identifier.ofVanilla("block/copper_lantern_hanging"))
+            val lanternItemModelId = Identifier.ofVanilla("item/copper_lantern")
             generator.registerParentedItemModel(lantern, lanternItemModelId)
             generator.blockStateCollector.accept(
                 VariantsBlockModelDefinitionCreator.of(lantern).with(

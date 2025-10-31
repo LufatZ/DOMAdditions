@@ -1,4 +1,4 @@
-package de.additions.blocks
+package de.additions.blocks.lanterns
 
 import net.minecraft.block.Block
 import net.minecraft.block.BlockState
@@ -27,7 +27,7 @@ open class RedstoneLantern(
     companion object {
         /**
          * A boolean property that determines whether the lantern is lit.
-         * This reuses the property from [RedstoneTorchBlock] for consistency.
+         * This reuses the property from [net.minecraft.block.RedstoneTorchBlock] for consistency.
          */
         val LIT: BooleanProperty = RedstoneTorchBlock.LIT
     }

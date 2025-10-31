@@ -5,6 +5,13 @@ package de.additions.datagen
 import de.additions.Additions.MODID
 import de.additions.Additions.logger
 import de.additions.blocks.*
+import de.additions.blocks.lanterns.BigLantern
+import de.additions.blocks.lanterns.BigOxidizableLantern
+import de.additions.blocks.lanterns.BigRedstoneLantern
+import de.additions.blocks.lanterns.RedstoneLantern
+import de.additions.blocks.lanterns.SmallLantern
+import de.additions.blocks.lanterns.SmallOxidizableLantern
+import de.additions.blocks.lanterns.SmallRedstoneLantern
 import de.additions.items.ItemRegistry
 import de.additions.items.ToolItem
 import de.additions.items.ToolItem.Companion.C_DIAMOND

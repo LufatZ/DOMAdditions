@@ -4,6 +4,13 @@ package de.additions.datagen
 
 import de.additions.Additions.logger
 import de.additions.blocks.*
+import de.additions.blocks.lanterns.BigLantern
+import de.additions.blocks.lanterns.BigOxidizableLantern
+import de.additions.blocks.lanterns.BigRedstoneLantern
+import de.additions.blocks.lanterns.RedstoneLantern
+import de.additions.blocks.lanterns.SmallLantern
+import de.additions.blocks.lanterns.SmallOxidizableLantern
+import de.additions.blocks.lanterns.SmallRedstoneLantern
 import de.additions.items.ItemRegistry
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricLanguageProvider
@@ -84,6 +91,8 @@ class TranslationGenerator(
         )
         configTranslationbuilder()
         modMenuTranslationBuilder()
+        chainTranslationBuilder()
+
 
         itemsTranslationBuilder(ItemRegistry.registeredItems)
 
@@ -100,7 +109,6 @@ class TranslationGenerator(
 
         add("tag.item.additions.stones", "Stones")
         add("tag.item.additions.stones.tooltip", "All stone variants")
-        add("item.minecraft.redstone_chain", "Redstone Chain")
     }
 
     private fun itemsTranslationBuilder(stacks: MutableList<ItemStack>) {
@@ -189,38 +197,64 @@ class TranslationGenerator(
         )
     }
 
+    private fun extractOxidationPrefix(translationKey: String): String {
+        val keyParts = translationKey.split(".").last()
+
+        return when {
+            keyParts.startsWith("waxed_oxidized_") -> "Waxed Oxidized "
+            keyParts.startsWith("waxed_weathered_") -> "Waxed Weathered "
+            keyParts.startsWith("waxed_exposed_") -> "Waxed Exposed "
+            keyParts.startsWith("waxed_") -> "Waxed "
+            keyParts.startsWith("oxidized_") -> "Oxidized "
+            keyParts.startsWith("weathered_") -> "Weathered "
+            keyParts.startsWith("exposed_") -> "Exposed "
+            else -> ""
+        }
+    }
+    private fun chainTranslationBuilder() {
+        BlockRegistry.registeredChains.forEach { chain ->
+            add(chain.asItem().translationKey, extractNameFromKey(chain.translationKey))
+        }
+    }
+
     private fun blockTranslationBuilder(
         blockList: List<Block>,
         parentBlockList: List<Block>,
     ) {
-        val nounMaterials = setOf("Gold", "Iron", "Copper", "Diamond", "Emerald", "Netherite") // ggf. erweitern
+        val nounMaterials = setOf("Gold", "Iron", "Copper", "Diamond", "Emerald", "Netherite")
 
         blockList.forEachIndexed { index, block ->
             val parentName = extractNameFromKey(parentBlockList[index].translationKey)
+            val oxidationPrefix = extractOxidationPrefix(block.asItem().translationKey)
+
             val blockType =
                 when (block) {
-                    is StairsBlock -> "Stairs" //Strictly speaking, this is not logical. The reason is linguistic habit: ‘Stairs’ is often a singular word in English, similar to ‘scissors’.
+                    is StairsBlock -> "Stairs"
                     is SlabBlock -> "Slab"
                     is TrapdoorBlock -> "Trapdoor"
                     is LanternBlock -> "Lantern"
                     else -> "Block"
                 }
+
             val prefix =
                 when (block) {
                     is SmallLantern, is SmallRedstoneLantern -> "Small "
                     is BigLantern, is BigRedstoneLantern -> "Big "
                     else -> ""
                 }
+
             val type =
                 when (block) {
                     is RedstoneLantern -> "Redstone "
                     else -> ""
                 }
+
             val name = if (blockType in listOf("Stairs", "Slab", "Trapdoor") && parentName in nounMaterials) {
-                prefix + type + blockType.dropLast(if (blockType.endsWith("s")) 1 else 0) + " of " + parentName
+                oxidationPrefix + prefix + type + blockType.dropLast(if (blockType.endsWith("s")) 1 else 0) + " of " + parentName
             } else {
-                prefix + parentName + " " + type + blockType
+                "$oxidationPrefix$prefix$parentName $type$blockType"
             }
+
             add(block.asItem().translationKey, name)
         }
     }
