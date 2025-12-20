@@ -89,14 +89,14 @@ class ModelGenerator(
      *
      * @param generator The BlockStateModelGenerator used for creating block state models
      */
-    override fun generateBlockStateModels(generator: BlockStateModelGenerator?) {
+    override fun generateBlockStateModels(generator: BlockStateModelGenerator) {
         with(generator) {
             // Generate models for registered blocks
             init()
         }
     }
 
-    override fun generateItemModels(generator: ItemModelGenerator?) {
+    override fun generateItemModels(generator: ItemModelGenerator) {
         with(generator) {
             // Generate models for registered items
             generateItemsModels()

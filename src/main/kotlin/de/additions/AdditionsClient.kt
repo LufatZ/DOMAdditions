@@ -40,7 +40,7 @@ object AdditionsClient : ClientModInitializer {
                 lanterns
 
         BlockRenderLayerMap.putBlocks(
-            BlockRenderLayer.CUTOUT_MIPPED,
+            BlockRenderLayer.CUTOUT,
             *blocksForTextureCutOut.toTypedArray(),
         )
     }
