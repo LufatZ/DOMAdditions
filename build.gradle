@@ -81,7 +81,7 @@ dependencies {
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
     // Fabric API and Kotlin Language Adapter
-    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
     modImplementation "net.fabricmc:fabric-language-kotlin:${project.fabric_kotlin_version}"
 
     // Mod Dependencies
@@ -90,8 +90,8 @@ dependencies {
     modImplementation "maven.modrinth:midnightlib:${project.midnightlib}-fabric" // MidnightLib (Library dependency)
 
     // Optional: REI Integration (Compile-Only API, Runtime-Only Implementation)
-    // modCompileOnly "me.shedaniel:RoughlyEnoughItems-api-fabric:${project.rei}"
-    // modRuntimeOnly "me.shedaniel:RoughlyEnoughItems-fabric:${project.rei}"
+    modCompileOnly "me.shedaniel:RoughlyEnoughItems-api-fabric:${project.rei}"
+    modRuntimeOnly "me.shedaniel:RoughlyEnoughItems-fabric:${project.rei}"
 }
 
 processResources {
