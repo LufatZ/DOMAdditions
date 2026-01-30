@@ -3,14 +3,8 @@
 package de.additions.datagen
 
 import de.additions.Additions.logger
-import de.additions.blocks.*
-import de.additions.blocks.lanterns.BigLantern
-import de.additions.blocks.lanterns.BigOxidizableLantern
-import de.additions.blocks.lanterns.BigRedstoneLantern
-import de.additions.blocks.lanterns.RedstoneLantern
-import de.additions.blocks.lanterns.SmallLantern
-import de.additions.blocks.lanterns.SmallOxidizableLantern
-import de.additions.blocks.lanterns.SmallRedstoneLantern
+import de.additions.blocks.BlockRegistry
+import de.additions.blocks.lanterns.*
 import de.additions.items.ItemRegistry
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricLanguageProvider
@@ -39,38 +33,42 @@ class TranslationGenerator(
     }
 
     /**
-     * Creates a readable name from the last segment of the translationKey.
-     * - Converts snake_case -> Title Case
-     * - Removes any remaining “Block”/“Item”
-     * - For ITEM keys: Normalizes material names **only for tools**:
-     *   “Wood” -> “Wooden”, ‘Gold’ -> “Golden” (only if the item is a tool/type)
+     * Extracts a human-readable name from a translation key by processing its components.
      *
-     * Rationale: Vanilla uses illogical but established patterns (e.g. “Wooden Shovel”,
-     * “Golden Shovel” for tools; for blocks, ‘Gold’ remains “Block of Gold”, for example).
+     * This method handles various transformations based on the input key:
+     * - Splits the key after the last dot and processes each segment
+     * - Converts underscores to spaces and capitalizes words
+     * - Removes certain suffixes like "Block" or "Item"
+     * - Handles special cases for tool names (shovel, hammer, etc.)
+     * - Applies specific transformations for material types (wood → wooden, gold → golden)
+     * - Processes the "big axe" case to produce "Lumberjack Axe"
+     *
+     * @param translationKey The input key string containing the name components separated by dots and underscores
+     * @return The processed human-readable name with proper capitalization and transformations applied
      */
     private fun extractNameFromKey(translationKey: String): String {
         val base = translationKey
-            .split(".")
-            .last()
+            .substringAfterLast(".")
             .split("_")
-            .joinToString(" ") {
-                it.replaceFirstChar { it.uppercase() }
-            }.replace(Regex("\\bBlock\\b"), "")
-            .replace(Regex("\\bItem\\b"), "")
+            .joinToString(" ") { it.replaceFirstChar(Char::uppercaseChar) }
+            .replace(Regex("\\b(Block|Item)\\b"), "")
             .trim()
 
-        if (translationKey.startsWith("item.")) {
-            val toolSuffixes = setOf("Shovel", "Hammer", "Pickaxe", "Axe", "Sword", "Hoe", "Spade", "Pick")
-            val lastWord = base.split(" ").lastOrNull() ?: ""
+        if (!translationKey.startsWith("item.")) return base
 
-            if (toolSuffixes.contains(lastWord)) {
-                return base
-                    .replace(Regex("\\bWood\\b"), "Wooden")
-                    .replace(Regex("\\bGold\\b"), "Golden")
-            }
-        }
+        val toolSuffixes = setOf("Shovel", "Hammer", "Pickaxe", "Axe", "Sword", "Hoe", "Spade", "Pick")
+        val words = base.split(" ")
+        if (words.lastOrNull() !in toolSuffixes) return base
 
         return base
+            .replace(Regex("\\bWood\\b"), "Wooden")
+            .replace(Regex("\\bGold\\b"), "Golden")
+            .run {
+                if ("big_" in translationKey && words.last() == "Axe") {
+                    replace(Regex("\\bBig\\s+"), "")
+                        .replace(Regex("\\bAxe\\b"), "Lumberjack Axe")
+                } else this
+            }
     }
 
     override fun generateTranslations(
