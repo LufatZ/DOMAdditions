@@ -1,6 +1,6 @@
 package de.additions.helper
 
-import de.additions.datagen.models.ModelGenerator
+import de.additions.datagen.ModelGenerator
 import net.minecraft.block.Block
 import net.minecraft.block.GrassBlock
 import net.minecraft.block.SnowBlock

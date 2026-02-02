@@ -6,7 +6,6 @@ import de.additions.items.ToolItem.Companion.materials
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback
 import net.minecraft.block.Block
 import net.minecraft.block.BlockState
-import net.minecraft.block.Blocks
 import net.minecraft.component.DataComponentTypes
 import net.minecraft.component.type.ToolComponent
 import net.minecraft.entity.LivingEntity
@@ -153,10 +152,8 @@ open class ToolItem(
                 "gold" to C_GOLD,
                 "netherite" to C_NETHERITE,
             )
+        internal const val UNKNOWN_MATERIAL_MSG = "Fallback -> Unknown material used in RadiusMineItem"
     }
-
-    private val unknownMaterialErrorMsg = "Fallback -> Unknown material used in RadiusMineItem: $material"
-
     // --- Material Helper Functions ---
 
     /**
@@ -173,7 +170,7 @@ open class ToolItem(
             C_GOLD -> Pair(null, Items.GOLD_INGOT)
             C_NETHERITE -> Pair(null, Items.NETHERITE_INGOT)
             else -> {
-                logger.warn("$unknownMaterialErrorMsg (from getCraftingTagOrItem)")
+                logger.warn("$UNKNOWN_MATERIAL_MSG (from getCraftingTagOrItem: ${material})")
                 Pair(ItemTags.PLANKS, null) // Fallback to Planks tag
             }
         }
@@ -190,30 +187,11 @@ open class ToolItem(
             tag != null -> Ingredient.ofTag(registryLookup.getOrThrow(tag))
             item != null -> Ingredient.ofItems(item) // Use ofItems for clarity with single item
             else -> {
-                logger.warn("$unknownMaterialErrorMsg (from getMaterialIngredient - fallback used)")
+                logger.warn("$UNKNOWN_MATERIAL_MSG (from getMaterialIngredient: ${material})")
                 Ingredient.ofTag(registryLookup.getOrThrow(ItemTags.PLANKS)) // Fallback ingredient
             }
         }
     }
-
-    /**
-     * Gets a representative block associated with the tool's material.
-     * Useful for visual elements in recipes or GUIs. Logs a warning for unknown materials.
-     * @return The representative [Block].
-     */
-    fun getMaterialBlock(): Block =
-        when (material) {
-            C_WOOD -> Blocks.OAK_LOG // Keep example consistent
-            C_STONE -> Blocks.STONE
-            C_IRON -> Blocks.IRON_BLOCK
-            C_DIAMOND -> Blocks.DIAMOND_BLOCK
-            C_GOLD -> Blocks.GOLD_BLOCK
-            C_NETHERITE -> Blocks.NETHERITE_BLOCK
-            else -> {
-                logger.warn("$unknownMaterialErrorMsg (from getMaterialBlock)")
-                Blocks.OAK_PLANKS // Fallback block
-            }
-        }
 
     /**
      * Gets the string identifier (e.g., "wood", "stone") for the tool's material based on the [materials] map.
@@ -223,7 +201,7 @@ open class ToolItem(
     fun getMaterialName(): String =
         materials.entries.firstOrNull { it.value == material }?.key
             ?: run {
-                logger.warn("$unknownMaterialErrorMsg (from getMaterialName)")
+                logger.warn("$UNKNOWN_MATERIAL_MSG (from getMaterialName: ${material})")
                 "unknown" // Fallback name
             }
 

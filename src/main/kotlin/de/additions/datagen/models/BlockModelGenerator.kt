@@ -3,7 +3,6 @@
 package de.additions.datagen.models
 
 import de.additions.Additions.MODID
-import de.additions.blocks.*
 import de.additions.blocks.BlockRegistry.blockVariantsParents
 import de.additions.blocks.BlockRegistry.registeredChains
 import de.additions.blocks.BlockRegistry.registeredLanterns
@@ -11,18 +10,14 @@ import de.additions.blocks.BlockRegistry.registeredSlabs
 import de.additions.blocks.BlockRegistry.registeredStairs
 import de.additions.blocks.BlockRegistry.registeredTrapdoors
 import de.additions.blocks.BlockRegistry.trapdoorVariantsParents
-import de.additions.blocks.lanterns.BigLantern
-import de.additions.blocks.lanterns.BigRedstoneLantern
-import de.additions.blocks.lanterns.RedstoneLantern
-import de.additions.blocks.lanterns.SmallLantern
-import de.additions.blocks.lanterns.SmallRedstoneLantern
+import de.additions.blocks.lanterns.*
+import de.additions.datagen.ModelGenerator.Companion.hasNoTexture
+import de.additions.datagen.ModelGenerator.Companion.hasSideAndTop
+import de.additions.datagen.ModelGenerator.Companion.removeBlock
+import de.additions.datagen.ModelGenerator.Companion.snowyOvergrownBlocks
 import de.additions.datagen.models.CustomStates.createCustomStairsBlockState
 import de.additions.datagen.models.CustomStates.createSnowySlabBlockState
 import de.additions.datagen.models.CustomStates.createStairsModelMap
-import de.additions.datagen.models.ModelGenerator.Companion.hasNoTexture
-import de.additions.datagen.models.ModelGenerator.Companion.hasSideAndTop
-import de.additions.datagen.models.ModelGenerator.Companion.removeBlock
-import de.additions.datagen.models.ModelGenerator.Companion.snowyOvergrownBlocks
 import de.additions.helper.ModelHelper.configureBlockTextureMapping
 import de.additions.helper.ModelHelper.extractCleanBlockIdentifier
 import de.additions.helper.ModelHelper.generateBlockItemModel
@@ -37,7 +32,7 @@ import net.minecraft.state.property.Properties
 import net.minecraft.util.Identifier
 import java.util.*
 
-object BlockModels {
+object BlockModelGenerator {
     lateinit var generator: BlockStateModelGenerator
 
     fun BlockStateModelGenerator?.init() {

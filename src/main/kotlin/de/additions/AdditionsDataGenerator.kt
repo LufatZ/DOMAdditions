@@ -1,7 +1,6 @@
 package de.additions
 
 import de.additions.datagen.*
-import de.additions.datagen.models.ModelGenerator
 import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator
 
