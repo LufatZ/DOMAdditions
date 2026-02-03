@@ -21,7 +21,12 @@ import net.minecraft.util.Identifier
 import java.util.*
 
 object ItemModelGenerator {
-
+    enum class TextureType {
+        HANDLE,
+        TOOL,
+        FINISHING,
+        HANDLE_WRAPPING
+    }
     /**
      * Generates all item models from registered items.
      */
@@ -34,87 +39,43 @@ object ItemModelGenerator {
         }
     }
 
-    //TODO Needs simplifing, finetuning and documentation
-    fun getHandleMaterialTextureIdentifier(item: ToolItem) : Identifier {
-        var replace = listOf("","")
-        val blockForTexture = when (item.material) {
-            C_WOOD -> Blocks.STRIPPED_SPRUCE_WOOD.also { replace = listOf("wood", "log") }
-            C_STONE -> Blocks.STRIPPED_SPRUCE_WOOD.also { replace = listOf("wood", "log") }
-            C_IRON -> Blocks.ANVIL
-            C_DIAMOND -> Blocks.ANVIL
-            C_GOLD -> Blocks.ANVIL
-            C_NETHERITE -> Blocks.NETHERITE_BLOCK
-            else -> {
-                logger.warn("$UNKNOWN_MATERIAL_MSG (from getHandleMaterialTextureIdentifier: ${item.material})")
-                Blocks.OAK_PLANKS // Fallback block
-            }
-        }
-        val id = Identifier.ofVanilla(
-            "block/${ModelHelper.extractCleanBlockIdentifier(blockForTexture)
-                .replace(replace[0], replace[1])}"
-        )
-        logger.info("Using material texture: $id for item: ${item.name}")
-        return id
-    }
-
-    fun getToolMaterialTextureIdentifier(item: ToolItem): Identifier {
+    fun getMaterialTextureIdentifier(item: ToolItem, type: TextureType): Identifier {
         var replace = listOf("", "")
-        val blockForTexture = when (item.material) {
-            C_WOOD -> Blocks.SPRUCE_LOG
-            C_STONE -> Blocks.STONE
-            C_IRON -> Blocks.IRON_BLOCK
-            C_DIAMOND -> Blocks.DIAMOND_BLOCK
-            C_GOLD -> Blocks.GOLD_BLOCK
-            C_NETHERITE -> Blocks.NETHERITE_BLOCK
-            else -> {
-                logger.warn("$UNKNOWN_MATERIAL_MSG (from getToolMaterialTextureIdentifier: ${item.material})")
-                Blocks.OAK_PLANKS // Fallback block
+        val blockForTexture = when (type) {
+            TextureType.HANDLE -> when (item.material) {
+                C_WOOD -> Blocks.STRIPPED_SPRUCE_WOOD.also { replace = listOf("wood", "log") }
+                C_STONE -> Blocks.STRIPPED_SPRUCE_WOOD.also { replace = listOf("wood", "log") }
+                C_IRON, C_DIAMOND, C_GOLD -> Blocks.ANVIL
+                C_NETHERITE -> Blocks.NETHERITE_BLOCK
+                else -> null
             }
+            TextureType.TOOL -> when (item.material) {
+                C_WOOD -> Blocks.SPRUCE_LOG
+                C_STONE -> Blocks.STONE
+                C_IRON -> Blocks.IRON_BLOCK
+                C_DIAMOND -> Blocks.DIAMOND_BLOCK
+                C_GOLD -> Blocks.GOLD_BLOCK
+                C_NETHERITE -> Blocks.NETHERITE_BLOCK
+                else -> null
+            }
+            TextureType.FINISHING -> when (item.material) {
+                C_WOOD -> Blocks.STONE
+                C_STONE -> Blocks.IRON_BLOCK
+                C_IRON -> Blocks.OBSIDIAN
+                C_DIAMOND -> Blocks.CRYING_OBSIDIAN
+                C_GOLD -> Blocks.IRON_BLOCK
+                C_NETHERITE -> Blocks.AMETHYST_BLOCK
+                else -> null
+            }
+            TextureType.HANDLE_WRAPPING -> when (item.material) {
+                C_WOOD, C_STONE, C_IRON, C_DIAMOND, C_GOLD, C_NETHERITE -> Blocks.GRAY_WOOL
+                else -> null
+            }
+        } ?: run {
+            logger.warn("$UNKNOWN_MATERIAL_MSG (from getMaterialTextureIdentifier: ${item.material}, type: $type)")
+            Blocks.OAK_PLANKS
         }
-        val id = Identifier.ofVanilla(
-            "block/${ModelHelper.extractCleanBlockIdentifier(blockForTexture)
-                .replace(replace[0], replace[1])}"
-        )
-        logger.info("Using material texture: $id for item: ${item.name}")
-        return id
-    }
 
-    fun getFinishingMaterialTextureIdentifier(item: ToolItem): Identifier {
-        var replace = listOf("", "")
-        val blockForTexture = when (item.material) {
-            C_WOOD -> Blocks.STONE
-            C_STONE -> Blocks.IRON_BLOCK
-            C_IRON -> Blocks.OBSIDIAN
-            C_DIAMOND -> Blocks.CRYING_OBSIDIAN
-            C_GOLD -> Blocks.IRON_BLOCK
-            C_NETHERITE -> Blocks.AMETHYST_BLOCK
-            else -> {
-                logger.warn("$UNKNOWN_MATERIAL_MSG (from getFinishingMaterialTextureIdentifier: ${item.material})")
-                Blocks.OAK_PLANKS // Fallback block
-            }
-        }
-        val id = Identifier.ofVanilla(
-            "block/${ModelHelper.extractCleanBlockIdentifier(blockForTexture)
-                .replace(replace[0], replace[1])}"
-        )
-        logger.info("Using material texture: $id for item: ${item.name}")
-        return id
-    }
-
-    fun getHandleWrappingMaterialTextureIdentifier(item: ToolItem): Identifier {
-        var replace = listOf("", "")
-        val blockForTexture = when (item.material) {
-            C_WOOD -> Blocks.GRAY_WOOL
-            C_STONE -> Blocks.GRAY_WOOL
-            C_IRON -> Blocks.GRAY_WOOL
-            C_DIAMOND -> Blocks.GRAY_WOOL
-            C_GOLD -> Blocks.GRAY_WOOL
-            C_NETHERITE -> Blocks.GRAY_WOOL
-            else -> {
-                logger.warn("$UNKNOWN_MATERIAL_MSG (from getFinishingMaterialTextureIdentifier: ${item.material})")
-                Blocks.OAK_PLANKS // Fallback block
-            }
-        }
         val id = Identifier.ofVanilla(
             "block/${ModelHelper.extractCleanBlockIdentifier(blockForTexture)
                 .replace(replace[0], replace[1])}"
@@ -155,11 +116,11 @@ object ItemModelGenerator {
 
         // Create texture map (template already defines the "stick" part via key "0")
         val textureMap = TextureMap()
-            .put(handleMaterialKey, getHandleMaterialTextureIdentifier(item))
-            .put(toolMaterialKey, getToolMaterialTextureIdentifier(item))
-            .put(finishingMaterialKey, getFinishingMaterialTextureIdentifier(item))
-            .put(handleWrappingMaterialKey, getHandleWrappingMaterialTextureIdentifier(item))
-            .put(particleKey, getToolMaterialTextureIdentifier(item))
+            .put(handleMaterialKey, getMaterialTextureIdentifier(item, TextureType.HANDLE))
+            .put(toolMaterialKey, getMaterialTextureIdentifier(item, TextureType.TOOL))
+            .put(finishingMaterialKey, getMaterialTextureIdentifier(item, TextureType.FINISHING))
+            .put(handleWrappingMaterialKey, getMaterialTextureIdentifier(item, TextureType.HANDLE_WRAPPING))
+            .put(particleKey, getMaterialTextureIdentifier(item, TextureType.TOOL))
 
         // Create model with template parent and required texture keys
         val model = Model(
