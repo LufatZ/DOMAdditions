@@ -39,20 +39,28 @@ object ItemModelGenerator {
         }
     }
 
+    /**
+     * Generates a block identifier for the given tool's material and texture type.
+     *
+     * @param item The [ToolItem] whose material determines the base texture.
+     * @param type The [TextureType] specifying which part of the tool the texture is for (e.g., handle, blade).
+     * @return An [Identifier] pointing to the resolved block texture resource path.
+     */
     fun getMaterialTextureIdentifier(item: ToolItem, type: TextureType): Identifier {
         var replace = listOf("", "")
         val blockForTexture = when (type) {
             TextureType.HANDLE -> when (item.material) {
                 C_WOOD -> Blocks.STRIPPED_SPRUCE_WOOD.also { replace = listOf("wood", "log") }
                 C_STONE -> Blocks.STRIPPED_SPRUCE_WOOD.also { replace = listOf("wood", "log") }
-                C_IRON, C_DIAMOND, C_GOLD -> Blocks.ANVIL
+                C_IRON -> Blocks.IRON_BLOCK
+                C_DIAMOND, C_GOLD -> Blocks.ANVIL
                 C_NETHERITE -> Blocks.NETHERITE_BLOCK
                 else -> null
             }
             TextureType.TOOL -> when (item.material) {
                 C_WOOD -> Blocks.SPRUCE_LOG
                 C_STONE -> Blocks.STONE
-                C_IRON -> Blocks.IRON_BLOCK
+                C_IRON -> Blocks.ANVIL
                 C_DIAMOND -> Blocks.DIAMOND_BLOCK
                 C_GOLD -> Blocks.GOLD_BLOCK
                 C_NETHERITE -> Blocks.NETHERITE_BLOCK
@@ -68,7 +76,7 @@ object ItemModelGenerator {
                 else -> null
             }
             TextureType.HANDLE_WRAPPING -> when (item.material) {
-                C_WOOD, C_STONE, C_IRON, C_DIAMOND, C_GOLD, C_NETHERITE -> Blocks.GRAY_WOOL
+                C_WOOD, C_STONE, C_IRON, C_DIAMOND, C_GOLD, C_NETHERITE -> Blocks.LIGHT_GRAY_WOOL
                 else -> null
             }
         } ?: run {
@@ -101,7 +109,7 @@ object ItemModelGenerator {
                     Identifier.of(MODID, "item/template_hammer")
                 else Identifier.of(MODID, "item/template_pickaxe")
             BlockTags.SHOVEL_MINEABLE -> Identifier.of(MODID, "item/template_shovel")
-            BlockTags.AXE_MINEABLE -> Identifier.of(MODID, "item/template_axe")
+            BlockTags.AXE_MINEABLE -> Identifier.of(MODID, "item/template_lumberjack_axe")
             else -> Identifier.of(MODID, "item/template_hammer").also {
                 logger.warn("Unknown effective block tag: ${item.effectiveBlocks}")
             }
