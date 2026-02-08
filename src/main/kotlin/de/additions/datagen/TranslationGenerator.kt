@@ -63,12 +63,6 @@ class TranslationGenerator(
         return base
             .replace(Regex("\\bWood\\b"), "Wooden")
             .replace(Regex("\\bGold\\b"), "Golden")
-            .run {
-                if ("big_" in translationKey && words.last() == "Axe") {
-                    replace(Regex("\\bBig\\s+"), "")
-                        .replace(Regex("\\bAxe\\b"), "Lumberjack Axe")
-                } else this
-            }
     }
 
     override fun generateTranslations(

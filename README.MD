@@ -1,5 +1,25 @@
 ![DayOfMind](https://cdn.modrinth.com/data/o0NSWXiU/images/30dd4442f5da1001f240de08fb3e7130a56c8a87.jpeg)
 
+---
+## 🔨 **Join the Tools Rework Beta Testing!**
+
+We're excited to announce that **DayOfMind Additions is getting a complete tools overhaul**, and we need YOUR help to make it amazing! 🚀
+
+### 🎮 **What's New in the Test Versions:**
+- **Lumberjack Axe** – Completely reworked model & functionality *(formerly "Big Axe")*
+- **Hammer** – Fresh new design and improvements
+- **Fast Leaf Decay** – Bug fixes for tree harvesting
+- **Code Optimizations** – Enhanced asset generation system
+
+### 💬 **Get Involved:**
+This is your chance to shape the future of DayOfMind's mining and harvesting tools! We're releasing test builds step-by-step and actively collecting feedback from the community.
+
+👉 **[Join the Discussion & Download Test Builds](https://discord.gg/8pwVT6RDXB)** *(Look for the "TEST VERSION - Tool Rework" thread)*
+
+Your feedback, bug reports, and feature suggestions are **highly encouraged**! Let's build something incredible together. ⚒️✨
+
+---
+
 # DayOfMind Additions
 Welcome to **DayOfMind**, a sophisticated Minecraft mod project developed by OxfaTech, designed to enhance your gaming experience with thoughtfully crafted additions. Our focus is on aesthetic integration with vanilla Minecraft. 🌟
 ![fabric](https://img.shields.io/badge/environment-any-707070?style=flat-square)
@@ -9,7 +29,7 @@ Welcome to **DayOfMind**, a sophisticated Minecraft mod project developed by Oxf
 [![ko-fi](https://img.shields.io/badge/Ko--fi-FF5E5B?logo=ko-fi&logoColor=white)](https://ko-fi.com/R6R818TUQY)
 [![Crowdin](https://badges.crowdin.net/dayofmind-additions/localized.svg)](https://crowdin.com/project/dayofmind-additions)
 [![GitHub](https://img.shields.io/badge/GitHub-%23121011.svg?logo=github&logoColor=white)](https://github.com/LufatZ/DOMAdditions)
-[![Discord](https://img.shields.io/badge/Discord-%237289DA.svg?logo=discord&logoColor=white)](https://discord.gg/yRkqCvFcmz)
+[![Discord](https://img.shields.io/badge/Discord-%237289DA.svg?logo=discord&logoColor=white)](https://discord.gg/juxu5Jrrdk)
 [![Modrinth](https://img.shields.io/badge/Modrinth-0077DD?logo=modrinth&logoColor=white)](https://modrinth.com/mod/dayofmind-additions)
 [![CurseForge](https://img.shields.io/badge/CurseForge-551A8B?logo=curseforge&logoColor=white)](https://www.curseforge.com/minecraft/mc-mods/dayofmind-additions)
 [![OxFaTech](https://img.shields.io/badge/OxFaTech-FF5E5B?logo=oxfatech&logoColor=white)](https://oxfatech.de)

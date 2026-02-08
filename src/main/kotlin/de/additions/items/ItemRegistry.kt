@@ -187,15 +187,15 @@ object ItemRegistry {
             )
 
         // Register big shovels: moderate damage (1.5), slow speed (-3.0), radius mining
-        registerToolItems("big_%material_shovel", shovelLore, 1.5f, -3.0f, ToolTypes.SHOVEL, MiningTypes.RADIUS_MINING)
+        registerToolItems("%material_terraformer_shovel", shovelLore, 1.5f, -3.0f, ToolTypes.SHOVEL, MiningTypes.RADIUS_MINING)
 
         // Register hammers: lower damage (1.0), slightly faster than shovels (-2.8), radius mining
         registerToolItems("%material_hammer", hammerLore, 1f, -2.8f, ToolTypes.PICKAXE, MiningTypes.RADIUS_MINING)
 
         // Register big axes: high damage (6.0), slowest speed (-3.2), vein mining for tree cutting
-        registerToolItems("big_%material_axe", axeLore, 6f, -3.2f, ToolTypes.AXE, MiningTypes.VEIN_MINING)
+        registerToolItems("%material_lumberjack_axe", axeLore, 6f, -3.2f, ToolTypes.AXE, MiningTypes.VEIN_MINING)
 
         // Register big axes: high damage (6.0), slowest speed (-3.2), vein mining for tree cutting
-        registerToolItems("vein_%material_pickaxe", pickaxeLore, 1.5f, -3.0f, ToolTypes.PICKAXE, MiningTypes.VEIN_MINING)
+        registerToolItems("%material_prospector_pickaxe", pickaxeLore, 1.5f, -3.0f, ToolTypes.PICKAXE, MiningTypes.VEIN_MINING)
     }
 }
