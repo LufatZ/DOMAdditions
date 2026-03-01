@@ -1,10 +1,16 @@
 pluginManagement {
+	Properties props = new Properties()
+	file("gradle.properties").withInputStream { props.load(it) }
+
+	plugins {
+		id 'fabric-loom'               version props.loom_version
+		id 'org.jetbrains.kotlin.jvm'  version props.kotlin_version
+	}
+
 	repositories {
-		maven {
-			name = 'Fabric'
-			url = 'https://maven.fabricmc.net/'
-		}
-		mavenCentral()
+		maven { url "https://maven.fabricmc.net/" }
 		gradlePluginPortal()
 	}
 }
+
+rootProject.name = "DOMAdditions"

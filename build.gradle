@@ -1,22 +1,17 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    id 'fabric-loom' version '1.+'
+    id 'fabric-loom'              // version managed in settings.gradle via pluginManagement
     id 'maven-publish'
-    id "org.jetbrains.kotlin.jvm" version "2.3.0" // Ensure this Kotlin version matches the project needs
+    id 'org.jetbrains.kotlin.jvm' // version managed in settings.gradle via pluginManagement
 }
-
-// ==========================================================================================
-// Project Properties
-// ==========================================================================================
-// defined in gradle.properties
-// ==========================================================================================
 
 // ==========================================================================================
 // Build Number Logic
 // ==========================================================================================
-// Manages an incremental build number, stored in 'build.number'.
+// Manages an incremental build number stored in 'build.number'.
 // Resets to 1 if 'mod_version' changes compared to the last build ('last.version').
+// ==========================================================================================
 def buildNumberFile = file('build.number')
 def currentModVersion = project.mod_version
 def buildNumber = 1
@@ -25,137 +20,122 @@ def versionFile = file('last.version')
 if (versionFile.exists()) {
     def previousVersion = versionFile.text.trim()
     if (buildNumberFile.exists()) {
-       // Reset build number if mod version has changed
-       if (previousVersion != currentModVersion) {
-          buildNumber = 1
-       } else {
-          // Increment build number if mod version is the same
-          buildNumber = Integer.parseInt(buildNumberFile.text.trim()) + 1
-       }
+        if (previousVersion != currentModVersion) {
+            // Reset build number if mod version has changed
+            buildNumber = 1
+        } else {
+            // Increment build number if mod version is the same
+            buildNumber = Integer.parseInt(buildNumberFile.text.trim()) + 1
+        }
     }
 }
-// Write current build number for this build
 buildNumberFile.text = buildNumber.toString()
-// Write current mod version for the next build's comparison
 versionFile.text = currentModVersion
-// ==========================================================================================
-
 
 // ==========================================================================================
 // Version Configuration (SemVer Compliant)
 // ==========================================================================================
-// Sets the project version using the SemVer format: MAJOR.MINOR.PATCH-minecraft_version+build.BUILDNUMBER
-// Example Result: 0.14.2-1.21.5+build.188
-version = "${project.mod_version}-${project.minecraft_version}+build.${buildNumber}"
+// Format: MAJOR.MINOR.PATCH-minecraft_version+build.BUILDNUMBER
+// Example: 0.15.0-alpha-1.21.11+build.42
 // ==========================================================================================
-
-group = project.maven_group
+version = "${project.mod_version}-${project.minecraft_version}+build.${buildNumber}"
+group   = project.maven_group
 
 base {
     archivesName = project.archives_base_name
 }
 
+// ==========================================================================================
+// Repositories
+// ==========================================================================================
 repositories {
-    // Essential Minecraft/Fabric repositories
-    // And any other repositories the dependencies require
-    mavenCentral() // Generally good practice to include
+    mavenCentral()
     maven { url "https://maven.fabricmc.net/" }
-    // Dependency specific repositories
-    maven { url "https://maven.shedaniel.me" }        // REI
+    maven { url "https://maven.shedaniel.me"       } // REI
     maven { url "https://maven.terraformersmc.com/" } // ModMenu
-    maven { url "https://api.modrinth.com/maven" }    // Modrinth Maven (Jade, MidnightLib)
+    maven { url "https://api.modrinth.com/maven"   } // Jade, MidnightLib
 }
 
+// ==========================================================================================
+// Fabric Data Generation
+// ==========================================================================================
 fabricApi {
-    // Configure Fabric API features if needed, e.g., data generation
     configureDataGeneration() {
-		// enable data generation for the mod
-		client = true
-	}
+        client = true
+    }
 }
 
+// ==========================================================================================
+// Dependencies
+// ==========================================================================================
 dependencies {
-    // Core Minecraft & Fabric dependencies
-    minecraft "com.mojang:minecraft:${project.minecraft_version}"
-    mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
-    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    // Core Minecraft & Fabric
+    minecraft          "com.mojang:minecraft:${project.minecraft_version}"
+    mappings           "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+    modImplementation  "net.fabricmc:fabric-loader:${project.loader_version}"
 
-    // Fabric API and Kotlin Language Adapter
-    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
-    modImplementation "net.fabricmc:fabric-language-kotlin:${project.fabric_kotlin_version}"
+    // Fabric API + Kotlin Language Adapter
+    modImplementation  "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+    modImplementation  "net.fabricmc:fabric-language-kotlin:${project.fabric_kotlin_version}"
 
-    // Mod Dependencies
-    modRuntimeOnly "com.terraformersmc:modmenu:${project.modmenu_version}"       // ModMenu
-    modRuntimeOnly "maven.modrinth:jade:${project.jade}+fabric"                  // Jade (Waila alternative)
-    modImplementation "maven.modrinth:midnightlib:${project.midnightlib}-fabric" // MidnightLib (Library dependency)
+    // Required Library
+    modImplementation  "maven.modrinth:midnightlib:${project.midnightlib}-fabric"
 
-    // Optional: REI Integration (Compile-Only API, Runtime-Only Implementation)
-    modCompileOnly "me.shedaniel:RoughlyEnoughItems-api-fabric:${project.rei}"
-    modRuntimeOnly "me.shedaniel:RoughlyEnoughItems-fabric:${project.rei}"
+    // Optional Runtime Mods
+    modRuntimeOnly     "com.terraformersmc:modmenu:${project.modmenu_version}"
+    modRuntimeOnly     "maven.modrinth:jade:${project.jade}+fabric"
+
+    // Optional REI Integration
+    modCompileOnly     "me.shedaniel:RoughlyEnoughItems-api-fabric:${project.rei}"
+    modRuntimeOnly     "me.shedaniel:RoughlyEnoughItems-fabric:${project.rei}"
 }
 
+// ==========================================================================================
+// Resource Processing (version injection into fabric.mod.json)
+// ==========================================================================================
 processResources {
-    // Ensure resources are always processed (useful for version injection)
-    outputs.upToDateWhen { false } // Force processing every time, safer for version changes
-    // Replace placeholders in fabric.mod.json
-    inputs.property "version", project.version // Make task sensitive to version changes
+    outputs.upToDateWhen { false }
+    inputs.property "version", project.version
     filesMatching("fabric.mod.json") {
         expand "version": project.version
     }
 }
 
 // ==========================================================================================
-// Build Number Utility Task
-// ==========================================================================================
-// Adds a task to manually reset the build number (e.g., ./gradlew resetBuildNumber)
-tasks.register('resetBuildNumber') {
-    group = "Build Setup" // Assign task to a group in ./gradlew tasks
-    description = "Resets the build number counter to 0."
-    doLast {
-       buildNumberFile.text = '0'
-       println "Build number file ('${buildNumberFile.name}') reset to 0. It will start from 1 on the next build."
-    }
-}
-// ==========================================================================================
-
-
-// ==========================================================================================
-// Java / Kotlin Compilation Configuration
+// Java / Kotlin Compilation
 // ==========================================================================================
 tasks.withType(JavaCompile).configureEach {
-    // Set Java bytecode version compatibility
-    options.release.set(21) // Target Java 21
+    options.release.set(21)
 }
 
 tasks.withType(KotlinCompile).configureEach {
-    // Configure Kotlin compiler options
     kotlinOptions {
-       jvmTarget = "21" // Target JVM 21 for Kotlin code
+        jvmTarget = "21"
     }
 }
 
 java {
-    // Optional: Include source code in the resulting JARs
-    //withSourcesJar()
-
-    // Set Java language level compatibility for the project
     sourceCompatibility = JavaVersion.VERSION_21
     targetCompatibility = JavaVersion.VERSION_21
+    // withSourcesJar() // uncomment to include sources in JARs
 }
 
 // ==========================================================================================
-// Task Dependencies Configuration
+// Task Dependencies (runDatagen runs before any execution / build)
 // ==========================================================================================
-// Ensure that runClient depends on runDatagen
-tasks.named("runClient").configure {
-    dependsOn(tasks.named("runDatagen"))
-}
-// Ensure that runServer also depends on runDatagen
-tasks.named("runServer").configure {
-    dependsOn(tasks.named("runDatagen"))
-}
-// Ensure that build also depends on runDatagen
-tasks.named("build").configure {
-    dependsOn(tasks.named("runDatagen"))
-}
+tasks.named("runClient").configure { dependsOn(tasks.named("runDatagen")) }
+tasks.named("runServer").configure { dependsOn(tasks.named("runDatagen")) }
+tasks.named("build").configure     { dependsOn(tasks.named("runDatagen")) }
+
 // ==========================================================================================
+// Utility: Reset Build Number
+// Usage: ./gradlew resetBuildNumber
+// ==========================================================================================
+tasks.register('resetBuildNumber') {
+    group       = "Build Setup"
+    description = "Resets the build number counter to 0 (next build will start at 1)."
+    doLast {
+        buildNumberFile.text = '0'
+        println "Build number reset to 0. Next build will start from 1."
+    }
+}
