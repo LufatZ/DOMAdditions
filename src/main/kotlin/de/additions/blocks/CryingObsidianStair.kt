@@ -1,14 +1,14 @@
 package de.additions.blocks
 
-import net.minecraft.block.BlockState
-import net.minecraft.block.StairsBlock
-import net.minecraft.block.enums.BlockHalf
-import net.minecraft.block.enums.StairShape
-import net.minecraft.particle.ParticleTypes
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.Direction
-import net.minecraft.util.math.random.Random
-import net.minecraft.world.World
+import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.block.StairBlock
+import net.minecraft.world.level.block.state.properties.Half
+import net.minecraft.world.level.block.state.properties.StairsShape
+import net.minecraft.core.particles.ParticleTypes
+import net.minecraft.core.BlockPos
+import net.minecraft.core.Direction
+import net.minecraft.util.RandomSource
+import net.minecraft.world.level.Level
 
 /**
  * Represents a stair block variant of Crying Obsidian.
@@ -19,23 +19,23 @@ import net.minecraft.world.World
  */
 class CryingObsidianStair(
     baseBlockState: BlockState,
-    settings: Settings,
-) : StairsBlock(baseBlockState, settings) {
+    settings: Properties,
+) : StairBlock(baseBlockState, settings) {
     /**
      * Called periodically to display random particles.
      * There is a 20% chance each tick for particles to spawn.
      * The particle emission logic is delegated based on the stair's properties.
      */
-    override fun randomDisplayTick(
+    override fun animateTick(
         state: BlockState,
-        world: World,
+        world: Level,
         pos: BlockPos,
-        random: Random,
+        random: RandomSource,
     ) {
         if (random.nextInt(5) == 0) {
-            val facing = state.get(FACING)
-            val half = state.get(HALF)
-            val shape = state.get(SHAPE)
+            val facing = state.getValue(FACING)
+            val half = state.getValue(HALF)
+            val shape = state.getValue(SHAPE)
 
             getValidDirections(facing, half, shape).forEach { direction ->
                 trySpawnParticle(world, pos, direction, random, half)
@@ -53,12 +53,12 @@ class CryingObsidianStair(
      */
     private fun getValidDirections(
         facing: Direction,
-        half: BlockHalf,
-        shape: StairShape,
+        half: Half,
+        shape: StairsShape,
     ): List<Direction> =
         when (half) {
-            BlockHalf.BOTTOM -> getBottomValidDirections(facing, shape)
-            BlockHalf.TOP -> getTopValidDirections(facing, shape)
+            Half.BOTTOM -> getBottomValidDirections(facing, shape)
+            Half.TOP -> getTopValidDirections(facing, shape)
         }
 
     /**
@@ -66,21 +66,21 @@ class CryingObsidianStair(
      */
     private fun getBottomValidDirections(
         facing: Direction,
-        shape: StairShape,
+        shape: StairsShape,
     ): List<Direction> {
         val directions = mutableListOf(Direction.DOWN)
         when (shape) {
-            StairShape.STRAIGHT -> directions.add(facing.opposite)
-            StairShape.INNER_LEFT,
-            StairShape.OUTER_LEFT,
+            StairsShape.STRAIGHT -> directions.add(facing.opposite)
+            StairsShape.INNER_LEFT,
+            StairsShape.OUTER_LEFT,
             -> {
-                directions.add(facing.rotateYCounterclockwise())
+                directions.add(facing.counterClockWise)
                 directions.add(facing.opposite)
             }
-            StairShape.INNER_RIGHT,
-            StairShape.OUTER_RIGHT,
+            StairsShape.INNER_RIGHT,
+            StairsShape.OUTER_RIGHT,
             -> {
-                directions.add(facing.rotateYClockwise())
+                directions.add(facing.clockWise)
                 directions.add(facing.opposite)
             }
         }
@@ -92,22 +92,22 @@ class CryingObsidianStair(
      */
     private fun getTopValidDirections(
         facing: Direction,
-        shape: StairShape,
+        shape: StairsShape,
     ): List<Direction> {
         val directions = mutableListOf(Direction.UP)
         when (shape) {
-            StairShape.STRAIGHT -> directions.add(facing)
-            StairShape.INNER_LEFT,
-            StairShape.OUTER_LEFT,
+            StairsShape.STRAIGHT -> directions.add(facing)
+            StairsShape.INNER_LEFT,
+            StairsShape.OUTER_LEFT,
             -> {
                 directions.add(facing)
-                directions.add(facing.rotateYCounterclockwise())
+                directions.add(facing.counterClockWise)
             }
-            StairShape.INNER_RIGHT,
-            StairShape.OUTER_RIGHT,
+            StairsShape.INNER_RIGHT,
+            StairsShape.OUTER_RIGHT,
             -> {
                 directions.add(facing)
-                directions.add(facing.rotateYClockwise())
+                directions.add(facing.clockWise)
             }
         }
         return directions
@@ -119,18 +119,18 @@ class CryingObsidianStair(
      * @param half The stair half (top/bottom) for vertical positioning.
      */
     private fun trySpawnParticle(
-        world: World,
+        world: Level,
         pos: BlockPos,
         direction: Direction,
-        random: Random,
-        half: BlockHalf,
+        random: RandomSource,
+        half: Half,
     ) {
-        val blockPos = pos.offset(direction)
+        val blockPos = pos.relative(direction)
         val blockState = world.getBlockState(blockPos)
 
-        if (!blockState.isOpaque || !blockState.isSideSolidFullSquare(world, blockPos, direction.opposite)) {
+        if (!blockState.canOcclude() || !blockState.isFaceSturdy(world, blockPos, direction.opposite)) {
             val (x, y, z) = calculateParticlePosition(direction, random, half)
-            world.addParticleClient(
+            world.addParticle(
                 ParticleTypes.DRIPPING_OBSIDIAN_TEAR,
                 pos.x + x,
                 pos.y + y,
@@ -151,13 +151,13 @@ class CryingObsidianStair(
      */
     private fun calculateParticlePosition(
         direction: Direction,
-        random: Random,
-        half: BlockHalf,
+        random: RandomSource,
+        half: Half,
     ): Triple<Double, Double, Double> {
         val (baseY, heightRange) =
             when (half) {
-                BlockHalf.BOTTOM -> 0.25 to 0.25
-                BlockHalf.TOP -> 0.5 to 0.5
+                Half.BOTTOM -> 0.25 to 0.25
+                Half.TOP -> 0.5 to 0.5
             }
 
         return when (direction.axis) {
@@ -171,13 +171,13 @@ class CryingObsidianStair(
      */
     private fun handleVerticalDirection(
         direction: Direction,
-        random: Random,
-        half: BlockHalf,
+        random: RandomSource,
+        half: Half,
     ): Triple<Double, Double, Double> {
         val y =
             when {
-                half == BlockHalf.BOTTOM && direction == Direction.DOWN -> 0.1 + random.nextDouble() * 0.4
-                half == BlockHalf.TOP && direction == Direction.UP -> 0.9 + random.nextDouble() * 0.1
+                half == Half.BOTTOM && direction == Direction.DOWN -> 0.1 + random.nextDouble() * 0.4
+                half == Half.TOP && direction == Direction.UP -> 0.9 + random.nextDouble() * 0.1
                 else -> random.nextDouble()
             }
 
@@ -193,7 +193,7 @@ class CryingObsidianStair(
      */
     private fun handleHorizontalDirection(
         direction: Direction,
-        random: Random,
+        random: RandomSource,
         baseY: Double,
         heightRange: Double,
     ): Triple<Double, Double, Double> {

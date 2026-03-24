@@ -1,21 +1,29 @@
 package de.additions.items
 
-import net.minecraft.block.*
-import net.minecraft.component.DataComponentTypes
-import net.minecraft.component.type.ToolComponent
-import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.item.*
-import net.minecraft.registry.tag.BlockTags
-import net.minecraft.registry.tag.TagKey
-import net.minecraft.sound.SoundCategory
-import net.minecraft.sound.SoundEvents
-import net.minecraft.util.ActionResult
-import net.minecraft.util.Hand
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.Direction
-import net.minecraft.world.World
-import net.minecraft.world.event.GameEvent
+import net.minecraft.core.component.DataComponents
+import net.minecraft.world.item.component.Tool
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.player.Player
+import net.minecraft.tags.BlockTags
+import net.minecraft.tags.TagKey
+import net.minecraft.sounds.SoundSource
+import net.minecraft.sounds.SoundEvents
+import net.minecraft.world.InteractionResult
+import net.minecraft.world.InteractionHand
+import net.minecraft.core.BlockPos
+import net.minecraft.core.Direction
+import net.minecraft.world.item.HoneycombItem
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.ToolMaterial
+import net.minecraft.world.item.context.UseOnContext
+import net.minecraft.world.level.Level
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.level.block.DropExperienceBlock
+import net.minecraft.world.level.block.RotatedPillarBlock
+import net.minecraft.world.level.block.WeatheringCopper
+import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.gameevent.GameEvent
 
 /**
  * Represents a custom mining tool that breaks a vein of connected blocks of the same type.
@@ -34,7 +42,7 @@ import net.minecraft.world.event.GameEvent
 class VeinMineItem(
     material: ToolMaterial,
     effectiveBlocks: TagKey<Block>,
-    settings: Settings,
+    settings: Properties,
 ) : ToolItem(material, effectiveBlocks, settings) {
 
     companion object {
@@ -92,19 +100,19 @@ class VeinMineItem(
      * @param context The context in which the item was used.
      * @return [ActionResult.SUCCESS] if the AoE action was performed, otherwise delegates to the parent implementation.
      */
-    override fun useOnBlock(context: ItemUsageContext): ActionResult {
+    override fun useOn(context: UseOnContext): InteractionResult {
         // Only perform AoE stripping/scraping if the tool is an axe.
-        if (effectiveBlocks != BlockTags.AXE_MINEABLE) return super.useOnBlock(context)
+        if (effectiveBlocks != BlockTags.MINEABLE_WITH_AXE) return super.useOn(context)
 
-        val world = context.world
-        val player = context.player ?: return ActionResult.PASS
-        val pos = context.blockPos
-        val stack = context.stack
+        val world = context.level
+        val player = context.player ?: return InteractionResult.PASS
+        val pos = context.clickedPos
+        val stack = context.itemInHand
 
         // Prevent action if certain offhand conditions are met.
-        if (shouldCancelStripAttempt(context)) return ActionResult.PASS
+        if (shouldCancelStripAttempt(context)) return InteractionResult.PASS
 
-        val facing = player.facing
+        val facing = player.nearestViewDirection
 
         /**
          * Helper function to attempt stripping/scraping a single block at the target position.
@@ -112,9 +120,9 @@ class VeinMineItem(
          */
         fun handleBlockAt(targetPos: BlockPos) {
             tryStrip(world, targetPos, player, world.getBlockState(targetPos))?.let { newState ->
-                world.setBlockState(targetPos, newState, 11) // Set block state with updates
-                world.emitGameEvent(GameEvent.BLOCK_CHANGE, targetPos, GameEvent.Emitter.of(player, newState))
-                stack.damage(1, player, context.hand)
+                world.setBlock(targetPos, newState, 11) // Set block state with updates
+                world.gameEvent(GameEvent.BLOCK_CHANGE, targetPos, GameEvent.Context.of(player, newState))
+                stack.hurtAndBreak(1, player, context.hand)
             }
         }
 
@@ -123,7 +131,7 @@ class VeinMineItem(
                 for (dx in -RADIUS..RADIUS) {
                     for (dz in -RADIUS..RADIUS) {
                         if ((dx != 0 || dz != 0) && dx * dx + dz * dz <= RADIUS * RADIUS) {
-                            handleBlockAt(pos.add(dx, 0, dz))
+                            handleBlockAt(pos.offset(dx, 0, dz))
                         }
                     }
                 }
@@ -132,7 +140,7 @@ class VeinMineItem(
                 for (dx in -RADIUS..RADIUS) {
                     for (dy in -RADIUS..RADIUS) {
                         if ((dx != 0 || dy != 0) && dx * dx + dy * dy <= RADIUS * RADIUS) {
-                            handleBlockAt(pos.add(dx, dy, 0))
+                            handleBlockAt(pos.offset(dx, dy, 0))
                         }
                     }
                 }
@@ -141,7 +149,7 @@ class VeinMineItem(
                 for (dz in -RADIUS..RADIUS) {
                     for (dy in -RADIUS..RADIUS) {
                         if ((dz != 0 || dy != 0) && dz * dz + dy * dy <= RADIUS * RADIUS) {
-                            handleBlockAt(pos.add(0, dy, dz))
+                            handleBlockAt(pos.offset(0, dy, dz))
                         }
                     }
                 }
@@ -151,12 +159,12 @@ class VeinMineItem(
 
         // Also apply the action to the center block that was initially clicked.
         tryStrip(world, pos, player, world.getBlockState(pos))?.let { newState ->
-            world.setBlockState(pos, newState, 11)
-            world.emitGameEvent(GameEvent.BLOCK_CHANGE, pos, GameEvent.Emitter.of(player, newState))
-            stack.damage(1, player, context.hand)
+            world.setBlock(pos, newState, 11)
+            world.gameEvent(GameEvent.BLOCK_CHANGE, pos, GameEvent.Context.of(player, newState))
+            stack.hurtAndBreak(1, player, context.hand)
         }
 
-        return ActionResult.SUCCESS
+        return InteractionResult.SUCCESS
     }
 
     /**
@@ -169,26 +177,26 @@ class VeinMineItem(
      * @param state The current state of the block.
      * @return The new [BlockState] if an action was successful, otherwise `null`.
      */
-    private fun tryStrip(world: World, pos: BlockPos, player: PlayerEntity?, state: BlockState): BlockState? {
+    private fun tryStrip(world: Level, pos: BlockPos, player: Player?, state: BlockState): BlockState? {
         // 1. Attempt to strip log/wood
         getStrippedState(state)?.let { newState ->
-            world.playSound(player, pos, SoundEvents.ITEM_AXE_STRIP, SoundCategory.BLOCKS, 1f, 1f)
+            world.playSound(player, pos, SoundEvents.AXE_STRIP, SoundSource.BLOCKS, 1f, 1f)
             return newState
         }
 
         // 2. Attempt to scrape oxidizable blocks (copper)
-        Oxidizable.getDecreasedOxidationState(state).orElse(null)?.let { newState ->
-            world.playSound(player, pos, SoundEvents.ITEM_AXE_SCRAPE, SoundCategory.BLOCKS, 1f, 1f)
-            world.syncWorldEvent(player, 3005, pos, 0) // Visual effect for scraping
+        WeatheringCopper.getPrevious(state).orElse(null)?.let { newState ->
+            world.playSound(player, pos, SoundEvents.AXE_SCRAPE, SoundSource.BLOCKS, 1f, 1f)
+            world.levelEvent(player, 3005, pos, 0) // Visual effect for scraping
             return newState
         }
 
         // 3. Attempt to dewax waxed blocks
-        HoneycombItem.WAXED_TO_UNWAXED_BLOCKS.get()[state.block]
-            ?.getStateWithProperties(state)
+        HoneycombItem.WAX_OFF_BY_BLOCK.get()[state.block]
+            ?.withPropertiesOf(state)
             ?.let { newState ->
-                world.playSound(player, pos, SoundEvents.ITEM_AXE_WAX_OFF, SoundCategory.BLOCKS, 1f, 1f)
-                world.syncWorldEvent(player, 3004, pos, 0) // Visual effect for dewaxing
+                world.playSound(player, pos, SoundEvents.AXE_WAX_OFF, SoundSource.BLOCKS, 1f, 1f)
+                world.levelEvent(player, 3004, pos, 0) // Visual effect for dewaxing
                 return newState
             }
 
@@ -202,8 +210,8 @@ class VeinMineItem(
      * @return The stripped [BlockState] if one exists, otherwise `null`.
      */
     private fun getStrippedState(state: BlockState): BlockState? =
-        STRIPPED_BLOCKS[state.block]?.defaultState
-            ?.with(PillarBlock.AXIS, state[PillarBlock.AXIS])
+        STRIPPED_BLOCKS[state.block]?.defaultBlockState()
+            ?.setValue(RotatedPillarBlock.AXIS, state.getValue(RotatedPillarBlock.AXIS))
 
     /**
      * Checks if the stripping action should be cancelled, e.g., if an offhand item action takes precedence.
@@ -212,12 +220,12 @@ class VeinMineItem(
      * @param context The context of the item usage.
      * @return `true` if the stripping attempt should be cancelled, `false` otherwise.
      */
-    private fun shouldCancelStripAttempt(context: ItemUsageContext): Boolean {
+    private fun shouldCancelStripAttempt(context: UseOnContext): Boolean {
         val player = context.player ?: return false
         // This logic mirrors vanilla checks to prevent right-click actions when the offhand action is prioritized.
-        return context.hand == Hand.MAIN_HAND &&
-                player.offHandStack.contains(DataComponentTypes.BLOCKS_ATTACKS) &&
-                !player.shouldCancelInteraction()
+        return context.hand == InteractionHand.MAIN_HAND &&
+                player.offhandItem.has(DataComponents.BLOCKS_ATTACKS) &&
+                !player.isSecondaryUseActive
     }
 
     /**
@@ -230,22 +238,23 @@ class VeinMineItem(
      * @param miner The entity that mined the block.
      * @return Always returns `true` after attempting the vein mine to indicate the action was handled.
      */
-    override fun postMine(
+    override fun mineBlock(
         stack: ItemStack,
-        world: World,
+        world: Level,
         state: BlockState,
         pos: BlockPos, // position of the first block
         miner: LivingEntity,
     ): Boolean {
         // First, call the superclass method to handle default tool damage and stats.
-        val initialResult = super.postMine(stack, world, state, pos, miner)
+        val initialResult = super.mineBlock(stack, world, state, pos, miner)
 
-        val toolData = stack.get(DataComponentTypes.TOOL)
+        val toolData = stack.get(DataComponents.TOOL)
 
-        // Execute vein mining only on the server, if the item has tool data, and the initial block wasn't instantly breakable.
-        if (world.isClient || state.getHardness(world, pos) <= 0.0f || toolData == null) {
-            return initialResult // Don't process AoE on client or for trivial blocks
-        }
+        val isCreative = miner is Player && miner.isCreative
+
+        if (world.isClientSide || toolData == null) return initialResult
+
+        if (!isCreative && state.getDestroySpeed(world, pos) <= 0.0f) return initialResult
 
         // Trigger the main vein mining logic.
         performVeinMining(world, pos, state.block, miner, stack, toolData)
@@ -265,19 +274,19 @@ class VeinMineItem(
      * @param toolData The tool component data from the item stack.
      */
     private fun performVeinMining(
-        world: World,
+        world: Level,
         startPos: BlockPos,
         targetBlock: Block,
         miner: LivingEntity,
         stack: ItemStack,
-        toolData: ToolComponent
+        toolData: Tool
     ) {
         val visitedPositions = mutableSetOf<BlockPos>()
         val positionsToCheck = ArrayDeque<BlockPos>() // Use ArrayDeque as a queue for efficiency
 
         // Start the search from the direct neighbors of the initial block.
         NEIGHBOR_OFFSETS.forEach { offset ->
-            positionsToCheck.add(startPos.add(offset))
+            positionsToCheck.add(startPos.offset(offset))
         }
         visitedPositions.add(startPos)
 
@@ -289,19 +298,19 @@ class VeinMineItem(
 
             // Skip positions we have already processed and blocks that are not vein mineable.
             if (!visitedPositions.add(currentPos) ||
-                (world.getBlockState(currentPos).block !is ExperienceDroppingBlock && effectiveBlocks == BlockTags.PICKAXE_MINEABLE)) {
+                (world.getBlockState(currentPos).block !is DropExperienceBlock && effectiveBlocks == BlockTags.MINEABLE_WITH_PICKAXE)) {
                 continue
             }
 
             // Check if the block at this position is a valid part of the vein.
-            if (isValidVeinBlock(world, currentPos, targetBlock, toolData)) {
+            if (isValidVeinBlock(world, currentPos, targetBlock, miner, toolData)) {
                 // Mine the block and increment the counter.
                 tryBreakBlock(currentPos, world, miner, stack, toolData)
                 blocksMinedCount++
 
                 // Add all neighbors of the newly mined block to the queue to continue the search.
                 NEIGHBOR_OFFSETS.forEach { offset ->
-                    val neighborPos = currentPos.add(offset)
+                    val neighborPos = currentPos.offset(offset)
                     if (neighborPos !in visitedPositions) {
                         positionsToCheck.addLast(neighborPos)
                     }
@@ -321,19 +330,18 @@ class VeinMineItem(
      * @return `true` if the block can be vein-mined, `false` otherwise.
      */
     private fun isValidVeinBlock(
-        world: World,
+        world: Level,
         pos: BlockPos,
         targetBlock: Block,
-        toolData: ToolComponent
+        miner: LivingEntity,
+        toolData: Tool
     ): Boolean {
         val blockState = world.getBlockState(pos)
 
-        // The block must be the same type as the one originally mined.
-        if (blockState.block != targetBlock) {
-            return false
-        }
+        if (blockState.block != targetBlock) return false
 
-        // Delegate to the superclass for general suitability checks (e.g., tool level, hardness).
+        if (miner is Player && miner.isCreative) return true
+
         return isSuitableForMining(blockState, world, pos, toolData)
     }
 }

@@ -8,19 +8,19 @@ import de.additions.items.ToolItem.Companion.MiningTypes
 import de.additions.items.ToolItem.Companion.RADIUS
 import de.additions.items.ToolItem.Companion.ToolTypes
 import de.additions.items.ToolItem.Companion.materials
-import net.minecraft.component.DataComponentTypes
-import net.minecraft.component.type.LoreComponent
-import net.minecraft.item.Item
-import net.minecraft.item.ItemStack
-import net.minecraft.item.Items
-import net.minecraft.registry.Registries
-import net.minecraft.registry.Registry
-import net.minecraft.registry.RegistryKey
-import net.minecraft.registry.RegistryKeys
-import net.minecraft.registry.tag.BlockTags
-import net.minecraft.text.Text
-import net.minecraft.util.Formatting
-import net.minecraft.util.Identifier
+import net.minecraft.core.component.DataComponents
+import net.minecraft.world.item.component.ItemLore
+import net.minecraft.world.item.Item
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.Items
+import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.core.Registry
+import net.minecraft.resources.ResourceKey
+import net.minecraft.core.registries.Registries
+import net.minecraft.tags.BlockTags
+import net.minecraft.network.chat.Component
+import net.minecraft.ChatFormatting
+import net.minecraft.resources.Identifier
 
 /**
  * A singleton registry responsible for registering custom tool items with material variants.
@@ -81,7 +81,7 @@ object ItemRegistry {
      */
     private fun registerToolItems(
         placeholderId: String,
-        tooltip: LoreComponent,
+        tooltip: ItemLore,
         damage: Float,
         speed: Float,
         type: ToolTypes,
@@ -92,10 +92,10 @@ object ItemRegistry {
                 val id = placeholderId.replace("%material", materialName)
 
                 val toolFunction = when (type) {
-                    ToolTypes.SHOVEL -> Item.Settings::shovel
-                    ToolTypes.PICKAXE -> Item.Settings::pickaxe
-                    ToolTypes.AXE -> Item.Settings::axe
-                    ToolTypes.HOE -> Item.Settings::hoe
+                    ToolTypes.SHOVEL -> Item.Properties::shovel
+                    ToolTypes.PICKAXE -> Item.Properties::pickaxe
+                    ToolTypes.AXE -> Item.Properties::axe
+                    ToolTypes.HOE -> Item.Properties::hoe
                 }
 
                 val toolClass = when (miningType) {
@@ -104,24 +104,24 @@ object ItemRegistry {
                 }
 
                 val effectiveBlocks = when (type) {
-                    ToolTypes.SHOVEL -> BlockTags.SHOVEL_MINEABLE
-                    ToolTypes.PICKAXE -> BlockTags.PICKAXE_MINEABLE
-                    ToolTypes.AXE -> BlockTags.AXE_MINEABLE
-                    ToolTypes.HOE -> BlockTags.HOE_MINEABLE
+                    ToolTypes.SHOVEL -> BlockTags.MINEABLE_WITH_SHOVEL
+                    ToolTypes.PICKAXE -> BlockTags.MINEABLE_WITH_PICKAXE
+                    ToolTypes.AXE -> BlockTags.MINEABLE_WITH_AXE
+                    ToolTypes.HOE -> BlockTags.MINEABLE_WITH_HOE
                 }
 
-                val toolSettings = toolFunction(Item.Settings(), material, damage, speed)
-                    .component(DataComponentTypes.LORE, tooltip)
+                val toolSettings = toolFunction(Item.Properties(), material, damage, speed)
+                    .component(DataComponents.LORE, tooltip)
 
                 val registryKey =
-                    RegistryKey.of(RegistryKeys.ITEM, Identifier.of(MODID, id))
+                    ResourceKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(MODID, id))
 
                 val tool =
-                    toolClass(material, effectiveBlocks, toolSettings.registryKey(registryKey))
+                    toolClass(material, effectiveBlocks, toolSettings.setId(registryKey))
 
                 Registry.register(
-                    Registries.ITEM,
-                    RegistryKey.of(RegistryKeys.ITEM, Identifier.of(MODID, id)),
+                    BuiltInRegistries.ITEM,
+                    ResourceKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(MODID, id)),
                     tool
                 )
 
@@ -151,60 +151,60 @@ object ItemRegistry {
      */
     private fun addToolItems() {
         val diameter = 2 * RADIUS + 1
-        val areaText = Text.literal("${diameter}x${diameter}").formatted(Formatting.GRAY)
+        val areaText = Component.literal("${diameter}x${diameter}").withStyle(ChatFormatting.GRAY)
 
         val shovelLore =
-            LoreComponent(
+            ItemLore(
                 listOf(
-                    Text.translatable(
+                    Component.translatable(
                         "tooltip.additions.radius_mine.shovel_description",
                         areaText
-                    ).formatted(Formatting.WHITE),
-                    Text.translatable(
+                    ).withStyle(ChatFormatting.WHITE),
+                    Component.translatable(
                         "tooltip.additions.radius_mine.path_creation_description"
-                    ).formatted(Formatting.WHITE),
-                    Text.translatable(
+                    ).withStyle(ChatFormatting.WHITE),
+                    Component.translatable(
                         "tooltip.additions.radius_mine.sneak_description"
-                    ).formatted(Formatting.GRAY),
+                    ).withStyle(ChatFormatting.GRAY),
                 ),
             )
 
         val hammerLore =
-            LoreComponent(
+            ItemLore(
                 listOf(
-                    Text.translatable(
+                    Component.translatable(
                         "tooltip.additions.radius_mine.hammer_description",
                         areaText
-                    ).formatted(Formatting.WHITE),
-                    Text.translatable(
+                    ).withStyle(ChatFormatting.WHITE),
+                    Component.translatable(
                         "tooltip.additions.radius_mine.path_creation_description"
-                    ).formatted(Formatting.WHITE),
-                    Text.translatable(
+                    ).withStyle(ChatFormatting.WHITE),
+                    Component.translatable(
                         "tooltip.additions.radius_mine.sneak_description"
-                    ).formatted(Formatting.GRAY),
+                    ).withStyle(ChatFormatting.GRAY),
                 ),
             )
 
         val axeLore =
-            LoreComponent(
+            ItemLore(
                 listOf(
-                    Text.translatable(
+                    Component.translatable(
                         "tooltip.additions.radius_mine.axe_description",
                         areaText
-                    ).formatted(Formatting.WHITE),
-                    Text.translatable(
+                    ).withStyle(ChatFormatting.WHITE),
+                    Component.translatable(
                         "tooltip.additions.radius_mine.stripped_wood_creation_description"
-                    ).formatted(Formatting.WHITE),
+                    ).withStyle(ChatFormatting.WHITE),
                 ),
             )
 
         val pickaxeLore =
-            LoreComponent(
+            ItemLore(
                 listOf(
-                    Text.translatable(
+                    Component.translatable(
                         "tooltip.additions.radius_mine.pickaxe_description",
                         areaText
-                    ).formatted(Formatting.WHITE),
+                    ).withStyle(ChatFormatting.WHITE),
                 ),
             )
 

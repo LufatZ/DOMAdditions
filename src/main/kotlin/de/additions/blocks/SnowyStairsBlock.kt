@@ -1,22 +1,22 @@
 package de.additions.blocks
 
-import net.minecraft.block.Block
-import net.minecraft.block.BlockState
-import net.minecraft.block.StairsBlock
-import net.minecraft.block.enums.BlockHalf
-import net.minecraft.block.enums.StairShape
-import net.minecraft.fluid.Fluids
-import net.minecraft.item.ItemPlacementContext
-import net.minecraft.registry.tag.BlockTags
-import net.minecraft.state.StateManager
-import net.minecraft.state.property.BooleanProperty
-import net.minecraft.state.property.Properties
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.Direction
-import net.minecraft.util.math.random.Random
-import net.minecraft.world.BlockView
-import net.minecraft.world.WorldView
-import net.minecraft.world.tick.ScheduledTickView
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.block.StairBlock
+import net.minecraft.world.level.block.state.properties.Half
+import net.minecraft.world.level.block.state.properties.StairsShape
+import net.minecraft.world.level.material.Fluids
+import net.minecraft.world.item.context.BlockPlaceContext
+import net.minecraft.tags.BlockTags
+import net.minecraft.world.level.block.state.StateDefinition
+import net.minecraft.world.level.block.state.properties.BooleanProperty
+import net.minecraft.world.level.block.state.properties.BlockStateProperties
+import net.minecraft.core.BlockPos
+import net.minecraft.core.Direction
+import net.minecraft.util.RandomSource
+import net.minecraft.world.level.BlockGetter
+import net.minecraft.world.level.LevelReader
+import net.minecraft.world.level.ScheduledTickAccess
 
 /**
  * Represents a stair block that can be covered with snow, similar to a grass block.
@@ -27,22 +27,23 @@ import net.minecraft.world.tick.ScheduledTickView
  */
 class SnowyStairsBlock(
     blockstate: BlockState,
-    settings: Settings,
-) : StairsBlock(blockstate, settings) {
+    settings: Properties,
+) : StairBlock(blockstate, settings) {
     companion object {
         /** A boolean property indicating whether the stair is covered with snow. */
-        val SNOWY: BooleanProperty = Properties.SNOWY
+        val SNOWY: BooleanProperty = BlockStateProperties.SNOWY
     }
 
     init {
-        this.defaultState =
-            this.stateManager
-                .defaultState
-                .with(FACING, Direction.NORTH)
-                .with(HALF, BlockHalf.BOTTOM)
-                .with(SHAPE, StairShape.STRAIGHT)
-                .with(WATERLOGGED, false)
-                .with(SNOWY, false)
+        this.registerDefaultState(
+            this.stateDefinition
+                .any()
+                .setValue(FACING, Direction.NORTH)
+                .setValue(HALF, Half.BOTTOM)
+                .setValue(SHAPE, StairsShape.STRAIGHT)
+                .setValue(WATERLOGGED, false)
+                .setValue(SNOWY, false)
+        )
     }
 
     /**
@@ -50,8 +51,8 @@ class SnowyStairsBlock(
      *
      * @param builder The state manager builder.
      */
-    override fun appendProperties(builder: StateManager.Builder<Block, BlockState>) {
-        super.appendProperties(builder)
+    override fun createBlockStateDefinition(builder: StateDefinition.Builder<Block, BlockState>) {
+        super.createBlockStateDefinition(builder)
         builder.add(SNOWY)
     }
 
@@ -62,25 +63,25 @@ class SnowyStairsBlock(
      * @param ctx The item placement context.
      * @return The appropriate block state for placement.
      */
-    override fun getPlacementState(ctx: ItemPlacementContext): BlockState {
-        val snowyBlockState = ctx.world.getBlockState(ctx.blockPos.up())
-        val direction = ctx.side
-        val blockPos = ctx.blockPos
-        val fluidState = ctx.world.getFluidState(blockPos)
+    override fun getStateForPlacement(ctx: BlockPlaceContext): BlockState {
+        val snowyBlockState = ctx.level.getBlockState(ctx.clickedPos.above())
+        val direction = ctx.clickedFace
+        val blockPos = ctx.clickedPos
+        val fluidState = ctx.level.getFluidState(blockPos)
         val blockState =
-            this.defaultState
-                .with(SNOWY, isSnow(snowyBlockState))
-                .with(FACING, ctx.horizontalPlayerFacing)
-                .with(
+            this.defaultBlockState()
+                .setValue(SNOWY, isSnow(snowyBlockState))
+                .setValue(FACING, ctx.horizontalDirection)
+                .setValue(
                     HALF,
-                    if (direction != Direction.DOWN && (direction == Direction.UP || !(ctx.hitPos.y - blockPos.y.toDouble() > 0.5))) {
-                        BlockHalf.BOTTOM
+                    if (direction != Direction.DOWN && (direction == Direction.UP || !(ctx.clickLocation.y - blockPos.y.toDouble() > 0.5))) {
+                        Half.BOTTOM
                     } else {
-                        BlockHalf.TOP
+                        Half.TOP
                     },
-                ).with(WATERLOGGED, fluidState.fluid == Fluids.WATER)
+                ).setValue(WATERLOGGED, fluidState.type == Fluids.WATER)
 
-        return blockState.with(SHAPE, getStairShape(blockState, ctx.world, blockPos))
+        return blockState.setValue(SHAPE, getStairShape(blockState, ctx.level, blockPos))
     }
 
     /**
@@ -89,27 +90,27 @@ class SnowyStairsBlock(
      *
      * @return The updated block state.
      */
-    override fun getStateForNeighborUpdate(
+    override fun updateShape(
         state: BlockState,
-        world: WorldView,
-        tickView: ScheduledTickView,
+        world: LevelReader,
+        tickView: ScheduledTickAccess,
         pos: BlockPos,
         direction: Direction,
         neighborPos: BlockPos,
         neighborState: BlockState,
-        random: Random,
+        random: RandomSource,
     ): BlockState {
-        if (state.get(WATERLOGGED)) {
-            tickView.scheduleFluidTick(pos, Fluids.WATER, Fluids.WATER.getTickRate(world))
+        if (state.getValue(WATERLOGGED)) {
+            tickView.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(world))
         }
         val newState =
             if (direction.axis.isHorizontal) {
-                state.with(SHAPE, getStairShape(state, world, pos))
+                state.setValue(SHAPE, getStairShape(state, world, pos))
             } else {
-                super.getStateForNeighborUpdate(state, world, tickView, pos, direction, neighborPos, neighborState, random)
+                super.updateShape(state, world, tickView, pos, direction, neighborPos, neighborState, random)
             }
 
-        return newState.with(SNOWY, isSnow(world.getBlockState(pos.up())))
+        return newState.setValue(SNOWY, isSnow(world.getBlockState(pos.above())))
     }
 
     /**
@@ -118,7 +119,7 @@ class SnowyStairsBlock(
      * @param state The block state to check.
      * @return `true` if the block state is in the `SNOW` tag, `false` otherwise.
      */
-    private fun isSnow(state: BlockState): Boolean = state.isIn(BlockTags.SNOW)
+    private fun isSnow(state: BlockState): Boolean = state.`is`(BlockTags.SNOW)
 
     /**
      * Determines the shape of the stair block based on its neighbors.
@@ -126,39 +127,39 @@ class SnowyStairsBlock(
      * @param state The current block state.
      * @param world The world view.
      * @param pos The position of the block.
-     * @return The calculated [StairShape].
+     * @return The calculated [StairsShape].
      */
     private fun getStairShape(
         state: BlockState,
-        world: BlockView,
+        world: BlockGetter,
         pos: BlockPos,
-    ): StairShape {
-        val direction = state.get(FACING)
-        val blockState = world.getBlockState(pos.offset(direction))
-        if (isStairs(blockState) && state.get(HALF) == blockState.get(HALF)) {
-            val neighborDirection = blockState.get(FACING)
+    ): StairsShape {
+        val direction = state.getValue(FACING)
+        val blockState = world.getBlockState(pos.relative(direction))
+        if (isStairs(blockState) && state.getValue(HALF) == blockState.getValue(HALF)) {
+            val neighborDirection = blockState.getValue(FACING)
             if (neighborDirection.axis != direction.axis && isDifferentOrientation(state, world, pos, neighborDirection.opposite)) {
-                return if (neighborDirection == direction.rotateYCounterclockwise()) {
-                    StairShape.OUTER_LEFT
+                return if (neighborDirection == direction.counterClockWise) {
+                    StairsShape.OUTER_LEFT
                 } else {
-                    StairShape.OUTER_RIGHT
+                    StairsShape.OUTER_RIGHT
                 }
             }
         }
 
-        val oppositeBlockState = world.getBlockState(pos.offset(direction.opposite))
-        if (isStairs(oppositeBlockState) && state.get(HALF) == oppositeBlockState.get(HALF)) {
-            val neighborDirection = oppositeBlockState.get(FACING)
+        val oppositeBlockState = world.getBlockState(pos.relative(direction.opposite))
+        if (isStairs(oppositeBlockState) && state.getValue(HALF) == oppositeBlockState.getValue(HALF)) {
+            val neighborDirection = oppositeBlockState.getValue(FACING)
             if (neighborDirection.axis != direction.axis && isDifferentOrientation(state, world, pos, neighborDirection)) {
-                return if (neighborDirection == direction.rotateYCounterclockwise()) {
-                    StairShape.INNER_LEFT
+                return if (neighborDirection == direction.counterClockWise) {
+                    StairsShape.INNER_LEFT
                 } else {
-                    StairShape.INNER_RIGHT
+                    StairsShape.INNER_RIGHT
                 }
             }
         }
 
-        return StairShape.STRAIGHT
+        return StairsShape.STRAIGHT
     }
 
     /**
@@ -172,13 +173,13 @@ class SnowyStairsBlock(
      */
     private fun isDifferentOrientation(
         state: BlockState,
-        world: BlockView,
+        world: BlockGetter,
         pos: BlockPos,
         dir: Direction,
     ): Boolean {
-        val neighborState = world.getBlockState(pos.offset(dir))
+        val neighborState = world.getBlockState(pos.relative(dir))
         return !isStairs(neighborState) ||
-            neighborState.get(FACING) != state.get(FACING) ||
-            neighborState.get(HALF) != state.get(HALF)
+            neighborState.getValue(FACING) != state.getValue(FACING) ||
+            neighborState.getValue(HALF) != state.getValue(HALF)
     }
 }

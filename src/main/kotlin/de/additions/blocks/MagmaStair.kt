@@ -1,18 +1,18 @@
 package de.additions.blocks
 
-import net.minecraft.block.BlockState
-import net.minecraft.block.Blocks
-import net.minecraft.block.BubbleColumnBlock
-import net.minecraft.block.StairsBlock
-import net.minecraft.entity.Entity
-import net.minecraft.entity.LivingEntity
-import net.minecraft.server.world.ServerWorld
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.Direction
-import net.minecraft.util.math.random.Random
-import net.minecraft.world.World
-import net.minecraft.world.WorldView
-import net.minecraft.world.tick.ScheduledTickView
+import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.level.block.BubbleColumnBlock
+import net.minecraft.world.level.block.StairBlock
+import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.server.level.ServerLevel
+import net.minecraft.core.BlockPos
+import net.minecraft.core.Direction
+import net.minecraft.util.RandomSource
+import net.minecraft.world.level.Level
+import net.minecraft.world.level.LevelReader
+import net.minecraft.world.level.ScheduledTickAccess
 
 /**
  * Represents a stair block made of magma.
@@ -23,72 +23,72 @@ import net.minecraft.world.tick.ScheduledTickView
  */
 class MagmaStair(
     blockstate: BlockState,
-    settings: Settings,
-) : StairsBlock(blockstate, settings) {
+    settings: Properties,
+) : StairBlock(blockstate, settings) {
     /**
      * Called when an entity steps on the block.
      * Damages living entities that are not immune to stepping effects.
      */
-    override fun onSteppedOn(
-        world: World,
+    override fun stepOn(
+        world: Level,
         pos: BlockPos,
         state: BlockState,
         entity: Entity,
     ) {
-        if (!entity.bypassesSteppingEffects() && entity is LivingEntity && world is ServerWorld) {
-            entity.damage(
+        if (!entity.isSteppingCarefully && entity is LivingEntity && world is ServerLevel) {
+            entity.hurtServer(
                 world,
-                world.damageSources.hotFloor(),
+                world.damageSources().hotFloor(),
                 1.0f,
             )
         }
-        super.onSteppedOn(world, pos, state, entity)
+        super.stepOn(world, pos, state, entity)
     }
 
     /**
      * Called when a scheduled tick occurs for the block.
      * Updates bubble columns in the block above.
      */
-    override fun scheduledTick(
+    override fun tick(
         state: BlockState,
-        world: ServerWorld,
+        world: ServerLevel,
         pos: BlockPos,
-        random: Random,
+        random: RandomSource,
     ) {
-        BubbleColumnBlock.update(world, pos.up(), state)
+        BubbleColumnBlock.updateColumn(world, pos.above(), state)
     }
 
     /**
      * Called when a neighboring block is updated.
      * Schedules a block tick if water is placed on top of this block.
      */
-    override fun getStateForNeighborUpdate(
+    override fun updateShape(
         state: BlockState,
-        world: WorldView,
-        tickView: ScheduledTickView,
+        world: LevelReader,
+        tickView: ScheduledTickAccess,
         pos: BlockPos,
         direction: Direction,
         neighborPos: BlockPos,
         neighborState: BlockState,
-        random: Random,
+        random: RandomSource,
     ): BlockState {
-        if (direction == Direction.UP && neighborState.isOf(Blocks.WATER)) {
-            tickView.scheduleBlockTick(pos, this, 20)
+        if (direction == Direction.UP && neighborState.`is`(Blocks.WATER)) {
+            tickView.scheduleTick(pos, this, 20)
         }
-        return super.getStateForNeighborUpdate(state, world, tickView, pos, direction, neighborPos, neighborState, random)
+        return super.updateShape(state, world, tickView, pos, direction, neighborPos, neighborState, random)
     }
 
     /**
      * Called when the block is added to the world.
      * Schedules a block tick to handle initial interactions.
      */
-    override fun onBlockAdded(
+    override fun onPlace(
         state: BlockState,
-        world: World,
+        world: Level,
         pos: BlockPos,
         oldState: BlockState,
         notify: Boolean,
     ) {
-        world.scheduleBlockTick(pos, this, 20)
+        world.scheduleTick(pos, this, 20)
     }
 }

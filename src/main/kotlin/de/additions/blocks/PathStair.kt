@@ -1,13 +1,13 @@
 package de.additions.blocks
 
-import net.minecraft.block.BlockState
-import net.minecraft.block.ShapeContext
-import net.minecraft.block.StairsBlock
-import net.minecraft.block.enums.BlockHalf
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.shape.VoxelShape
-import net.minecraft.util.shape.VoxelShapes
-import net.minecraft.world.BlockView
+import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.phys.shapes.CollisionContext
+import net.minecraft.world.level.block.StairBlock
+import net.minecraft.world.level.block.state.properties.Half
+import net.minecraft.core.BlockPos
+import net.minecraft.world.phys.shapes.VoxelShape
+import net.minecraft.world.phys.shapes.Shapes
+import net.minecraft.world.level.BlockGetter
 import java.util.stream.IntStream
 
 /**
@@ -18,7 +18,7 @@ import java.util.stream.IntStream
  * @param blockstate The base block state of the stair.
  * @param settings The settings for the block.
  */
-open class PathStair(blockstate: BlockState, settings: Settings) : StairsBlock(blockstate, settings) {
+open class PathStair(blockstate: BlockState, settings: Properties) : StairBlock(blockstate, settings) {
 
     companion object {
         /** The base shape for the top part of the stair, one pixel shorter than a regular stair. */
@@ -27,16 +27,16 @@ open class PathStair(blockstate: BlockState, settings: Settings) : StairsBlock(b
         protected val BOTTOM_SHAPE: VoxelShape = PathSlab.BOTTOM_SHAPE
 
         /** Corner shapes for the bottom part of the stair. */
-        protected val BOTTOM_NORTH_WEST_CORNER_SHAPE: VoxelShape = createCuboidShape(0.0, 0.0, 0.0, 8.0, 8.0, 8.0)
-        protected val BOTTOM_SOUTH_WEST_CORNER_SHAPE: VoxelShape = createCuboidShape(0.0, 0.0, 8.0, 8.0, 8.0, 16.0)
-        protected val BOTTOM_NORTH_EAST_CORNER_SHAPE: VoxelShape = createCuboidShape(8.0, 0.0, 0.0, 16.0, 8.0, 8.0)
-        protected val BOTTOM_SOUTH_EAST_CORNER_SHAPE: VoxelShape = createCuboidShape(8.0, 0.0, 8.0, 16.0, 8.0, 16.0)
+        protected val BOTTOM_NORTH_WEST_CORNER_SHAPE: VoxelShape = box(0.0, 0.0, 0.0, 8.0, 8.0, 8.0)
+        protected val BOTTOM_SOUTH_WEST_CORNER_SHAPE: VoxelShape = box(0.0, 0.0, 8.0, 8.0, 8.0, 16.0)
+        protected val BOTTOM_NORTH_EAST_CORNER_SHAPE: VoxelShape = box(8.0, 0.0, 0.0, 16.0, 8.0, 8.0)
+        protected val BOTTOM_SOUTH_EAST_CORNER_SHAPE: VoxelShape = box(8.0, 0.0, 8.0, 16.0, 8.0, 16.0)
 
         /** Corner shapes for the top part of the stair, adjusted to be one pixel shorter. */
-        protected val TOP_NORTH_WEST_CORNER_SHAPE: VoxelShape = createCuboidShape(0.0, 7.0, 0.0, 8.0, 15.0, 8.0)
-        protected val TOP_SOUTH_WEST_CORNER_SHAPE: VoxelShape = createCuboidShape(0.0, 7.0, 8.0, 8.0, 15.0, 16.0)
-        protected val TOP_NORTH_EAST_CORNER_SHAPE: VoxelShape = createCuboidShape(8.0, 7.0, 0.0, 16.0, 15.0, 8.0)
-        protected val TOP_SOUTH_EAST_CORNER_SHAPE: VoxelShape = createCuboidShape(8.0, 7.0, 8.0, 16.0, 15.0, 16.0)
+        protected val TOP_NORTH_WEST_CORNER_SHAPE: VoxelShape = box(0.0, 7.0, 0.0, 8.0, 15.0, 8.0)
+        protected val TOP_SOUTH_WEST_CORNER_SHAPE: VoxelShape = box(0.0, 7.0, 8.0, 8.0, 15.0, 16.0)
+        protected val TOP_NORTH_EAST_CORNER_SHAPE: VoxelShape = box(8.0, 7.0, 0.0, 16.0, 15.0, 8.0)
+        protected val TOP_SOUTH_EAST_CORNER_SHAPE: VoxelShape = box(8.0, 7.0, 8.0, 16.0, 15.0, 16.0)
 
         /** Indices used to look up the correct shape combination based on the block's state. */
         private val SHAPE_INDICES = intArrayOf(12, 5, 3, 10, 14, 13, 7, 11, 13, 7, 11, 14, 8, 4, 1, 2, 4, 1, 2, 8)
@@ -88,16 +88,16 @@ open class PathStair(blockstate: BlockState, settings: Settings) : StairsBlock(b
             var voxelShape = base
 
             if (i and 1 != 0) {
-                voxelShape = VoxelShapes.union(voxelShape, northWest)
+                voxelShape = Shapes.or(voxelShape, northWest)
             }
             if (i and 2 != 0) {
-                voxelShape = VoxelShapes.union(voxelShape, northEast)
+                voxelShape = Shapes.or(voxelShape, northEast)
             }
             if (i and 4 != 0) {
-                voxelShape = VoxelShapes.union(voxelShape, southWest)
+                voxelShape = Shapes.or(voxelShape, southWest)
             }
             if (i and 8 != 0) {
-                voxelShape = VoxelShapes.union(voxelShape, southEast)
+                voxelShape = Shapes.or(voxelShape, southEast)
             }
 
             return voxelShape
@@ -108,19 +108,19 @@ open class PathStair(blockstate: BlockState, settings: Settings) : StairsBlock(b
      * Calculates an index into the [SHAPE_INDICES] array based on the block's shape and facing direction.
      */
     private fun getShapeIndexIndex(state: BlockState): Int {
-        return state.get(SHAPE).ordinal * 4 + state.get(FACING).horizontalQuarterTurns
+        return state.getValue(SHAPE).ordinal * 4 + state.getValue(FACING).get2DDataValue()
     }
 
     /**
      * Gets the outline shape of the stair based on its state.
      * Overridden to provide custom shapes that are one pixel shorter than regular stairs.
      */
-    override fun getOutlineShape(
+    override fun getShape(
         state: BlockState,
-        world: BlockView,
+        world: BlockGetter,
         pos: BlockPos,
-        context: ShapeContext
+        context: CollisionContext
     ): VoxelShape {
-        return (if (state.get(HALF) == BlockHalf.TOP) TOP_SHAPES else BOTTOM_SHAPES)[SHAPE_INDICES[getShapeIndexIndex(state)]]
+        return (if (state.getValue(HALF) == Half.TOP) TOP_SHAPES else BOTTOM_SHAPES)[SHAPE_INDICES[getShapeIndexIndex(state)]]
     }
 }

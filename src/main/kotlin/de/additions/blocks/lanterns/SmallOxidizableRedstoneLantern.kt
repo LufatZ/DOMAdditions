@@ -11,7 +11,7 @@ import net.minecraft.core.BlockPos
 import net.minecraft.util.RandomSource
 import java.util.function.Function
 
-class BigOxidizableRedstoneLantern (private var oxidationLevel: WeatherState, settings: Properties) :  BigRedstoneLantern (settings),
+class SmallOxidizableRedstoneLantern (private var oxidationLevel: WeatherState, settings: Properties) :  SmallRedstoneLantern (settings),
     WeatheringCopper {
     override fun codec(): MapCodec<WeatheringLanternBlock> {
         return CODEC
@@ -32,7 +32,7 @@ class BigOxidizableRedstoneLantern (private var oxidationLevel: WeatherState, se
     companion object {
         val CODEC: MapCodec<WeatheringLanternBlock> =
             RecordCodecBuilder.mapCodec(
-                Function { instance: RecordCodecBuilder.Instance<WeatheringLanternBlock> ->
+                Function { instance: RecordCodecBuilder.Instance<WeatheringLanternBlock>->
                     instance.group(
                         WeatherState.CODEC.fieldOf("weathering_state")
                             .forGetter { obj: WeatheringLanternBlock -> obj.age },

@@ -3,18 +3,18 @@
 package de.additions.datagen.models
 
 import de.additions.datagen.models.CustomStates.StairsModelType.*
-import net.minecraft.block.Block
-import net.minecraft.block.enums.BlockHalf
-import net.minecraft.block.enums.SlabType
-import net.minecraft.block.enums.StairShape
-import net.minecraft.client.data.BlockModelDefinitionCreator
-import net.minecraft.client.data.BlockStateModelGenerator
-import net.minecraft.client.data.BlockStateVariantMap.models
-import net.minecraft.client.data.VariantsBlockModelDefinitionCreator
-import net.minecraft.client.render.model.json.WeightedVariant
-import net.minecraft.state.property.BooleanProperty
-import net.minecraft.state.property.Properties
-import net.minecraft.util.math.Direction
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.state.properties.Half
+import net.minecraft.world.level.block.state.properties.SlabType
+import net.minecraft.world.level.block.state.properties.StairsShape
+import net.minecraft.client.data.models.blockstates.BlockModelDefinitionGenerator
+import net.minecraft.client.data.models.BlockModelGenerators
+import net.minecraft.client.data.models.blockstates.PropertyDispatch.initial
+import net.minecraft.client.data.models.blockstates.MultiVariantGenerator
+import net.minecraft.client.data.models.MultiVariant
+import net.minecraft.world.level.block.state.properties.BooleanProperty
+import net.minecraft.world.level.block.state.properties.BlockStateProperties
+import net.minecraft.core.Direction
 
 /**
  * Utility object for generating custom block states for stairs and slabs
@@ -58,7 +58,7 @@ object CustomStates {
      * @param shape The stair shape to check
      * @return True if the shape is an inner stair (either left or right)
      */
-    private fun isInnerStair(shape: StairShape): Boolean = shape == StairShape.INNER_LEFT || shape == StairShape.INNER_RIGHT
+    private fun isInnerStair(shape: StairsShape): Boolean = shape == StairsShape.INNER_LEFT || shape == StairsShape.INNER_RIGHT
 
     /**
      * Determines if a stair shape is an outer stair type.
@@ -66,7 +66,7 @@ object CustomStates {
      * @param shape The stair shape to check
      * @return True if the shape is an outer stair (either left or right)
      */
-    private fun isOuterStair(shape: StairShape): Boolean = shape == StairShape.OUTER_LEFT || shape == StairShape.OUTER_RIGHT
+    private fun isOuterStair(shape: StairsShape): Boolean = shape == StairsShape.OUTER_LEFT || shape == StairsShape.OUTER_RIGHT
 
     /**
      * Determines if a stair half is in the top position.
@@ -74,7 +74,7 @@ object CustomStates {
      * @param half The block half to check
      * @return True if the half is the top half
      */
-    private fun isTopStair(half: BlockHalf): Boolean = half == BlockHalf.TOP
+    private fun isTopStair(half: Half): Boolean = half == Half.TOP
 
     /**
      * Helper function to create a complete model map from individual model variants.
@@ -94,19 +94,19 @@ object CustomStates {
      * @return A map associating each stair model type with its corresponding weighted variant
      */
     fun createStairsModelMap(
-        innerModel: WeightedVariant,
-        regularModel: WeightedVariant,
-        outerModel: WeightedVariant,
-        innerModelRotated: WeightedVariant,
-        regularModelRotated: WeightedVariant,
-        outerModelRotated: WeightedVariant,
-        innerSnowyModel: WeightedVariant? = null,
-        regularSnowyModel: WeightedVariant? = null,
-        outerSnowyModel: WeightedVariant? = null,
-        innerSnowyModelRotated: WeightedVariant? = null,
-        regularSnowyModelRotated: WeightedVariant? = null,
-        outerSnowyModelRotated: WeightedVariant? = null,
-    ): Map<StairsModelType, WeightedVariant?> =
+        innerModel: MultiVariant,
+        regularModel: MultiVariant,
+        outerModel: MultiVariant,
+        innerModelRotated: MultiVariant,
+        regularModelRotated: MultiVariant,
+        outerModelRotated: MultiVariant,
+        innerSnowyModel: MultiVariant? = null,
+        regularSnowyModel: MultiVariant? = null,
+        outerSnowyModel: MultiVariant? = null,
+        innerSnowyModelRotated: MultiVariant? = null,
+        regularSnowyModelRotated: MultiVariant? = null,
+        outerSnowyModelRotated: MultiVariant? = null,
+    ): Map<StairsModelType, MultiVariant?> =
         mapOf(
             INNER to innerModel,
             REGULAR to regularModel,
@@ -132,18 +132,18 @@ object CustomStates {
      * @return The appropriate weighted variant for the given properties
      */
     private fun getModelType(
-        models: Map<StairsModelType, WeightedVariant?>,
-        half: BlockHalf,
-        shape: StairShape,
+        models: Map<StairsModelType, MultiVariant?>?,
+        half: Half,
+        shape: StairsShape,
         isSnowy: Boolean = false,
-    ): WeightedVariant {
+    ): MultiVariant {
         val isTop = isTopStair(half)
-        var modelType =
+        val modelType =
             when {
-                !isTop && shape == StairShape.STRAIGHT && !isSnowy -> REGULAR
-                !isTop && shape == StairShape.STRAIGHT && isSnowy -> REGULAR_SNOWY
-                isTop && shape == StairShape.STRAIGHT && !isSnowy -> REGULAR_ROTATED
-                isTop && shape == StairShape.STRAIGHT && isSnowy -> REGULAR_SNOWY_ROTATED
+                !isTop && shape == StairsShape.STRAIGHT && !isSnowy -> REGULAR
+                !isTop && shape == StairsShape.STRAIGHT && isSnowy -> REGULAR_SNOWY
+                isTop && shape == StairsShape.STRAIGHT && !isSnowy -> REGULAR_ROTATED
+                isTop && shape == StairsShape.STRAIGHT && isSnowy -> REGULAR_SNOWY_ROTATED
                 !isTop && isOuterStair(shape) && !isSnowy -> OUTER
                 !isTop && isOuterStair(shape) && isSnowy -> OUTER_SNOWY
                 isTop && isOuterStair(shape) && !isSnowy -> OUTER_ROTATED
@@ -155,7 +155,7 @@ object CustomStates {
                 else -> REGULAR
             }
 
-        return models[modelType] ?: models[REGULAR]!!
+        return models?.get(modelType) ?: models?.get(REGULAR)!!
     }
 
     /**
@@ -168,31 +168,31 @@ object CustomStates {
      * @return The model with all necessary rotations applied
      */
     private fun applyDefaultStairRotation(
-        inputModel: WeightedVariant,
-        half: BlockHalf,
-        shape: StairShape,
+        inputModel: MultiVariant,
+        half: Half,
+        shape: StairsShape,
         rotation: Int,
-    ): WeightedVariant {
+    ): MultiVariant {
         var model = inputModel
         var rot = rotation
 
         if (isTopStair(half)) {
-            model = model.apply(BlockStateModelGenerator.ROTATE_X_180)
+            model = model.with(BlockModelGenerators.X_ROT_180)
         }
 
         // Determine additional rotation offset for specific shapes
-        rot += if (shape == StairShape.OUTER_LEFT || shape == StairShape.INNER_LEFT) 270 else 0
-        rot += if (isTopStair(half) && shape != StairShape.STRAIGHT) 90 else 0
+        rot += if (shape == StairsShape.OUTER_LEFT || shape == StairsShape.INNER_LEFT) 270 else 0
+        rot += if (isTopStair(half) && shape != StairsShape.STRAIGHT) 90 else 0
 
         // Apply Y-rotation
         model =
             when (rot % 360) {
-                90 -> model.apply(BlockStateModelGenerator.ROTATE_Y_90)
-                180 -> model.apply(BlockStateModelGenerator.ROTATE_Y_180)
-                270 -> model.apply(BlockStateModelGenerator.ROTATE_Y_270)
+                90 -> model.with(BlockModelGenerators.Y_ROT_90)
+                180 -> model.with(BlockModelGenerators.Y_ROT_180)
+                270 -> model.with(BlockModelGenerators.Y_ROT_270)
                 else -> model
             }
-        model = model.apply(BlockStateModelGenerator.UV_LOCK)
+        model = model.with(BlockModelGenerators.UV_LOCK)
         return model
     }
 
@@ -207,10 +207,10 @@ object CustomStates {
      */
     fun createCustomStairsBlockState(
         stairsBlock: Block,
-        models: Map<StairsModelType, WeightedVariant?>,
+        models: Map<StairsModelType, MultiVariant?>,
         property: BooleanProperty? = null,
-    ): BlockModelDefinitionCreator =
-        if (property == Properties.SNOWY) {
+    ): BlockModelDefinitionGenerator =
+        if (property == BlockStateProperties.SNOWY) {
             createSnowyStairsBlockState(stairsBlock, models)
         } else {
             createOvergrownStairsBlockState(stairsBlock, models)
@@ -226,17 +226,17 @@ object CustomStates {
      */
     private fun createOvergrownStairsBlockState(
         stairsBlock: Block,
-        models: Map<StairsModelType, WeightedVariant?>,
-    ): BlockModelDefinitionCreator =
-        VariantsBlockModelDefinitionCreator.of(stairsBlock).with(
-            models<Direction?, BlockHalf?, StairShape?>(
-                Properties.HORIZONTAL_FACING,
-                Properties.BLOCK_HALF,
-                Properties.STAIR_SHAPE,
+        models: Map<StairsModelType, MultiVariant?>?,
+    ): BlockModelDefinitionGenerator =
+        MultiVariantGenerator.dispatch(stairsBlock).with(
+            initial(
+                BlockStateProperties.HORIZONTAL_FACING,
+                BlockStateProperties.HALF,
+                BlockStateProperties.STAIRS_SHAPE,
             ).apply {
                 for ((direction, rotation) in facingRotations) {
-                    for (half in listOf(BlockHalf.BOTTOM, BlockHalf.TOP)) {
-                        for (shape in StairShape.entries) {
+                    for (half in listOf(Half.BOTTOM, Half.TOP)) {
+                        for (shape in StairsShape.entries) {
                             // Select the appropriate model based on shape and half
                             var model =
                                 getModelType(
@@ -251,7 +251,7 @@ object CustomStates {
                                     shape,
                                     rotation,
                                 )
-                            register(direction, half, shape, model)
+                            select(direction, half, shape, model)
                         }
                     }
                 }
@@ -268,18 +268,18 @@ object CustomStates {
      */
     private fun createSnowyStairsBlockState(
         stairsBlock: Block,
-        models: Map<StairsModelType, WeightedVariant?>,
-    ): BlockModelDefinitionCreator =
-        VariantsBlockModelDefinitionCreator.of(stairsBlock).with(
-            models<Direction?, BlockHalf?, StairShape?, Boolean?>(
-                Properties.HORIZONTAL_FACING,
-                Properties.BLOCK_HALF,
-                Properties.STAIR_SHAPE,
-                Properties.SNOWY,
+        models: Map<StairsModelType, MultiVariant?>?,
+    ): BlockModelDefinitionGenerator =
+        MultiVariantGenerator.dispatch(stairsBlock).with(
+            initial(
+                BlockStateProperties.HORIZONTAL_FACING,
+                BlockStateProperties.HALF,
+                BlockStateProperties.STAIRS_SHAPE,
+                BlockStateProperties.SNOWY,
             ).apply {
                 for ((direction, rotation) in facingRotations) {
-                    for (half in listOf(BlockHalf.BOTTOM, BlockHalf.TOP)) {
-                        for (shape in StairShape.entries) {
+                    for (half in listOf(Half.BOTTOM, Half.TOP)) {
+                        for (shape in StairsShape.entries) {
                             for (isSnowy in listOf(false, true)) {
                                 // Select the appropriate model based on shape and snow status
                                 var model =
@@ -296,7 +296,7 @@ object CustomStates {
                                         shape,
                                         rotation,
                                     )
-                                register(direction, half, shape, isSnowy, model)
+                                select(direction, half, shape, isSnowy, model)
                             }
                         }
                     }
@@ -321,26 +321,26 @@ object CustomStates {
      */
     fun createSnowySlabBlockState(
         slabBlock: Block,
-        bottomModel: WeightedVariant,
-        topModel: WeightedVariant,
-        fullModel: WeightedVariant,
-        bottomSnowyModel: WeightedVariant,
-        topSnowyModel: WeightedVariant,
-        fullSnowyModel: WeightedVariant,
-    ): BlockModelDefinitionCreator =
-        VariantsBlockModelDefinitionCreator.of(slabBlock).with(
-            models<SlabType, Boolean>(
-                Properties.SLAB_TYPE,
-                Properties.SNOWY,
+        bottomModel: MultiVariant,
+        topModel: MultiVariant,
+        fullModel: MultiVariant,
+        bottomSnowyModel: MultiVariant,
+        topSnowyModel: MultiVariant,
+        fullSnowyModel: MultiVariant,
+    ): BlockModelDefinitionGenerator =
+        MultiVariantGenerator.dispatch(slabBlock).with(
+            initial<SlabType, Boolean>(
+                BlockStateProperties.SLAB_TYPE,
+                BlockStateProperties.SNOWY,
             ).apply {
                 // Register models for non-snowy slabs
-                register(SlabType.BOTTOM, false, bottomModel)
-                register(SlabType.TOP, false, topModel)
-                register(SlabType.DOUBLE, false, fullModel)
+                select(SlabType.BOTTOM, false, bottomModel)
+                select(SlabType.TOP, false, topModel)
+                select(SlabType.DOUBLE, false, fullModel)
                 // Register models for snowy slabs
-                register(SlabType.BOTTOM, true, bottomSnowyModel)
-                register(SlabType.TOP, true, topSnowyModel)
-                register(SlabType.DOUBLE, true, fullSnowyModel)
+                select(SlabType.BOTTOM, true, bottomSnowyModel)
+                select(SlabType.TOP, true, topSnowyModel)
+                select(SlabType.DOUBLE, true, fullSnowyModel)
             },
         )
 }

@@ -2,46 +2,52 @@ package de.additions.blocks.lanterns
 
 import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
-import net.minecraft.block.BlockState
-import net.minecraft.block.Oxidizable
-import net.minecraft.block.Oxidizable.OxidationLevel
-import net.minecraft.block.OxidizableLanternBlock
-import net.minecraft.server.world.ServerWorld
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.random.Random
+import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.block.WeatheringCopper
+import net.minecraft.world.level.block.WeatheringCopper.WeatherState
+import net.minecraft.world.level.block.WeatheringLanternBlock
+import net.minecraft.server.level.ServerLevel
+import net.minecraft.core.BlockPos
+import net.minecraft.util.RandomSource
 import java.util.function.Function
 
-class BigOxidizableLantern (private var oxidationLevel: OxidationLevel, settings: Settings?) :  BigLantern (settings), Oxidizable {
-    override fun getCodec(): MapCodec<OxidizableLanternBlock?> {
+class BigOxidizableLantern (private var oxidationLevel: WeatherState, settings: Properties) :  BigLantern (settings),
+    WeatheringCopper {
+    override fun codec(): MapCodec<WeatheringLanternBlock> {
         return CODEC
     }
 
-    override fun randomTick(state: BlockState?, world: ServerWorld?, pos: BlockPos?, random: Random?) {
-        this.tickDegradation(state, world, pos, random)
+    override fun randomTick(
+        state: BlockState,
+        level: ServerLevel,
+        pos: BlockPos,
+        random: RandomSource
+    ) {
+        this.changeOverTime(state, level, pos, random)
     }
 
-    override fun hasRandomTicks(state: BlockState): Boolean {
-        return Oxidizable.getIncreasedOxidationBlock(state.block).isPresent
+    override fun isRandomlyTicking(state: BlockState): Boolean {
+        return WeatheringCopper.getNext(state.block).isPresent
     }
 
-    override fun getDegradationLevel(): OxidationLevel? {
+    override fun getAge(): WeatherState {
         return this.oxidationLevel
     }
 
     companion object {
-        val CODEC: MapCodec<OxidizableLanternBlock?> =
-            RecordCodecBuilder.mapCodec<OxidizableLanternBlock?>(
-                Function { instance: RecordCodecBuilder.Instance<OxidizableLanternBlock?>? ->
-                    instance!!.group<OxidationLevel?, Settings?>(
-                        OxidationLevel.CODEC.fieldOf("weathering_state")
-                            .forGetter<OxidizableLanternBlock?> { obj: OxidizableLanternBlock? -> obj!!.degradationLevel },
-                        createSettingsCodec<OxidizableLanternBlock?>()
-                    ).apply<OxidizableLanternBlock?>(
+        val CODEC: MapCodec<WeatheringLanternBlock> =
+            RecordCodecBuilder.mapCodec(
+                Function { instance: RecordCodecBuilder.Instance<WeatheringLanternBlock> ->
+                    instance.group(
+                        WeatherState.CODEC.fieldOf("weathering_state")
+                            .forGetter { obj: WeatheringLanternBlock -> obj.age },
+                        propertiesCodec<WeatheringLanternBlock>()
+                    ).apply(
                         instance
-                    ) { oxidationLevel: OxidationLevel?, settings: Settings? ->
-                        OxidizableLanternBlock(
+                    ) { oxidationLevel: WeatherState, settings: Properties ->
+                        WeatheringLanternBlock(
                             oxidationLevel,
-                            settings!!
+                            settings
                         )
                     }
                 })

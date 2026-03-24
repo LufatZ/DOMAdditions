@@ -1,19 +1,19 @@
 package de.additions.blocks.lanterns
 
-import net.minecraft.block.Block
-import net.minecraft.block.BlockState
-import net.minecraft.block.LanternBlock
-import net.minecraft.block.RedstoneTorchBlock
-import net.minecraft.fluid.Fluids
-import net.minecraft.item.ItemPlacementContext
-import net.minecraft.server.world.ServerWorld
-import net.minecraft.state.StateManager
-import net.minecraft.state.property.BooleanProperty
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.Direction
-import net.minecraft.util.math.random.Random
-import net.minecraft.world.World
-import net.minecraft.world.block.WireOrientation
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.block.LanternBlock
+import net.minecraft.world.level.block.RedstoneTorchBlock
+import net.minecraft.world.level.material.Fluids
+import net.minecraft.world.item.context.BlockPlaceContext
+import net.minecraft.server.level.ServerLevel
+import net.minecraft.world.level.block.state.StateDefinition
+import net.minecraft.world.level.block.state.properties.BooleanProperty
+import net.minecraft.core.BlockPos
+import net.minecraft.core.Direction
+import net.minecraft.util.RandomSource
+import net.minecraft.world.level.Level
+import net.minecraft.world.level.redstone.Orientation
 
 /**
  * A redstone-powered version of the standard Lantern block.
@@ -22,22 +22,23 @@ import net.minecraft.world.block.WireOrientation
  * @param settings The settings for the block.
  */
 open class RedstoneLantern(
-    settings: Settings?,
+    settings: Properties,
 ) : LanternBlock(settings) {
     companion object {
         /**
          * A boolean property that determines whether the lantern is lit.
-         * This reuses the property from [net.minecraft.block.RedstoneTorchBlock] for consistency.
+         * This reuses the property from [RedstoneTorchBlock] for consistency.
          */
         val LIT: BooleanProperty = RedstoneTorchBlock.LIT
     }
 
     init {
-        defaultState =
-            stateManager.defaultState
-                .with(HANGING, false)
-                .with(WATERLOGGED, false)
-                .with(LIT, false)
+        registerDefaultState(
+            stateDefinition.any()
+                .setValue(HANGING, false)
+                .setValue(WATERLOGGED, false)
+                .setValue(LIT, false)
+        )
     }
 
     /**
@@ -47,17 +48,17 @@ open class RedstoneLantern(
      * @param ctx The item placement context.
      * @return The appropriate block state for placement, or `null` if it cannot be placed.
      */
-    override fun getPlacementState(ctx: ItemPlacementContext): BlockState? {
-        val fluidState = ctx.world.getFluidState(ctx.blockPos)
+    override fun getStateForPlacement(ctx: BlockPlaceContext): BlockState? {
+        val fluidState = ctx.level.getFluidState(ctx.clickedPos)
 
-        for (direction in ctx.placementDirections) {
+        for (direction in ctx.nearestLookingDirections) {
             if (direction.axis == Direction.Axis.Y) {
                 val blockState =
-                    defaultState.with(HANGING, direction == Direction.UP)
-                if (blockState.canPlaceAt(ctx.world, ctx.blockPos)) {
+                    defaultBlockState().setValue(HANGING, direction == Direction.UP)
+                if (blockState.canSurvive(ctx.level, ctx.clickedPos)) {
                     return blockState
-                        .with(WATERLOGGED, fluidState.fluid == Fluids.WATER)
-                        .with(LIT, ctx.world.isReceivingRedstonePower(ctx.blockPos))
+                        .setValue(WATERLOGGED, fluidState.type == Fluids.WATER)
+                        .setValue(LIT, ctx.level.hasNeighborSignal(ctx.clickedPos))
                 }
             }
         }
@@ -69,21 +70,21 @@ open class RedstoneLantern(
      * Handles updates from neighboring blocks, primarily for redstone signals.
      * If the redstone signal changes, it updates the lantern's lit state.
      */
-    override fun neighborUpdate(
+    override fun neighborChanged(
         state: BlockState,
-        world: World,
+        world: Level,
         pos: BlockPos,
         sourceBlock: Block,
-        wireOrientation: WireOrientation?,
+        wireOrientation: Orientation?,
         notify: Boolean,
     ) {
-        if (!world.isClient) {
-            val isLit = state.get(LIT)
-            if (isLit != world.isReceivingRedstonePower(pos)) {
+        if (!world.isClientSide) {
+            val isLit = state.getValue(LIT)
+            if (isLit != world.hasNeighborSignal(pos)) {
                 if (isLit) {
-                    world.scheduleBlockTick(pos, this, 4)
+                    world.scheduleTick(pos, this, 4)
                 } else {
-                    world.setBlockState(pos, state.cycle(LIT), NOTIFY_LISTENERS)
+                    world.setBlock(pos, state.cycle(LIT), UPDATE_CLIENTS)
                 }
             }
         }
@@ -92,21 +93,21 @@ open class RedstoneLantern(
     /**
      * Handles scheduled block ticks to turn the lantern off after a delay.
      */
-    override fun scheduledTick(
+    override fun tick(
         state: BlockState,
-        world: ServerWorld,
+        world: ServerLevel,
         pos: BlockPos,
-        random: Random,
+        random: RandomSource,
     ) {
-        if (state.get(LIT) && !world.isReceivingRedstonePower(pos)) {
-            world.setBlockState(pos, state.cycle(LIT), NOTIFY_LISTENERS)
+        if (state.getValue(LIT) && !world.hasNeighborSignal(pos)) {
+            world.setBlock(pos, state.cycle(LIT), UPDATE_CLIENTS)
         }
     }
 
     /**
      * Appends the `LIT` property to the block's state manager.
      */
-    override fun appendProperties(builder: StateManager.Builder<Block, BlockState>) {
+    override fun createBlockStateDefinition(builder: StateDefinition.Builder<Block, BlockState>) {
         builder.add(LIT, HANGING, WATERLOGGED)
     }
 }

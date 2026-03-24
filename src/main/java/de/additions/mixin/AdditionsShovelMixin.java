@@ -3,11 +3,15 @@ package de.additions.mixin;
 import de.additions.blocks.BlockRegistry;
 import de.additions.config.AdditionsConfig;
 import de.additions.datagen.BlockTagGenerator;
-import net.minecraft.block.*;
-import net.minecraft.item.ItemUsageContext;
-import net.minecraft.item.ShovelItem;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.tag.BlockTags;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.item.ShovelItem;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.SlabBlock;
+import net.minecraft.world.level.block.StairBlock;
+import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,8 +20,8 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
-import static net.minecraft.block.Blocks.DIRT;
-import static net.minecraft.block.Blocks.DIRT_PATH;
+import static net.minecraft.world.level.block.Blocks.DIRT;
+import static net.minecraft.world.level.block.Blocks.DIRT_PATH;
 
 /**
  * Mixin for the ShovelItem class.
@@ -66,23 +70,23 @@ public abstract class AdditionsShovelMixin {
      * @return The BlockState to actually store in `blockState2`, potentially modified by this mixin.
      */
     @ModifyVariable(
-            method = "useOnBlock",
+            method = "useOn",
             at = @At(value = "STORE", ordinal = 0),
             index = 6,
             require = 1
     )
-    private BlockState injectCustomPathStates(BlockState originalBlockState2, ItemUsageContext context) {
+    private BlockState injectCustomPathStates(BlockState originalBlockState2, UseOnContext context) {
        // Only intervene if vanilla lookup failed AND the feature is enabled
        if (originalBlockState2 == null && AdditionsConfig.EnabledShovelMixin) {
-          BlockState clickedBlockState = context.getWorld().getBlockState(context.getBlockPos());
+          BlockState clickedBlockState = context.getLevel().getBlockState(context.getClickedPos());
 
           // Check if the clicked block is relevant for transformation (Vanilla Dirt, or our custom variants)
           if (
-                clickedBlockState.isIn(BlockTags.DIRT) ||
+                clickedBlockState.is(BlockTags.DIRT) ||
                 // Check custom tag for dirt-like variants (e.g., Podzol Stairs, Moss Slabs)
-                clickedBlockState.isIn(BlockTagGenerator.Companion.getDirtLikeBlockTag()) ||
+                clickedBlockState.is(BlockTagGenerator.Companion.getDirtLikeBlockTag()) ||
                 // Check custom tag for path variants (Path Stairs, Path Slabs, Path Block itself)
-                clickedBlockState.isIn(BlockTagGenerator.Companion.getDirtPathVariantTag()) ||
+                clickedBlockState.is(BlockTagGenerator.Companion.getDirtPathVariantTag()) ||
                 clickedBlockState.getBlock() == DIRT_PATH // Check if clicked block is a Path Block
           ) {
              // Determine the target state (e.g., Path Stair, Dirt Slab, Dirt) including property transfer
@@ -93,8 +97,8 @@ public abstract class AdditionsShovelMixin {
              if (targetState != null && targetState != clickedBlockState) {
                 // Log the successful transformation
                 logger.debug("Shovel Mixin: Transforming {} to {}",
-                      Registries.BLOCK.getId(clickedBlockState.getBlock()),
-                      Registries.BLOCK.getId(targetState.getBlock()));
+                      BuiltInRegistries.BLOCK.getKey(clickedBlockState.getBlock()),
+                      BuiltInRegistries.BLOCK.getKey(targetState.getBlock()));
 
                 return targetState; // Return our custom transformed state
              }
@@ -138,7 +142,7 @@ public abstract class AdditionsShovelMixin {
     private static BlockState getTargetState(BlockState source) {
        BlockState target = source; // Default to original state
        try {
-           logger.info("Shovel Mixin: Attempting to transform {}", Registries.BLOCK.getId(source.getBlock()));
+           logger.info("Shovel Mixin: Attempting to transform {}", BuiltInRegistries.BLOCK.getKey(source.getBlock()));
           // --- Retrieve required block instances (real or fallback) ---
           // These are guaranteed non-null by the BlockRegistry implementation.
           Block dirtPathStairsBlock = BlockRegistry.INSTANCE.getDIRT_PATH_STAIR();
@@ -147,32 +151,32 @@ public abstract class AdditionsShovelMixin {
           Block dirtSlabBlock = BlockRegistry.INSTANCE.getDIRT_SLAB();
 
           // Get default states (safe now, as blocks are non-null)
-          BlockState stairPathState = dirtPathStairsBlock.getDefaultState();
-          BlockState slabPathState = dirtPathSlabBlock.getDefaultState();
-          BlockState stairDirtState = dirtStairsBlock.getDefaultState();
-          BlockState slabDirtState = dirtSlabBlock.getDefaultState();
+          BlockState stairPathState = dirtPathStairsBlock.defaultBlockState();
+          BlockState slabPathState = dirtPathSlabBlock.defaultBlockState();
+          BlockState stairDirtState = dirtStairsBlock.defaultBlockState();
+          BlockState slabDirtState = dirtSlabBlock.defaultBlockState();
 
           // --- Transformation Logic ---
           Block sourceBlock = source.getBlock();
           BlockState potentialTargetState;
 
-          if (sourceBlock instanceof StairsBlock) {
+          if (sourceBlock instanceof StairBlock) {
               // If source is PathStairs -> target DirtStairs, else target PathStairs
               potentialTargetState = (sourceBlock == dirtPathStairsBlock) ? stairDirtState : stairPathState;
               target = potentialTargetState
-                      .with(StairsBlock.FACING, source.get(StairsBlock.FACING))
-                      .with(StairsBlock.HALF, source.get(StairsBlock.HALF))
-                      .with(StairsBlock.SHAPE, source.get(StairsBlock.SHAPE))
-                      .with(StairsBlock.WATERLOGGED, source.get(StairsBlock.WATERLOGGED));
+                      .setValue(StairBlock.FACING, source.getValue(StairBlock.FACING))
+                      .setValue(StairBlock.HALF, source.getValue(StairBlock.HALF))
+                      .setValue(StairBlock.SHAPE, source.getValue(StairBlock.SHAPE))
+                      .setValue(StairBlock.WATERLOGGED, source.getValue(StairBlock.WATERLOGGED));
           } else if (sourceBlock instanceof SlabBlock) {
               // If source is PathSlab -> target DirtSlab, else target PathSlab
               potentialTargetState = (sourceBlock == dirtPathSlabBlock) ? slabDirtState : slabPathState;
               target = potentialTargetState
-                      .with(SlabBlock.TYPE, source.get(SlabBlock.TYPE))
-                      .with(SlabBlock.WATERLOGGED, source.get(SlabBlock.WATERLOGGED));
+                      .setValue(SlabBlock.TYPE, source.getValue(SlabBlock.TYPE))
+                      .setValue(SlabBlock.WATERLOGGED, source.getValue(SlabBlock.WATERLOGGED));
           } else if (sourceBlock == DIRT_PATH) {
               // Path -> Dirt
-              target = DIRT.getDefaultState();
+              target = DIRT.defaultBlockState();
           }
 
           // --- Sanity Check: Prevent transforming INTO a known fallback block ---
@@ -180,16 +184,16 @@ public abstract class AdditionsShovelMixin {
           Block targetBlock = target.getBlock();
           if (target != source && (targetBlock == FALLBACK_STAIR || targetBlock == FALLBACK_SLAB)) {
                logger.warn("Shovel Mixin: Prevented transformation of {} into fallback block {}. Target block likely not registered correctly.",
-                            Registries.BLOCK.getId(sourceBlock), Registries.BLOCK.getId(targetBlock));
+                            BuiltInRegistries.BLOCK.getKey(sourceBlock), BuiltInRegistries.BLOCK.getKey(targetBlock));
                target = source; // Abort transformation
           }
 
        } catch (IllegalArgumentException e) {
           logger.error("Failed to transfer block state properties from {}: {}",
-                Registries.BLOCK.getId(source.getBlock()), e.getMessage());
+                BuiltInRegistries.BLOCK.getKey(source.getBlock()), e.getMessage());
           target = source; // Fallback safely to original state
        } catch (Exception e) {
-            logger.error("Unexpected error during getTargetState for {}: {}", Registries.BLOCK.getId(source.getBlock()), e.getMessage(), e);
+            logger.error("Unexpected error during getTargetState for {}: {}", BuiltInRegistries.BLOCK.getKey(source.getBlock()), e.getMessage(), e);
             return null; // Signal critical error
        }
 

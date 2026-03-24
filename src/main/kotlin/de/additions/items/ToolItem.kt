@@ -4,24 +4,24 @@ import de.additions.Additions.logger
 import de.additions.datagen.ItemTagGenerator
 import de.additions.items.ToolItem.Companion.materials
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback
-import net.minecraft.block.Block
-import net.minecraft.block.BlockState
-import net.minecraft.component.DataComponentTypes
-import net.minecraft.component.type.ToolComponent
-import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.item.Item
-import net.minecraft.item.ItemStack
-import net.minecraft.item.Items
-import net.minecraft.item.ToolMaterial
-import net.minecraft.recipe.Ingredient
-import net.minecraft.registry.RegistryEntryLookup
-import net.minecraft.registry.tag.BlockTags
-import net.minecraft.registry.tag.ItemTags
-import net.minecraft.registry.tag.TagKey
-import net.minecraft.util.ActionResult
-import net.minecraft.util.math.BlockPos
-import net.minecraft.world.World
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.core.component.DataComponents
+import net.minecraft.world.item.component.Tool
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.player.Player
+import net.minecraft.world.item.Item
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.Items
+import net.minecraft.world.item.ToolMaterial
+import net.minecraft.world.item.crafting.Ingredient
+import net.minecraft.core.HolderGetter
+import net.minecraft.tags.BlockTags
+import net.minecraft.tags.ItemTags
+import net.minecraft.tags.TagKey
+import net.minecraft.world.InteractionResult
+import net.minecraft.core.BlockPos
+import net.minecraft.world.level.Level
 
 /**
  * Represents a custom mining tool that breaks blocks in a defined radius (AoE) around the initially mined block.
@@ -39,7 +39,7 @@ import net.minecraft.world.World
 open class ToolItem(
     val material: ToolMaterial,
     val effectiveBlocks: TagKey<Block>,
-    settings: Settings,
+    settings: Properties,
 ) : Item(settings) {
     companion object {
         init {
@@ -47,24 +47,24 @@ open class ToolItem(
             AttackBlockCallback.EVENT.register { player, world, _, pos, _ ->
                 // Only run on the server and in creative mode.
                 // Survival is handled by postMine.
-                if (world.isClient || !player.isCreative) {
-                    return@register ActionResult.PASS
+                if (world.isClientSide || !player.isCreative) {
+                    return@register InteractionResult.PASS
                 }
 
-                val stack = player.mainHandStack
+                val stack = player.mainHandItem
                 val item = stack.item
 
                 // Check if the player is holding a RadiusMineItem.
                 if (item is ToolItem) {
                     val state = world.getBlockState(pos)
 
-                    item.postMine(stack, world, state, pos, player)
+                    item.mineBlock(stack, world, state, pos, player)
                     // Let the original block be broken by the vanilla mechanic regardless.
-                    return@register ActionResult.PASS
+                    return@register InteractionResult.PASS
                 }
 
                 // If not our tool, let the default action proceed.
-                ActionResult.PASS
+                InteractionResult.PASS
             }
         }
 
@@ -181,14 +181,14 @@ open class ToolItem(
      * @param registryLookup A lookup provider for resolving registry entries like Item Tags.
      * @return The corresponding crafting [Ingredient].
      */
-    fun getMaterialIngredient(registryLookup: RegistryEntryLookup<Item>): Ingredient {
+    fun getMaterialIngredient(registryLookup: HolderGetter<Item>): Ingredient {
         val (tag, item) = getCraftingTagOrItem()
         return when {
-            tag != null -> Ingredient.ofTag(registryLookup.getOrThrow(tag))
-            item != null -> Ingredient.ofItems(item) // Use ofItems for clarity with single item
+            tag != null -> Ingredient.of(registryLookup.getOrThrow(tag))
+            item != null -> Ingredient.of(item) // Use ofItems for clarity with single item
             else -> {
                 logger.warn("$UNKNOWN_MATERIAL_MSG (from getMaterialIngredient: ${material})")
-                Ingredient.ofTag(registryLookup.getOrThrow(ItemTags.PLANKS)) // Fallback ingredient
+                Ingredient.of(registryLookup.getOrThrow(ItemTags.PLANKS)) // Fallback ingredient
             }
         }
     }
@@ -217,23 +217,21 @@ open class ToolItem(
      */
     internal fun tryBreakBlock(
         targetPos: BlockPos,
-        world: World,
+        world: Level,
         miner: LivingEntity,
         stack: ItemStack,
-        toolData: ToolComponent,
+        toolData: Tool,
     ) {
         val targetState = world.getBlockState(targetPos)
 
-        // Check if the block is suitable for AoE mining with this tool
-        // Pass 'miner' to isSuitableForMining in case future checks need player abilities etc.
-        if (isSuitableForMining(targetState, world, targetPos, toolData)) {
-            // Break the block, triggering drops and effects (true = drops enabled).
-            val blockBroken = world.breakBlock(targetPos, true, miner)
+        val isCreative = miner is Player && miner.isCreative
+        val canMine = isCreative || isSuitableForMining(targetState, world, targetPos, toolData)
 
-            // If the block was successfully broken, apply durability damage.
-            if (blockBroken) {
-                // Use the ToolComponent's damagePerBlock value.
-                stack.damage(toolData.damagePerBlock(), miner as PlayerEntity?)
+        if (canMine) {
+            val blockBroken = world.destroyBlock(targetPos, !isCreative, miner)
+
+            if (blockBroken && !isCreative) {
+                stack.hurtWithoutBreaking(toolData.damagePerBlock(), miner as Player)
             }
         }
     }
@@ -250,10 +248,10 @@ open class ToolItem(
      */
     internal fun isSuitableForMining(
         state: BlockState,
-        world: World,
+        world: Level,
         targetPos: BlockPos,
         // Keep miner parameter
-        toolData: ToolComponent,
+        toolData: Tool,
     ): Boolean {
         // 1. Check if the tool is configured to mine this block type via the effectiveBlocks tag.
         if (!toolData.isCorrectForDrops(state)) { // Use ToolComponent's check which considers the effectiveBlocks tag
@@ -267,20 +265,20 @@ open class ToolItem(
             when (material) {
                 // Using the constants defined in this class's companion object
                 C_NETHERITE, C_DIAMOND -> true
-                C_IRON -> !state.isIn(BlockTags.NEEDS_DIAMOND_TOOL)
+                C_IRON -> !state.`is`(BlockTags.NEEDS_DIAMOND_TOOL)
                 C_STONE ->
-                    !state.isIn(BlockTags.NEEDS_IRON_TOOL) &&
-                            !state.isIn(BlockTags.NEEDS_DIAMOND_TOOL)
+                    !state.`is`(BlockTags.NEEDS_IRON_TOOL) &&
+                            !state.`is`(BlockTags.NEEDS_DIAMOND_TOOL)
                 C_WOOD, C_GOLD ->
-                    !state.isIn(BlockTags.NEEDS_STONE_TOOL) &&
-                            !state.isIn(BlockTags.NEEDS_IRON_TOOL) &&
-                            !state.isIn(BlockTags.NEEDS_DIAMOND_TOOL)
+                    !state.`is`(BlockTags.NEEDS_STONE_TOOL) &&
+                            !state.`is`(BlockTags.NEEDS_IRON_TOOL) &&
+                            !state.`is`(BlockTags.NEEDS_DIAMOND_TOOL)
                 else -> false // Unknown material cannot mine
             }
 
         // 3. Check other conditions: Not air, has hardness > 0, tool deals damage, and meets material level.
         return !state.isAir &&
-                state.getHardness(world, targetPos) > 0.0f &&
+                state.getDestroySpeed(world, targetPos) > 0.0f &&
                 toolData.damagePerBlock() > 0 &&
                 // Ensure the tool component defines damage
                 sufficientMiningLevel

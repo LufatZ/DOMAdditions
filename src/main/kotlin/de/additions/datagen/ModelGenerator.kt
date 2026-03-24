@@ -4,10 +4,10 @@ import de.additions.datagen.models.BlockModelGenerator.init
 import de.additions.datagen.models.ItemModelGenerator.generateItemsModels
 import net.fabricmc.fabric.api.client.datagen.v1.provider.FabricModelProvider
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
-import net.minecraft.block.Block
-import net.minecraft.block.Blocks
-import net.minecraft.client.data.BlockStateModelGenerator
-import net.minecraft.client.data.ItemModelGenerator
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.Blocks
+import net.minecraft.client.data.models.BlockModelGenerators
+import net.minecraft.client.data.models.ItemModelGenerators
 
 /**
  * Comprehensive Model Generation Class
@@ -89,14 +89,14 @@ class ModelGenerator(
      *
      * @param generator The BlockStateModelGenerator used for creating block state models
      */
-    override fun generateBlockStateModels(generator: BlockStateModelGenerator) {
+    override fun generateBlockStateModels(generator: BlockModelGenerators) {
         with(generator) {
             // Generate models for registered blocks
             init()
         }
     }
 
-    override fun generateItemModels(generator: ItemModelGenerator) {
+    override fun generateItemModels(generator: ItemModelGenerators) {
         with(generator) {
             // Generate models for registered items
             generateItemsModels()

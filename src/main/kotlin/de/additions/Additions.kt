@@ -4,14 +4,10 @@ import de.additions.blocks.BlockRegistry
 import de.additions.config.AdditionsConfig
 import de.additions.itemGroups.ItemGroupRegistry
 import de.additions.items.ItemRegistry
-import de.additions.items.RadiusMineItem
 import eu.midnightdust.lib.config.MidnightConfig
 import net.fabricmc.api.ModInitializer
-import net.fabricmc.fabric.api.event.player.AttackBlockCallback
 import net.fabricmc.loader.api.FabricLoader
 import net.fabricmc.loader.impl.FabricLoaderImpl
-import net.minecraft.component.DataComponentTypes
-import net.minecraft.util.ActionResult
 import org.slf4j.LoggerFactory
 
 /**

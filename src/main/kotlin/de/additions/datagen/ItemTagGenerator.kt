@@ -14,15 +14,15 @@ import de.additions.items.ToolItem.Companion.C_STONE
 import de.additions.items.ToolItem.Companion.C_WOOD
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider
-import net.minecraft.block.Block
-import net.minecraft.block.Blocks
-import net.minecraft.item.Item
-import net.minecraft.registry.RegistryKeys
-import net.minecraft.registry.RegistryWrapper
-import net.minecraft.registry.tag.BlockTags
-import net.minecraft.registry.tag.ItemTags
-import net.minecraft.registry.tag.TagKey
-import net.minecraft.util.Identifier
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.item.Item
+import net.minecraft.core.registries.Registries
+import net.minecraft.core.HolderLookup
+import net.minecraft.tags.BlockTags
+import net.minecraft.tags.ItemTags
+import net.minecraft.tags.TagKey
+import net.minecraft.resources.Identifier
 import java.util.concurrent.CompletableFuture
 
 /**
@@ -33,11 +33,11 @@ import java.util.concurrent.CompletableFuture
  */
 class ItemTagGenerator(
     generator: FabricDataOutput,
-    registryLookup: CompletableFuture<RegistryWrapper.WrapperLookup>
-) : FabricTagProvider<Item>(generator, RegistryKeys.ITEM, registryLookup) {
+    registryLookup: CompletableFuture<HolderLookup.Provider>
+) : FabricTagProvider<Item>(generator, Registries.ITEM, registryLookup) {
 
     companion object {
-        val stonesTag = TagKey.of(RegistryKeys.ITEM, Identifier.of(MODID, "stones"))
+        val stonesTag = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(MODID, "stones"))
     }
 
     /**
@@ -45,7 +45,7 @@ class ItemTagGenerator(
      *
      * @param wrapper Registry wrapper providing block lookup capabilities
      */
-    override fun configure(wrapper: RegistryWrapper.WrapperLookup) {
+    override fun addTags(wrapper: HolderLookup.Provider) {
         stonesTag()
         BlockRegistry.registeredSlabs.forEach{ slab -> addToTag(slab, ItemTags.SLABS) }
         BlockRegistry.registeredStairs.forEach{ stair -> addToTag(stair, ItemTags.STAIRS) }
@@ -56,8 +56,8 @@ class ItemTagGenerator(
             if (item is ToolItem) {
                 // Check mineable type
                 when (item.effectiveBlocks) {
-                    BlockTags.SHOVEL_MINEABLE -> addToTag(item, ItemTags.SHOVELS)
-                    BlockTags.PICKAXE_MINEABLE -> addToTag(item, ItemTags.PICKAXES)
+                    BlockTags.MINEABLE_WITH_SHOVEL -> addToTag(item, ItemTags.SHOVELS)
+                    BlockTags.MINEABLE_WITH_PICKAXE -> addToTag(item, ItemTags.PICKAXES)
                 }
 
                 // Check material type
@@ -89,7 +89,7 @@ class ItemTagGenerator(
             Blocks.CRACKED_STONE_BRICKS, Blocks.CHISELED_STONE_BRICKS, Blocks.INFESTED_STONE,
             Blocks.INFESTED_COBBLESTONE, Blocks.INFESTED_STONE_BRICKS, Blocks.INFESTED_MOSSY_STONE_BRICKS,
             Blocks.INFESTED_CRACKED_STONE_BRICKS, Blocks.INFESTED_CHISELED_STONE_BRICKS, Blocks.SMOOTH_BASALT,
-            Blocks.COBBLESTONE,Blocks.MOSSY_COBBLESTONE
+            Blocks.COBBLESTONE, Blocks.MOSSY_COBBLESTONE
         )
         stones.forEach { stone -> addToTag(stone, stonesTag) }
     }
@@ -97,12 +97,12 @@ class ItemTagGenerator(
         item: Item,
         key: TagKey<Item>
     ) {
-        getTagBuilder(key).add(IdentifierHelper.getId(item))
+        getOrCreateRawBuilder(key).addElement(IdentifierHelper.getId(item))
     }
     private fun addToTag(
         block: Block,
         key: TagKey<Item>
     ) {
-        getTagBuilder(key).add(IdentifierHelper.getId(block))
+        getOrCreateRawBuilder(key).addElement(IdentifierHelper.getId(block))
     }
 }

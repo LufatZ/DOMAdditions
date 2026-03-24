@@ -1,15 +1,16 @@
+// TODO(Ravel): Failed to fully resolve file: null cannot be cast to non-null type com.intellij.psi.PsiJavaCodeReferenceElement
 package de.additions.mixin;
 
 import de.additions.config.AdditionsConfig;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.LeavesBlock;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.state.property.IntProperty;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.random.Random;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.LeavesBlock;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.util.RandomSource;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -26,12 +27,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(LeavesBlock.class)
 public abstract class AdditionsLeavesMixin {
 
-    @Shadow @Final public static IntProperty DISTANCE;
+    @Shadow @Final public static IntegerProperty DISTANCE;
     @Shadow @Final public static BooleanProperty PERSISTENT;
-    @Shadow @Final public static int MAX_DISTANCE; // = 7
+    @Shadow @Final public static int DECAY_DISTANCE; // = 7
 
     @Shadow
-    protected abstract boolean shouldDecay(BlockState state);
+    protected abstract boolean decaying(BlockState state);
 
     /**
      * Modifies the delay for leaf decay ticks, based on the mod's configuration.
@@ -41,10 +42,10 @@ public abstract class AdditionsLeavesMixin {
      * @return The modified delay, clamped to a minimum of 1.
      */
     @ModifyArg(
-            method = "getStateForNeighborUpdate",
+            method = "updateShape",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/world/tick/ScheduledTickView;scheduleBlockTick(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/Block;I)V"
+                    target = "Lnet/minecraft/world/level/ScheduledTickAccess;scheduleTick(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/Block;I)V"
             ),
             index = 2
     )
@@ -66,21 +67,21 @@ public abstract class AdditionsLeavesMixin {
      * @param random A random number generator.
      * @param ci The callback info.
      */
-    @Inject(method = "scheduledTick", at = @At("TAIL"))
-    private void additions$fastDecay(BlockState state, ServerWorld world, BlockPos pos, Random random, CallbackInfo ci) {
+    @Inject(method = "tick", at = @At("TAIL"))
+    private void additions$fastDecay(BlockState state, ServerLevel world, BlockPos pos, RandomSource random, CallbackInfo ci) {
         if (!AdditionsConfig.EnableFastLeafDecay) return;
-        if (state.get(PERSISTENT)) return;
+        if (state.getValue(PERSISTENT)) return;
 
         // Only proceed if the block is at max distance after the normal update
-        if (state.get(DISTANCE) != MAX_DISTANCE) return;
+        if (state.getValue(DISTANCE) != DECAY_DISTANCE) return;
 
         // Additional safety check: verify that no neighboring block could reduce the distance
         // This prevents decay during chunk generation when neighbors haven't been processed yet
         if (!isDefinitelyIsolated(world, pos)) return;
 
         // Use the vanilla shouldDecay check for consistency
-        if (this.shouldDecay(state)) {
-            Block.dropStacks(state, world, pos);
+        if (this.decaying(state)) {
+            Block.dropResources(state, world, pos);
             world.removeBlock(pos, false);
         }
     }
@@ -95,22 +96,22 @@ public abstract class AdditionsLeavesMixin {
      * @return true if the block is definitively isolated, false otherwise.
      */
     @Unique
-    private boolean isDefinitelyIsolated(ServerWorld world, BlockPos pos) {
-        BlockPos.Mutable mutable = new BlockPos.Mutable();
+    private boolean isDefinitelyIsolated(ServerLevel world, BlockPos pos) {
+        BlockPos.MutableBlockPos mutable = new BlockPos.MutableBlockPos();
 
         for (Direction direction : Direction.values()) {
-            mutable.set(pos, direction);
+            mutable.setWithOffset(pos, direction);
 
             // Check if the chunk is loaded - if not, we can't be sure about isolation
-            if (!world.isChunkLoaded(mutable.getX() >> 4, mutable.getZ() >> 4)) {
+            if (!world.hasChunk(mutable.getX() >> 4, mutable.getZ() >> 4)) {
                 return false;
             }
 
             BlockState neighborState = world.getBlockState(mutable);
-            int neighborDistance = LeavesBlock.getOptionalDistanceFromLog(neighborState).orElse(MAX_DISTANCE);
+            int neighborDistance = LeavesBlock.getOptionalDistanceAt(neighborState).orElse(DECAY_DISTANCE);
 
             // If any neighbor has a distance less than max, this block might not be isolated
-            if (neighborDistance < MAX_DISTANCE) {
+            if (neighborDistance < DECAY_DISTANCE) {
                 return false;
             }
         }

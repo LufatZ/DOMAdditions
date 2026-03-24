@@ -9,16 +9,16 @@ import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroupEntries
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents
 import net.fabricmc.loader.api.FabricLoader
-import net.minecraft.block.Block
-import net.minecraft.item.Item
-import net.minecraft.item.ItemGroups
-import net.minecraft.item.ItemStack
-import net.minecraft.registry.Registries
-import net.minecraft.registry.Registry
-import net.minecraft.registry.RegistryKey
-import net.minecraft.registry.RegistryKeys
-import net.minecraft.text.Text
-import net.minecraft.util.Identifier
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.item.Item
+import net.minecraft.world.item.CreativeModeTabs
+import net.minecraft.world.item.ItemStack
+import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.core.Registry
+import net.minecraft.resources.ResourceKey
+import net.minecraft.core.registries.Registries
+import net.minecraft.network.chat.Component
+import net.minecraft.resources.Identifier
 
 /**
  * ItemGroupRegistry manages the creation and registration of custom item groups (creative tabs)
@@ -40,17 +40,17 @@ object ItemGroupRegistry {
         icon: ItemStack,
         items: List<ItemStack>,
     ) {
-        val groupKey = RegistryKey.of(RegistryKeys.ITEM_GROUP, Identifier.of(MODID, name))
+        val groupKey = ResourceKey.create(Registries.CREATIVE_MODE_TAB, Identifier.fromNamespaceAndPath(MODID, name))
 
         Registry.register(
-            Registries.ITEM_GROUP,
+            BuiltInRegistries.CREATIVE_MODE_TAB,
             groupKey,
             FabricItemGroup
                 .builder()
-                .displayName(Text.translatable("itemGroup.$MODID.$name"))
+                .title(Component.translatable("itemGroup.$MODID.$name"))
                 .icon { icon }
-                .entries { _, entries ->
-                    entries.addAll(items)
+                .displayItems { _, entries ->
+                    entries.acceptAll(items)
                 }.build(),
         )
     }
@@ -92,53 +92,53 @@ object ItemGroupRegistry {
         parentItems: List<Item>,
     ) {
         // Add to Building Blocks group
-        ItemGroupEvents.modifyEntriesEvent(ItemGroups.BUILDING_BLOCKS).register { itemGroup ->
+        ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.BUILDING_BLOCKS).register { itemGroup ->
             addToGroupAfterParent(itemGroup, items, parentItems)
         }
 
         // Add to Natural Blocks group
-        ItemGroupEvents.modifyEntriesEvent(ItemGroups.NATURAL).register { itemGroup ->
+        ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.NATURAL_BLOCKS).register { itemGroup ->
             addToGroupAfterParent(itemGroup, items, parentItems)
         }
 
         // Add to Redstone group
-        ItemGroupEvents.modifyEntriesEvent(ItemGroups.REDSTONE).register { itemGroup ->
+        ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.REDSTONE_BLOCKS).register { itemGroup ->
             addToGroupAfterParent(itemGroup, items, parentItems)
         }
 
         // Add to Tools group
-        ItemGroupEvents.modifyEntriesEvent(ItemGroups.TOOLS).register { itemGroup ->
+        ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.TOOLS_AND_UTILITIES).register { itemGroup ->
             addToGroupAfterParent(itemGroup, items, parentItems)
         }
 
         // Add to Combat group
-        ItemGroupEvents.modifyEntriesEvent(ItemGroups.COMBAT).register { itemGroup ->
+        ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.COMBAT).register { itemGroup ->
             addToGroupAfterParent(itemGroup, items, parentItems)
         }
 
         // Add to Colored Blocks group
-        ItemGroupEvents.modifyEntriesEvent(ItemGroups.COLORED_BLOCKS).register { itemGroup ->
+        ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.COLORED_BLOCKS).register { itemGroup ->
             addToGroupAfterParent(itemGroup, items, parentItems)
         }
 
         // Add to Food and drink group
-        ItemGroupEvents.modifyEntriesEvent(ItemGroups.FOOD_AND_DRINK).register { itemGroup ->
+        ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.FOOD_AND_DRINKS).register { itemGroup ->
             addToGroupAfterParent(itemGroup, items, parentItems)
         }
 
-        ItemGroupEvents.modifyEntriesEvent(ItemGroups.FUNCTIONAL).register { itemGroup ->
+        ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.FUNCTIONAL_BLOCKS).register { itemGroup ->
             addToGroupAfterParent(itemGroup, items, parentItems)
         }
 
-        ItemGroupEvents.modifyEntriesEvent(ItemGroups.INGREDIENTS).register { itemGroup ->
+        ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.INGREDIENTS).register { itemGroup ->
             addToGroupAfterParent(itemGroup, items, parentItems)
         }
 
-        ItemGroupEvents.modifyEntriesEvent(ItemGroups.OPERATOR).register { itemGroup ->
+        ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.OP_BLOCKS).register { itemGroup ->
             addToGroupAfterParent(itemGroup, items, parentItems)
         }
 
-        ItemGroupEvents.modifyEntriesEvent(ItemGroups.SPAWN_EGGS).register { itemGroup ->
+        ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.SPAWN_EGGS).register { itemGroup ->
             addToGroupAfterParent(itemGroup, items, parentItems)
         }
     }

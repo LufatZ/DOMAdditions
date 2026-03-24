@@ -3,7 +3,7 @@ package de.additions.datagen
 import de.additions.blocks.BlockRegistry
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricBlockLootTableProvider
-import net.minecraft.registry.RegistryWrapper
+import net.minecraft.core.HolderLookup
 import java.util.concurrent.CompletableFuture
 
 /**
@@ -19,7 +19,7 @@ import java.util.concurrent.CompletableFuture
  */
 class LootGenerator(
     generator: FabricDataOutput,
-    registryLookup: CompletableFuture<RegistryWrapper.WrapperLookup>,
+    registryLookup: CompletableFuture<HolderLookup.Provider>,
 ) : FabricBlockLootTableProvider(generator, registryLookup) {
     /**
      * Called by the data generation process to generate all loot tables.
@@ -28,24 +28,24 @@ class LootGenerator(
     override fun generate() {
         // Generate standard drops (block drops itself) for trapdoors.
         BlockRegistry.registeredTrapdoors.forEach { trapdoor ->
-            addDrop(trapdoor) // Adds the standard drop behavior (the block drops itself).
+            dropSelf(trapdoor) // Adds the standard drop behavior (the block drops itself).
         }
 
         // Generate standard drops for lanterns.
         BlockRegistry.registeredLanterns.keys.toList().forEach { lantern ->
-            addDrop(lantern) // Adds the standard drop behavior.
+            dropSelf(lantern) // Adds the standard drop behavior.
         }
 
         // Generate standard drops for stairs.
         BlockRegistry.registeredStairs.forEach { stair ->
-            addDrop(stair) // Adds the standard drop behavior.
+            dropSelf(stair) // Adds the standard drop behavior.
         }
 
         // Generate specific drops for slabs using the slabDrops helper method.
         BlockRegistry.registeredSlabs.forEach { slab ->
             // slabDrops(slab) creates the LootTable.Builder for slabs (drops 1, or 2 if double slab).
             // addDrop(block, builder) registers this specific builder for the given block.
-            addDrop(slab, slabDrops(slab))
+            add(slab, createSlabItemTable(slab))
         }
     }
 }

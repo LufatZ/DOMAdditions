@@ -1,20 +1,20 @@
 package de.additions.blocks
 
-import net.minecraft.block.Block
-import net.minecraft.block.BlockState
-import net.minecraft.block.SlabBlock
-import net.minecraft.block.enums.SlabType
-import net.minecraft.fluid.Fluids
-import net.minecraft.item.ItemPlacementContext
-import net.minecraft.registry.tag.BlockTags
-import net.minecraft.state.StateManager
-import net.minecraft.state.property.BooleanProperty
-import net.minecraft.state.property.Properties
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.Direction
-import net.minecraft.util.math.random.Random
-import net.minecraft.world.WorldView
-import net.minecraft.world.tick.ScheduledTickView
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.block.SlabBlock
+import net.minecraft.world.level.block.state.properties.SlabType
+import net.minecraft.world.level.material.Fluids
+import net.minecraft.world.item.context.BlockPlaceContext
+import net.minecraft.tags.BlockTags
+import net.minecraft.world.level.block.state.StateDefinition
+import net.minecraft.world.level.block.state.properties.BooleanProperty
+import net.minecraft.world.level.block.state.properties.BlockStateProperties
+import net.minecraft.core.BlockPos
+import net.minecraft.core.Direction
+import net.minecraft.util.RandomSource
+import net.minecraft.world.level.LevelReader
+import net.minecraft.world.level.ScheduledTickAccess
 
 /**
  * Represents a slab block that can be covered with snow, similar to a grass block.
@@ -23,19 +23,20 @@ import net.minecraft.world.tick.ScheduledTickView
  * @param settings The block settings (e.g., hardness, tool required).
  */
 class SnowySlabBlock(
-    settings: Settings,
+    settings: Properties,
 ) : SlabBlock(settings) {
     companion object {
         /** A boolean property indicating whether the slab is covered with snow. */
-        val SNOWY: BooleanProperty = Properties.SNOWY
+        val SNOWY: BooleanProperty = BlockStateProperties.SNOWY
     }
 
     init {
-        this.defaultState =
-            this.stateManager.defaultState
-                .with(SNOWY, false)
-                .with(TYPE, SlabType.BOTTOM)
-                .with(WATERLOGGED, false)
+        this.registerDefaultState(
+            this.stateDefinition.any()
+                .setValue(SNOWY, false)
+                .setValue(TYPE, SlabType.BOTTOM)
+                .setValue(WATERLOGGED, false)
+        )
     }
 
     /**
@@ -43,8 +44,8 @@ class SnowySlabBlock(
      *
      * @param builder The state manager builder.
      */
-    override fun appendProperties(builder: StateManager.Builder<Block, BlockState>) {
-        super.appendProperties(builder)
+    override fun createBlockStateDefinition(builder: StateDefinition.Builder<Block, BlockState>) {
+        super.createBlockStateDefinition(builder)
         builder.add(SNOWY)
     }
 
@@ -55,29 +56,29 @@ class SnowySlabBlock(
      * @param ctx The item placement context.
      * @return The appropriate block state for placement.
      */
-    override fun getPlacementState(ctx: ItemPlacementContext): BlockState {
-        val world = ctx.world
-        val blockPos = ctx.blockPos
-        val aboveBlockState = world.getBlockState(blockPos.up())
+    override fun getStateForPlacement(ctx: BlockPlaceContext): BlockState {
+        val world = ctx.level
+        val blockPos = ctx.clickedPos
+        val aboveBlockState = world.getBlockState(blockPos.above())
         val currentBlockState = world.getBlockState(blockPos)
         val isSnowy = isSnow(aboveBlockState)
 
         // If the block is being placed on an existing slab, create a double slab
-        if (currentBlockState.isOf(this)) {
+        if (currentBlockState.`is`(this)) {
             return currentBlockState
-                .with(TYPE, SlabType.DOUBLE)
-                .with(WATERLOGGED, false)
-                .with(SNOWY, isSnowy)
+                .setValue(TYPE, SlabType.DOUBLE)
+                .setValue(WATERLOGGED, false)
+                .setValue(SNOWY, isSnowy)
         }
 
         // Determine slab type (top/bottom) and waterlogged state
         val fluidState = world.getFluidState(blockPos)
-        val isBottom = ctx.side != Direction.DOWN && (ctx.side == Direction.UP || !(ctx.hitPos.y - blockPos.y > 0.5))
+        val isBottom = ctx.clickedFace != Direction.DOWN && (ctx.clickedFace == Direction.UP || !(ctx.clickLocation.y - blockPos.y > 0.5))
 
-        return this.defaultState
-            .with(TYPE, if (isBottom) SlabType.BOTTOM else SlabType.TOP)
-            .with(WATERLOGGED, fluidState.fluid == Fluids.WATER)
-            .with(SNOWY, isSnowy)
+        return this.defaultBlockState()
+            .setValue(TYPE, if (isBottom) SlabType.BOTTOM else SlabType.TOP)
+            .setValue(WATERLOGGED, fluidState.type == Fluids.WATER)
+            .setValue(SNOWY, isSnowy)
     }
 
     /**
@@ -86,24 +87,24 @@ class SnowySlabBlock(
      *
      * @return The updated block state.
      */
-    override fun getStateForNeighborUpdate(
+    override fun updateShape(
         state: BlockState,
-        world: WorldView,
-        tickView: ScheduledTickView,
+        world: LevelReader,
+        tickView: ScheduledTickAccess,
         pos: BlockPos,
         direction: Direction,
         neighborPos: BlockPos,
         neighborState: BlockState,
-        random: Random,
+        random: RandomSource,
     ): BlockState {
-        if (state.get(WATERLOGGED)) {
-            tickView.scheduleFluidTick(pos, Fluids.WATER, Fluids.WATER.getTickRate(world))
+        if (state.getValue(WATERLOGGED)) {
+            tickView.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(world))
         }
 
-        val updatedState = super.getStateForNeighborUpdate(state, world, tickView, pos, direction, neighborPos, neighborState, random)
-        val aboveBlockState = world.getBlockState(pos.up())
+        val updatedState = super.updateShape(state, world, tickView, pos, direction, neighborPos, neighborState, random)
+        val aboveBlockState = world.getBlockState(pos.above())
 
-        return updatedState.with(SNOWY, isSnow(aboveBlockState))
+        return updatedState.setValue(SNOWY, isSnow(aboveBlockState))
     }
 
     /**
@@ -112,5 +113,5 @@ class SnowySlabBlock(
      * @param state The block state to check.
      * @return `true` if the block state is in the `SNOW` tag, `false` otherwise.
      */
-    private fun isSnow(state: BlockState): Boolean = state.isIn(BlockTags.SNOW)
+    private fun isSnow(state: BlockState): Boolean = state.`is`(BlockTags.SNOW)
 }

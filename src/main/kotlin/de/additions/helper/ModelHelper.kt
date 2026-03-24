@@ -1,15 +1,15 @@
 package de.additions.helper
 
 import de.additions.datagen.ModelGenerator
-import net.minecraft.block.Block
-import net.minecraft.block.GrassBlock
-import net.minecraft.block.SnowBlock
-import net.minecraft.client.data.BlockStateModelGenerator
-import net.minecraft.client.data.ItemModels
-import net.minecraft.client.data.TextureKey
-import net.minecraft.client.data.TextureMap
-import net.minecraft.client.render.item.tint.TintSource
-import net.minecraft.util.Identifier
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.GrassBlock
+import net.minecraft.world.level.block.SnowLayerBlock
+import net.minecraft.client.data.models.BlockModelGenerators
+import net.minecraft.client.data.models.model.ItemModelUtils
+import net.minecraft.client.data.models.model.TextureSlot
+import net.minecraft.client.data.models.model.TextureMapping
+import net.minecraft.client.color.item.ItemTintSource
+import net.minecraft.resources.Identifier
 
 object ModelHelper {
     /**
@@ -22,7 +22,7 @@ object ModelHelper {
      * @return Cleaned block identifier
      */
     fun extractCleanBlockIdentifier(block: Block, removeBlock: Boolean = false): String =
-        block.defaultState.registryEntry.idAsString
+        block.defaultBlockState().blockHolder.registeredName
             .replace("minecraft:", "")
             .let { if (removeBlock) it.replace("_block", "") else it }
 
@@ -55,7 +55,7 @@ object ModelHelper {
         if (bottom) append("_bottom")
         if (overlay) append("_overlay")
         if (snow) append("_snow")
-    }.let { Identifier.of(it) }
+    }.let { Identifier.parse(it) }
     /**
      * Creates a TextureMap for a block with flexible texture configuration.
      *
@@ -82,19 +82,19 @@ object ModelHelper {
         removeBlock: Boolean = false,
         bottomSameAsTop: Boolean = false,
         textureKey: String = "default"
-    ): TextureMap = TextureMap().apply {
+    ): TextureMapping = TextureMapping().apply {
         val topIdentifier = buildTextureIdentifier(
             block = top,
-            top = hasSideAndTop && top !is SnowBlock,
+            top = hasSideAndTop && top !is SnowLayerBlock,
             removeBlock = removeBlock,
             bottom = parent in ModelGenerator.Companion.bottomAllSide
         )
 
         val sideIdentifier = buildTextureIdentifier(
             block = side,
-            side = hasSideAndTop && top !is SnowBlock,
+            side = hasSideAndTop && top !is SnowLayerBlock,
             removeBlock = removeBlock,
-            snow = top is SnowBlock && parent !is SnowBlock
+            snow = top is SnowLayerBlock && parent !is SnowLayerBlock
         )
 
         val bottomIdentifier = buildTextureIdentifier(
@@ -111,20 +111,20 @@ object ModelHelper {
 
         when (textureKey) {
             "texture" -> {
-                put(TextureKey.TEXTURE, topIdentifier)
+                put(TextureSlot.TEXTURE, topIdentifier)
             }
 
             "overlay" -> {
-                put(TextureKey.TOP, topIdentifier)
-                put(TextureKey.SIDE, sideIdentifier)
-                put(TextureKey.BOTTOM, bottomIdentifier)
-                put(TextureKey.LAYER0, overlayIdentifier)
+                put(TextureSlot.TOP, topIdentifier)
+                put(TextureSlot.SIDE, sideIdentifier)
+                put(TextureSlot.BOTTOM, bottomIdentifier)
+                put(TextureSlot.LAYER0, overlayIdentifier)
             }
 
             else -> {
-                put(TextureKey.TOP, topIdentifier)
-                put(TextureKey.SIDE, sideIdentifier)
-                put(TextureKey.BOTTOM, bottomIdentifier)
+                put(TextureSlot.TOP, topIdentifier)
+                put(TextureSlot.SIDE, sideIdentifier)
+                put(TextureSlot.BOTTOM, bottomIdentifier)
             }
         }
     }
@@ -144,12 +144,12 @@ object ModelHelper {
         block: Block,
         parentBlock: Block,
         model: Identifier,
-        generator: BlockStateModelGenerator?
+        generator: BlockModelGenerators?
     ) {
-        val grassColor: TintSource = ItemModels.constantTintSource(0x91BD59)
+        val grassColor: ItemTintSource = ItemModelUtils.constantTint(0x91BD59)
         when (parentBlock) {
-            is GrassBlock -> generator?.registerTintedItemModel(block, model, grassColor)
-            else -> generator?.registerParentedItemModel(block, model)
+            is GrassBlock -> generator?.registerSimpleTintedItemModel(block, model, grassColor)
+            else -> generator?.registerSimpleItemModel(block, model)
         }
     }
 }

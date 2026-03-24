@@ -1,13 +1,13 @@
 package de.additions.blocks
 
-import net.minecraft.block.BlockState
-import net.minecraft.block.SlabBlock
-import net.minecraft.block.enums.SlabType
-import net.minecraft.particle.ParticleTypes
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.Direction
-import net.minecraft.util.math.random.Random
-import net.minecraft.world.World
+import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.block.SlabBlock
+import net.minecraft.world.level.block.state.properties.SlabType
+import net.minecraft.core.particles.ParticleTypes
+import net.minecraft.core.BlockPos
+import net.minecraft.core.Direction
+import net.minecraft.util.RandomSource
+import net.minecraft.world.level.Level
 
 /**
  * Represents a slab block variant of Crying Obsidian.
@@ -16,21 +16,21 @@ import net.minecraft.world.World
  * @param settings The settings for the block.
  */
 class CryingObsidianSlab(
-    settings: Settings,
+    settings: Properties,
 ) : SlabBlock(settings) {
     /**
      * Called periodically to display random particles.
      * There is a 20% chance each tick for particles to spawn.
      * The particle emission logic is delegated based on the slab type.
      */
-    override fun randomDisplayTick(
+    override fun animateTick(
         state: BlockState,
-        world: World,
+        world: Level,
         pos: BlockPos,
-        random: Random,
+        random: RandomSource,
     ) {
         if (random.nextInt(5) == 0) {
-            when (state.get(TYPE)) {
+            when (state.getValue(TYPE)) {
                 SlabType.DOUBLE -> handleDoubleSlab(world, pos, random)
                 SlabType.BOTTOM -> handleBottomSlab(world, pos, random)
                 SlabType.TOP -> handleTopSlab(world, pos, random)
@@ -43,11 +43,11 @@ class CryingObsidianSlab(
      * Particles are emitted from the center seam in all directions except up.
      */
     private fun handleDoubleSlab(
-        world: World,
+        world: Level,
         pos: BlockPos,
-        random: Random,
+        random: RandomSource,
     ) {
-        val direction = Direction.random(random)
+        val direction = Direction.getRandom(random)
         if (direction != Direction.UP) {
             trySpawnParticle(world, pos, direction, random, 0.5, 0.5)
         }
@@ -58,11 +58,11 @@ class CryingObsidianSlab(
      * Particles are emitted from the lower half of the block in all directions except up.
      */
     private fun handleBottomSlab(
-        world: World,
+        world: Level,
         pos: BlockPos,
-        random: Random,
+        random: RandomSource,
     ) {
-        val direction = Direction.random(random)
+        val direction = Direction.getRandom(random)
         if (direction != Direction.UP) {
             trySpawnParticle(world, pos, direction, random, 0.0, 0.5)
         }
@@ -73,11 +73,11 @@ class CryingObsidianSlab(
      * Particles are emitted from the upper half of the block in all directions except down.
      */
     private fun handleTopSlab(
-        world: World,
+        world: Level,
         pos: BlockPos,
-        random: Random,
+        random: RandomSource,
     ) {
-        val direction = Direction.random(random)
+        val direction = Direction.getRandom(random)
         if (direction != Direction.DOWN) {
             trySpawnParticle(world, pos, direction, random, 0.5, 1.0)
         }
@@ -90,18 +90,18 @@ class CryingObsidianSlab(
      * @param yRange The maximum Y position for the particle.
      */
     private fun trySpawnParticle(
-        world: World,
+        world: Level,
         pos: BlockPos,
         direction: Direction,
-        random: Random,
+        random: RandomSource,
         yBase: Double,
         yRange: Double,
     ) {
-        val blockPos = pos.offset(direction)
+        val blockPos = pos.relative(direction)
         val blockState = world.getBlockState(blockPos)
-        if (!blockState.isOpaque || !blockState.isSideSolidFullSquare(world, blockPos, direction.opposite)) {
+        if (!blockState.canOcclude() || !blockState.isFaceSturdy(world, blockPos, direction.opposite)) {
             val (x, y, z) = calculateParticlePosition(direction, random, yBase, yRange)
-            world.addParticleClient(
+            world.addParticle(
                 ParticleTypes.DRIPPING_OBSIDIAN_TEAR,
                 pos.x + x,
                 pos.y + y,
@@ -123,19 +123,19 @@ class CryingObsidianSlab(
      */
     private fun calculateParticlePosition(
         direction: Direction,
-        random: Random,
+        random: RandomSource,
         yBase: Double,
         yRange: Double,
     ): Triple<Double, Double, Double> {
         val x =
             when (direction.axis) {
-                Direction.Axis.X -> 0.5 + direction.offsetX * 0.6
+                Direction.Axis.X -> 0.5 + direction.stepX * 0.6
                 else -> random.nextDouble()
             }
 
         val z =
             when (direction.axis) {
-                Direction.Axis.Z -> 0.5 + direction.offsetZ * 0.6
+                Direction.Axis.Z -> 0.5 + direction.stepZ * 0.6
                 else -> random.nextDouble()
             }
 

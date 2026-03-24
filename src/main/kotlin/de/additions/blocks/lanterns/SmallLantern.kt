@@ -1,12 +1,12 @@
 package de.additions.blocks.lanterns
 
-import net.minecraft.block.BlockState
-import net.minecraft.block.LanternBlock
-import net.minecraft.block.ShapeContext
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.shape.VoxelShape
-import net.minecraft.util.shape.VoxelShapes
-import net.minecraft.world.BlockView
+import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.block.LanternBlock
+import net.minecraft.world.phys.shapes.CollisionContext
+import net.minecraft.core.BlockPos
+import net.minecraft.world.phys.shapes.VoxelShape
+import net.minecraft.world.phys.shapes.Shapes
+import net.minecraft.world.level.BlockGetter
 
 /**
  * Represents a smaller version of a lantern block.
@@ -15,40 +15,40 @@ import net.minecraft.world.BlockView
  * @param settings The settings for the block.
  */
 open class SmallLantern(
-    settings: Settings?,
+    settings: Properties,
 ) : LanternBlock(settings) {
     companion object {
         /** The outline shape for a hanging small lantern. */
         val SMALL_HANGING_SHAPE: VoxelShape =
-            VoxelShapes.union(
-                createCuboidShape(7.0, 3.0, 7.0, 9.0, 6.0, 9.0),
-                createCuboidShape(7.0, 2.0, 7.0, 9.0, 3.0, 9.0),
-                createCuboidShape(7.0, 9.0, 7.0, 9.0, 10.0, 9.0),
-                createCuboidShape(6.0, 0.0, 6.0, 10.0, 2.0, 10.0),
-                createCuboidShape(7.0, 6.0, 7.0, 9.0, 8.0, 9.0),
-                createCuboidShape(8.0, 2.0, 6.0, 9.0, 3.0, 7.0),
-                createCuboidShape(7.0, 2.0, 9.0, 8.0, 3.0, 10.0),
-                createCuboidShape(7.0, 6.0, 9.0, 8.0, 7.0, 10.0),
-                createCuboidShape(8.0, 6.0, 6.0, 9.0, 7.0, 7.0),
-                createCuboidShape(8.0, 3.0, 5.0, 9.0, 6.0, 6.0),
-                createCuboidShape(7.0, 3.0, 10.0, 8.0, 6.0, 11.0),
-                createCuboidShape(7.5, 8.0, 7.5, 8.5, 9.0, 8.5),
+            Shapes.or(
+                box(7.0, 3.0, 7.0, 9.0, 6.0, 9.0),
+                box(7.0, 2.0, 7.0, 9.0, 3.0, 9.0),
+                box(7.0, 9.0, 7.0, 9.0, 10.0, 9.0),
+                box(6.0, 0.0, 6.0, 10.0, 2.0, 10.0),
+                box(7.0, 6.0, 7.0, 9.0, 8.0, 9.0),
+                box(8.0, 2.0, 6.0, 9.0, 3.0, 7.0),
+                box(7.0, 2.0, 9.0, 8.0, 3.0, 10.0),
+                box(7.0, 6.0, 9.0, 8.0, 7.0, 10.0),
+                box(8.0, 6.0, 6.0, 9.0, 7.0, 7.0),
+                box(8.0, 3.0, 5.0, 9.0, 6.0, 6.0),
+                box(7.0, 3.0, 10.0, 8.0, 6.0, 11.0),
+                box(7.5, 8.0, 7.5, 8.5, 9.0, 8.5),
             )
         /** The outline shape for a standing small lantern. */
         val SMALL_STANDING_SHAPE: VoxelShape =
-            VoxelShapes.union(
-                createCuboidShape(7.0, 3.0, 7.0, 9.0, 6.0, 9.0),
-                createCuboidShape(7.0, 2.0, 7.0, 9.0, 3.0, 9.0),
-                createCuboidShape(7.0, 9.0, 7.0, 9.0, 10.0, 9.0),
-                createCuboidShape(6.0, 0.0, 6.0, 10.0, 2.0, 10.0),
-                createCuboidShape(7.0, 6.0, 7.0, 9.0, 8.0, 9.0),
-                createCuboidShape(8.0, 2.0, 6.0, 9.0, 3.0, 7.0),
-                createCuboidShape(7.0, 2.0, 9.0, 8.0, 3.0, 10.0),
-                createCuboidShape(7.0, 6.0, 9.0, 8.0, 7.0, 10.0),
-                createCuboidShape(8.0, 6.0, 6.0, 9.0, 7.0, 7.0),
-                createCuboidShape(8.0, 3.0, 5.0, 9.0, 6.0, 6.0),
-                createCuboidShape(7.0, 3.0, 10.0, 8.0, 6.0, 11.0),
-                createCuboidShape(7.5, 8.0, 7.5, 8.5, 9.0, 8.5),
+            Shapes.or(
+                box(7.0, 3.0, 7.0, 9.0, 6.0, 9.0),
+                box(7.0, 2.0, 7.0, 9.0, 3.0, 9.0),
+                box(7.0, 9.0, 7.0, 9.0, 10.0, 9.0),
+                box(6.0, 0.0, 6.0, 10.0, 2.0, 10.0),
+                box(7.0, 6.0, 7.0, 9.0, 8.0, 9.0),
+                box(8.0, 2.0, 6.0, 9.0, 3.0, 7.0),
+                box(7.0, 2.0, 9.0, 8.0, 3.0, 10.0),
+                box(7.0, 6.0, 9.0, 8.0, 7.0, 10.0),
+                box(8.0, 6.0, 6.0, 9.0, 7.0, 7.0),
+                box(8.0, 3.0, 5.0, 9.0, 6.0, 6.0),
+                box(7.0, 3.0, 10.0, 8.0, 6.0, 11.0),
+                box(7.5, 8.0, 7.5, 8.5, 9.0, 8.5),
             )
     }
 
@@ -56,10 +56,10 @@ open class SmallLantern(
      * Gets the outline shape of the lantern based on its state.
      * Overridden to provide the custom small lantern shapes.
      */
-    override fun getOutlineShape(
+    override fun getShape(
         state: BlockState,
-        world: BlockView?,
-        pos: BlockPos?,
-        context: ShapeContext?,
-    ): VoxelShape = if (state.get(HANGING)) SMALL_HANGING_SHAPE else SMALL_STANDING_SHAPE
+        world: BlockGetter,
+        pos: BlockPos,
+        context: CollisionContext,
+    ): VoxelShape = if (state.getValue(HANGING)) SMALL_HANGING_SHAPE else SMALL_STANDING_SHAPE
 }

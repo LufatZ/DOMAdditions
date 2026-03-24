@@ -13,11 +13,15 @@ import de.additions.items.ToolItem.Companion.C_NETHERITE
 import de.additions.items.ToolItem.Companion.C_STONE
 import de.additions.items.ToolItem.Companion.C_WOOD
 import de.additions.items.ToolItem.Companion.UNKNOWN_MATERIAL_MSG
-import net.minecraft.block.Blocks
+import net.minecraft.world.level.block.Blocks
 import net.minecraft.client.data.*
-import net.minecraft.client.data.ItemModelGenerator
-import net.minecraft.registry.tag.BlockTags
-import net.minecraft.util.Identifier
+import net.minecraft.client.data.models.ItemModelGenerators
+import net.minecraft.client.data.models.model.ItemModelUtils
+import net.minecraft.client.data.models.model.ModelTemplate
+import net.minecraft.client.data.models.model.TextureMapping
+import net.minecraft.client.data.models.model.TextureSlot
+import net.minecraft.tags.BlockTags
+import net.minecraft.resources.Identifier
 import java.util.*
 
 object ItemModelGenerator {
@@ -30,7 +34,7 @@ object ItemModelGenerator {
     /**
      * Generates all item models from registered items.
      */
-    fun ItemModelGenerator?.generateItemsModels() {
+    fun ItemModelGenerators.generateItemsModels() {
         registeredItems.forEach { stack ->
             when (val item = stack.item) {
                 is ToolItem -> generateMineToolModel(this, item)
@@ -84,7 +88,7 @@ object ItemModelGenerator {
             Blocks.OAK_PLANKS
         }
 
-        val id = Identifier.ofVanilla(
+        val id = Identifier.withDefaultNamespace(
             "block/${ModelHelper.extractCleanBlockIdentifier(blockForTexture)
                 .replace(replace[0], replace[1])}"
         )
@@ -101,29 +105,29 @@ object ItemModelGenerator {
      * @param generator The ItemModelGenerator instance (can be null)
      * @param item The ToolItem to generate the model for
      */
-    private fun generateMineToolModel(generator: ItemModelGenerator?, item: ToolItem) {
+    private fun generateMineToolModel(generator: ItemModelGenerators, item: ToolItem) {
         // Determine template model based on effective blocks
         val templateModelId = when(item.effectiveBlocks) {
-            BlockTags.PICKAXE_MINEABLE ->
+            BlockTags.MINEABLE_WITH_PICKAXE ->
                 if (item is RadiusMineItem)
-                    Identifier.of(MODID, "item/template_hammer")
-                else Identifier.of(MODID, "item/template_pickaxe")
-            BlockTags.SHOVEL_MINEABLE -> Identifier.of(MODID, "item/template_shovel")
-            BlockTags.AXE_MINEABLE -> Identifier.of(MODID, "item/template_lumberjack_axe")
-            else -> Identifier.of(MODID, "item/template_hammer").also {
+                    Identifier.fromNamespaceAndPath(MODID, "item/template_hammer")
+                else Identifier.fromNamespaceAndPath(MODID, "item/template_pickaxe")
+            BlockTags.MINEABLE_WITH_SHOVEL -> Identifier.fromNamespaceAndPath(MODID, "item/template_shovel")
+            BlockTags.MINEABLE_WITH_AXE -> Identifier.fromNamespaceAndPath(MODID, "item/template_lumberjack_axe")
+            else -> Identifier.fromNamespaceAndPath(MODID, "item/template_hammer").also {
                 logger.warn("Unknown effective block tag: ${item.effectiveBlocks}")
             }
         }
 
         // Define required texture keys (must use same instances)
-        val handleMaterialKey = TextureKey.of("0")
-        val toolMaterialKey = TextureKey.of("1")
-        val finishingMaterialKey = TextureKey.of("2")
-        val handleWrappingMaterialKey = TextureKey.of("3")
-        val particleKey = TextureKey.of("particle")
+        val handleMaterialKey = TextureSlot.create("0")
+        val toolMaterialKey = TextureSlot.create("1")
+        val finishingMaterialKey = TextureSlot.create("2")
+        val handleWrappingMaterialKey = TextureSlot.create("3")
+        val particleKey = TextureSlot.create("particle")
 
         // Create texture map (template already defines the "stick" part via key "0")
-        val textureMap = TextureMap()
+        val textureMap = TextureMapping()
             .put(handleMaterialKey, getMaterialTextureIdentifier(item, TextureType.HANDLE))
             .put(toolMaterialKey, getMaterialTextureIdentifier(item, TextureType.TOOL))
             .put(finishingMaterialKey, getMaterialTextureIdentifier(item, TextureType.FINISHING))
@@ -131,7 +135,7 @@ object ItemModelGenerator {
             .put(particleKey, getMaterialTextureIdentifier(item, TextureType.TOOL))
 
         // Create model with template parent and required texture keys
-        val model = Model(
+        val model = ModelTemplate(
             Optional.of(templateModelId),
             Optional.empty(),
             handleMaterialKey,
@@ -142,9 +146,9 @@ object ItemModelGenerator {
         )
 
         // "Bake" (upload) the model with texture map - generates final JSON
-        val uploadedModelId = model.upload(item, textureMap, generator?.modelCollector)
+        val uploadedModelId = model.create(item, textureMap, generator.modelOutput)
 
         // Register finished model for the item
-        generator?.output?.accept(item, ItemModels.basic(uploadedModelId))
+        generator.itemModelOutput.accept(item, ItemModelUtils.plainModel(uploadedModelId))
     }
 }

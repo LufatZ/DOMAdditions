@@ -14,15 +14,27 @@ import de.additions.blocks.BlockRegistry.trapdoorVariantsParents
 import de.additions.blocks.lanterns.*
 import de.additions.config.AdditionsConfig
 import de.additions.itemGroups.ItemGroupRegistry
-import net.minecraft.block.*
-import net.minecraft.item.BlockItem
-import net.minecraft.item.Item
-import net.minecraft.item.ItemStack
-import net.minecraft.registry.Registries
-import net.minecraft.registry.Registry
-import net.minecraft.registry.RegistryKey
-import net.minecraft.registry.RegistryKeys
-import net.minecraft.util.Identifier
+import net.minecraft.world.item.BlockItem
+import net.minecraft.world.item.Item
+import net.minecraft.world.item.ItemStack
+import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.core.Registry
+import net.minecraft.resources.ResourceKey
+import net.minecraft.core.registries.Registries
+import net.minecraft.resources.Identifier
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.level.block.CryingObsidianBlock
+import net.minecraft.world.level.block.DirtPathBlock
+import net.minecraft.world.level.block.GrassBlock
+import net.minecraft.world.level.block.LanternBlock
+import net.minecraft.world.level.block.MagmaBlock
+import net.minecraft.world.level.block.SlabBlock
+import net.minecraft.world.level.block.StairBlock
+import net.minecraft.world.level.block.TrapDoorBlock
+import net.minecraft.world.level.block.WeatheringCopperBlocks
+import net.minecraft.world.level.block.state.BlockBehaviour
+import net.minecraft.world.level.block.state.properties.BlockSetType
 
 /**
  * Handles the registration of all custom blocks and their variants.
@@ -242,29 +254,29 @@ object BlockRegistry {
      * @return The created [RegistryKey].
      * @throws IllegalArgumentException if the type T is not supported.
      */
-    private inline fun <reified T> keyOf(
+    private inline fun <reified T : Any> keyOf(
         id: String,
         vanilla: Boolean = true,
-        type: RegistryKey<Registry<T>>? = null,
-    ): RegistryKey<T> {
+        type: ResourceKey<Registry<T>>? = null,
+    ): ResourceKey<T> {
         @Suppress("UNCHECKED_CAST")
         val resolvedType =
             type ?: when (T::class) {
-                Block::class -> RegistryKeys.BLOCK as RegistryKey<Registry<T>>
-                Item::class -> RegistryKeys.ITEM as RegistryKey<Registry<T>>
+                Block::class -> Registries.BLOCK as ResourceKey<Registry<T>>
+                Item::class -> Registries.ITEM as ResourceKey<Registry<T>>
                 else -> throw IllegalArgumentException("Unsupported type: ${T::class}")
             }
 
         val identifier =
             if (vanilla) {
                 logger.debug("Creating Vanilla registry key for: $id")
-                Identifier.ofVanilla(id)
+                Identifier.withDefaultNamespace(id)
             } else {
                 logger.debug("Creating Mod-specific registry key for: $id")
-                Identifier.of(MODID, id)
+                Identifier.fromNamespaceAndPath(MODID, id)
             }
 
-        return RegistryKey.of(resolvedType, identifier)
+        return ResourceKey.create(resolvedType, identifier)
     }
 
     /**
@@ -280,13 +292,13 @@ object BlockRegistry {
     ): Block {
         logger.debug("Registering block variant: $id")
 
-        val blockKey = keyOf(id = id, type = RegistryKeys.BLOCK)
-        val itemKey = keyOf(id = id, type = RegistryKeys.ITEM)
+        val blockKey = keyOf(id = id, type = Registries.BLOCK)
+        val itemKey = keyOf(id = id, type = Registries.ITEM)
 
         // Register the block and its BlockItem
-        Registry.register(Registries.BLOCK, blockKey, block)
-        val blockItem = BlockItem(block, Item.Settings().registryKey(itemKey))
-        Registry.register(Registries.ITEM, itemKey, blockItem)
+        Registry.register(BuiltInRegistries.BLOCK, blockKey, block)
+        val blockItem = BlockItem(block, Item.Properties().setId(itemKey))
+        Registry.register(BuiltInRegistries.ITEM, itemKey, blockItem)
 
         // Add the ItemStack to the list for item groups
         registeredBlocks.add(ItemStack(blockItem))
@@ -308,11 +320,11 @@ object BlockRegistry {
             // Create variants for each parent block
             blockVariantsParents.forEach { parent ->
                 val baseName =
-                    Registries.BLOCK
-                        .getId(parent)
+                    BuiltInRegistries.BLOCK
+                        .getKey(parent)
                         .path
                         .replace("_block", "")
-                val settings = AbstractBlock.Settings.copy(parent)
+                val settings = BlockBehaviour.Properties.ofFullCopy(parent)
 
                 logger.debug("Creating variants for base block: $baseName")
 
@@ -323,7 +335,7 @@ object BlockRegistry {
                             register(
                                 "${baseName}_slab",
                                 SnowySlabBlock(
-                                    settings.registryKey(keyOf("${baseName}_slab")),
+                                    settings.setId(keyOf("${baseName}_slab")),
                                 ),
                             ).also { registeredGrassBlocks.add(it) }
                         }
@@ -331,7 +343,7 @@ object BlockRegistry {
                             register(
                                 "${baseName}_slab",
                                 SnowySlabBlock(
-                                    settings.registryKey(keyOf("${baseName}_slab")),
+                                    settings.setId(keyOf("${baseName}_slab")),
                                 ),
                             )
                         }
@@ -339,7 +351,7 @@ object BlockRegistry {
                             register(
                                 "${baseName}_slab",
                                 CryingObsidianSlab(
-                                    settings.registryKey(keyOf("${baseName}_slab")),
+                                    settings.setId(keyOf("${baseName}_slab")),
                                 ),
                             )
                         }
@@ -347,7 +359,7 @@ object BlockRegistry {
                             register(
                                 "${baseName}_slab",
                                 PathSlab(
-                                    settings.registryKey(keyOf("${baseName}_slab")),
+                                    settings.setId(keyOf("${baseName}_slab")),
                                 ),
                             ).also {
                                 DIRT_PATH_SLAB = it
@@ -358,7 +370,7 @@ object BlockRegistry {
                             register(
                                 "${baseName}_slab",
                                 SlabBlock(
-                                    settings.registryKey(keyOf("${baseName}_slab")),
+                                    settings.setId(keyOf("${baseName}_slab")),
                                 ),
                             ).also {
                                 DIRT_SLAB = it
@@ -369,7 +381,7 @@ object BlockRegistry {
                             register(
                                 "${baseName}_slab",
                                 MagmaSlab(
-                                    settings.registryKey(keyOf("${baseName}_slab")),
+                                    settings.setId(keyOf("${baseName}_slab")),
                                 ),
                             ).also {
                                 registeredMagmaBlockVariants.add(it)
@@ -379,7 +391,7 @@ object BlockRegistry {
                             register(
                                 "${baseName}_slab",
                                 SlabBlock(
-                                    settings.registryKey(keyOf("${baseName}_slab")),
+                                    settings.setId(keyOf("${baseName}_slab")),
                                 ),
                             ).also { if (parent == Blocks.DIRT) registeredDirtBlockVariants.add(it) }
                         }
@@ -392,8 +404,8 @@ object BlockRegistry {
                             register(
                                 "${baseName}_stairs",
                                 SnowyStairsBlock(
-                                    parent.defaultState,
-                                    settings.registryKey(keyOf("${baseName}_stairs")),
+                                    parent.defaultBlockState(),
+                                    settings.setId(keyOf("${baseName}_stairs")),
                                 ),
                             ).also { registeredGrassBlocks.add(it) }
 
@@ -401,32 +413,32 @@ object BlockRegistry {
                             register(
                                 "${baseName}_stairs",
                                 SnowyStairsBlock(
-                                    parent.defaultState,
-                                    settings.registryKey(keyOf("${baseName}_stairs")),
+                                    parent.defaultBlockState(),
+                                    settings.setId(keyOf("${baseName}_stairs")),
                                 ),
                             )
                         is CryingObsidianBlock ->
                             register(
                                 "${baseName}_stairs",
                                 CryingObsidianStair(
-                                    parent.defaultState,
-                                    settings.registryKey(keyOf("${baseName}_stairs")),
+                                    parent.defaultBlockState(),
+                                    settings.setId(keyOf("${baseName}_stairs")),
                                 ),
                             )
                         is MagmaBlock ->
                             register(
                                 "${baseName}_stairs",
                                 MagmaStair(
-                                    parent.defaultState,
-                                    settings.registryKey(keyOf("${baseName}_stairs")),
+                                    parent.defaultBlockState(),
+                                    settings.setId(keyOf("${baseName}_stairs")),
                                 ),
                             ).also { registeredMagmaBlockVariants.add(it) }
                         is DirtPathBlock ->
                             register(
                                 "${baseName}_stairs",
                                 PathStair(
-                                    parent.defaultState,
-                                    settings.suffocates(Blocks::never).registryKey(keyOf("${baseName}_stairs")),
+                                    parent.defaultBlockState(),
+                                    settings.isSuffocating(Blocks::never).setId(keyOf("${baseName}_stairs")),
                                 ),
                             ).also {
                                 DIRT_PATH_STAIR = it
@@ -435,9 +447,9 @@ object BlockRegistry {
                         Blocks.DIRT ->
                             register(
                                 "${baseName}_stairs",
-                                StairsBlock(
-                                    parent.defaultState,
-                                    settings.registryKey(keyOf("${baseName}_stairs")),
+                                StairBlock(
+                                    parent.defaultBlockState(),
+                                    settings.setId(keyOf("${baseName}_stairs")),
                                 ),
                             ).also {
                                 DIRT_STAIR = it
@@ -446,9 +458,9 @@ object BlockRegistry {
                         else ->
                             register(
                                 "${baseName}_stairs",
-                                StairsBlock(
-                                    parent.defaultState,
-                                    settings.registryKey(keyOf("${baseName}_stairs")),
+                                StairBlock(
+                                    parent.defaultBlockState(),
+                                    settings.setId(keyOf("${baseName}_stairs")),
                                 ),
                             ).also { if (parent == Blocks.DIRT) registeredDirtBlockVariants.add(it) }
                     }
@@ -474,18 +486,18 @@ object BlockRegistry {
             var bigRedstoneLantern: Block? = null
             var smallLantern: Block? = null
             var smallRedstoneLantern: Block? = null
-            var copperSmallLanternSet: CopperBlockSet? = null
-            var copperBigLanternSet: CopperBlockSet? = null
-            var copperSmallRedstoneLanternSet: CopperBlockSet? = null
-            var copperBigRedstoneLanternSet: CopperBlockSet? = null
-            var copperRedstoneLanternSet: CopperBlockSet? = null
+            var copperSmallLanternSet: WeatheringCopperBlocks? = null
+            var copperBigLanternSet: WeatheringCopperBlocks? = null
+            var copperSmallRedstoneLanternSet: WeatheringCopperBlocks? = null
+            var copperBigRedstoneLanternSet: WeatheringCopperBlocks? = null
+            var copperRedstoneLanternSet: WeatheringCopperBlocks? = null
 
             val baseName =
-                Registries.BLOCK
-                    .getId(baseBlock)
+                BuiltInRegistries.BLOCK
+                    .getKey(baseBlock)
                     .path
                     .replace("_block", "")
-            val lanternSettings = AbstractBlock.Settings.copy(Blocks.LANTERN)
+            val lanternSettings = BlockBehaviour.Properties.ofFullCopy(Blocks.LANTERN)
 
             logger.debug("Creating lantern variants for base block: $baseName")
             if (baseBlock != Blocks.COPPER_BLOCK) {
@@ -495,7 +507,7 @@ object BlockRegistry {
                         register(
                             "${baseName}_lantern",
                             LanternBlock(
-                                lanternSettings.registryKey(keyOf("${baseName}_lantern")),
+                                lanternSettings.setId(keyOf("${baseName}_lantern")),
                             ),
                         )
                 }
@@ -504,24 +516,24 @@ object BlockRegistry {
                     register(
                         "${baseName}_big_lantern",
                         BigLantern(
-                            lanternSettings.registryKey(keyOf("${baseName}_big_lantern")),
+                            lanternSettings.setId(keyOf("${baseName}_big_lantern")),
                         ),
                     )
                 smallLantern =
                     register(
                         "${baseName}_small_lantern",
                         SmallLantern(
-                            lanternSettings.registryKey(keyOf("${baseName}_small_lantern")),
+                            lanternSettings.setId(keyOf("${baseName}_small_lantern")),
                         ),
                     )
             } else {
 
                 // Standard Laterns not needed (already added by default minecraft)
                 // Große Laternen
-                copperBigLanternSet = CopperBlockSet.create(
+                copperBigLanternSet = WeatheringCopperBlocks.create(
                     "${baseName}_big_lantern",
                     { id, factory, settings ->
-                        register(id, factory.apply(settings.registryKey(keyOf(id))))
+                        register(id, factory.apply(settings.setId(keyOf(id))))
                     },
                     { settings -> BigLantern(settings) },
                     { oxidationLevel, settings -> BigOxidizableLantern(oxidationLevel, settings) },
@@ -529,10 +541,10 @@ object BlockRegistry {
                 )
 
                 // Kleine Laternen
-                copperSmallLanternSet = CopperBlockSet.create(
+                copperSmallLanternSet = WeatheringCopperBlocks.create(
                     "${baseName}_small_lantern",
                     { id, factory, settings ->
-                        register(id, factory.apply(settings.registryKey(keyOf(id))))
+                        register(id, factory.apply(settings.setId(keyOf(id))))
                     },
                     { settings -> SmallLantern(settings) },
                     { oxidationLevel, settings -> SmallOxidizableLantern(oxidationLevel, settings) },
@@ -547,8 +559,8 @@ object BlockRegistry {
                         register(
                             "${baseName}_redstone_lantern",
                             RedstoneLantern(
-                                lanternSettings.registryKey(keyOf("${baseName}_redstone_lantern")).luminance(
-                                    Blocks.createLightLevelFromLitBlockState(
+                                lanternSettings.setId(keyOf("${baseName}_redstone_lantern")).lightLevel(
+                                    Blocks.litBlockEmission(
                                         15,
                                     ),
                                 ),
@@ -558,8 +570,8 @@ object BlockRegistry {
                         register(
                             "${baseName}_big_redstone_lantern",
                             BigRedstoneLantern(
-                                lanternSettings.registryKey(keyOf("${baseName}_big_redstone_lantern")).luminance(
-                                    Blocks.createLightLevelFromLitBlockState(
+                                lanternSettings.setId(keyOf("${baseName}_big_redstone_lantern")).lightLevel(
+                                    Blocks.litBlockEmission(
                                         15,
                                     ),
                                 ),
@@ -569,8 +581,8 @@ object BlockRegistry {
                         register(
                             "${baseName}_small_redstone_lantern",
                             SmallRedstoneLantern(
-                                lanternSettings.registryKey(keyOf("${baseName}_small_redstone_lantern")).luminance(
-                                    Blocks.createLightLevelFromLitBlockState(
+                                lanternSettings.setId(keyOf("${baseName}_small_redstone_lantern")).lightLevel(
+                                    Blocks.litBlockEmission(
                                         15,
                                     ),
                                 ),
@@ -578,57 +590,57 @@ object BlockRegistry {
                         )
                 } else {
                     // Big Lantern
-                    copperBigRedstoneLanternSet = CopperBlockSet.create(
+                    copperBigRedstoneLanternSet = WeatheringCopperBlocks.create(
                         "${baseName}_big_redstone_lantern",
                         { id, factory, settings ->
-                            register(id, factory.apply(settings.registryKey(keyOf(id))))
+                            register(id, factory.apply(settings.setId(keyOf(id))))
                         },
                         { settings ->
-                            BigRedstoneLantern(settings.luminance(
-                                Blocks.createLightLevelFromLitBlockState(15)))
+                            BigRedstoneLantern(settings.lightLevel(
+                                Blocks.litBlockEmission(15)))
                         },
                         { oxidationLevel, settings ->
                             BigOxidizableRedstoneLantern(
                                 oxidationLevel,
-                                settings.luminance(Blocks.createLightLevelFromLitBlockState(15))
+                                settings.lightLevel(Blocks.litBlockEmission(15))
                             )
                         },
                         { _ -> lanternSettings }
                     )
 
                     // Small Lantern
-                    copperSmallRedstoneLanternSet = CopperBlockSet.create(
+                    copperSmallRedstoneLanternSet = WeatheringCopperBlocks.create(
                         "${baseName}_small_redstone_lantern",
                         { id, factory, settings ->
-                            register(id, factory.apply(settings.registryKey(keyOf(id))))
+                            register(id, factory.apply(settings.setId(keyOf(id))))
                         },
                         { settings ->
-                            SmallRedstoneLantern(settings.luminance(
-                                Blocks.createLightLevelFromLitBlockState(15)))
+                            SmallRedstoneLantern(settings.lightLevel(
+                                Blocks.litBlockEmission(15)))
                         },
                         { oxidationLevel, settings ->
-                            smallOxidizableRedstoneLantern(
+                            SmallOxidizableRedstoneLantern(
                                 oxidationLevel,
-                                settings.luminance(Blocks.createLightLevelFromLitBlockState(15))
+                                settings.lightLevel(Blocks.litBlockEmission(15))
                             )
                         },
                         { _ -> lanternSettings }
                     )
 
                     // Default Lantern
-                    copperRedstoneLanternSet = CopperBlockSet.create(
+                    copperRedstoneLanternSet = WeatheringCopperBlocks.create(
                         "${baseName}_redstone_lantern",
                         { id, factory, settings ->
-                            register(id, factory.apply(settings.registryKey(keyOf(id))))
+                            register(id, factory.apply(settings.setId(keyOf(id))))
                         },
                         { settings ->
-                            RedstoneLantern(settings.luminance(
-                                Blocks.createLightLevelFromLitBlockState(15)))
+                            RedstoneLantern(settings.lightLevel(
+                                Blocks.litBlockEmission(15)))
                         },
                         { oxidationLevel, settings ->
                             OxidizableRedstoneLantern(
                                 oxidationLevel,
-                                settings.luminance(Blocks.createLightLevelFromLitBlockState(15))
+                                settings.lightLevel(Blocks.litBlockEmission(15))
                             )
                         },
                         { _ -> lanternSettings }
@@ -663,11 +675,11 @@ object BlockRegistry {
 
         trapdoorVariantsParents.forEach { baseBlock ->
             val baseName =
-                Registries.BLOCK
-                    .getId(baseBlock)
+                BuiltInRegistries.BLOCK
+                    .getKey(baseBlock)
                     .path
                     .replace("_block", "")
-            val trapdoorSettings = AbstractBlock.Settings.copy(baseBlock)
+            val trapdoorSettings = BlockBehaviour.Properties.ofFullCopy(baseBlock)
 
             logger.debug("Creating trapdoor variants for base block: $baseName")
 
@@ -675,9 +687,9 @@ object BlockRegistry {
             val trapdoor =
                 register(
                     "${baseName}_trapdoor",
-                    TrapdoorBlock(
+                    TrapDoorBlock(
                         BlockSetType.OAK,
-                        trapdoorSettings.registryKey(keyOf("${baseName}_trapdoor")),
+                        trapdoorSettings.setId(keyOf("${baseName}_trapdoor")),
                     ),
                 )
 
@@ -691,12 +703,12 @@ object BlockRegistry {
      */
     private fun registerChains() {
         logger.info("Starting chain registration")
-        val chainSettings = AbstractBlock.Settings.copy(Blocks.IRON_CHAIN)
-        val chain = register("redstone_chain", RedstoneChainBlock(chainSettings.registryKey(keyOf("redstone_chain"))))
-        val copperChain = CopperBlockSet.create(
+        val chainSettings = BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_CHAIN)
+        val chain = register("redstone_chain", RedstoneChainBlock(chainSettings.setId(keyOf("redstone_chain"))))
+        val copperChain = WeatheringCopperBlocks.create(
             "copper_redstone_chain",
             { id, factory, settings ->
-                register(id, factory.apply(settings.registryKey(keyOf(id))))
+                register(id, factory.apply(settings.setId(keyOf(id))))
             },
             { settings -> RedstoneChainBlock(settings) },
             { oxidationLevel, settings -> OxidizableRedstoneChainBlock(oxidationLevel, settings) },

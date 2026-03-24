@@ -8,7 +8,7 @@ import de.additions.Additions.logging
 import de.additions.config.AdditionsConfig
 import de.additions.helper.DownloadHelper
 import net.fabricmc.loader.api.FabricLoader
-import net.minecraft.resource.ResourceType
+import net.minecraft.server.packs.PackType
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
@@ -186,8 +186,8 @@ internal object ModTranslations {
      */
     private fun createResourcePackMetadata() {
         val packMcMetaPath = Path(RESOURCEPACK_DIR).resolve("pack.mcmeta")
-        val currentPackFormat = net.minecraft.SharedConstants.getGameVersion()
-            .packVersion(ResourceType.CLIENT_RESOURCES)
+        val currentPackFormat = net.minecraft.SharedConstants.getCurrentVersion()
+            .packVersion(PackType.CLIENT_RESOURCES)
 
         val packMetadata = """
             {

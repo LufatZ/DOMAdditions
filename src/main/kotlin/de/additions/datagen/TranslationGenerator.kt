@@ -8,14 +8,18 @@ import de.additions.blocks.lanterns.*
 import de.additions.items.ItemRegistry
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricLanguageProvider
-import net.minecraft.block.*
-import net.minecraft.item.ItemStack
-import net.minecraft.registry.RegistryWrapper
+import net.minecraft.world.item.ItemStack
+import net.minecraft.core.HolderLookup
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.LanternBlock
+import net.minecraft.world.level.block.SlabBlock
+import net.minecraft.world.level.block.StairBlock
+import net.minecraft.world.level.block.TrapDoorBlock
 import java.util.concurrent.CompletableFuture
 
 class TranslationGenerator(
     generator: FabricDataOutput,
-    registryLookup: CompletableFuture<RegistryWrapper.WrapperLookup>,
+    registryLookup: CompletableFuture<HolderLookup.Provider>,
 ) : FabricLanguageProvider(generator, registryLookup) {
     private val processedKey = mutableListOf<String>()
     private lateinit var builder: TranslationBuilder
@@ -66,7 +70,7 @@ class TranslationGenerator(
     }
 
     override fun generateTranslations(
-        registryLookup: RegistryWrapper.WrapperLookup,
+        registryLookup: HolderLookup.Provider,
         translationBuilder: TranslationBuilder,
     ) {
         builder = translationBuilder
@@ -105,8 +109,8 @@ class TranslationGenerator(
 
     private fun itemsTranslationBuilder(stacks: MutableList<ItemStack>) {
         stacks.forEach { stack ->
-            val itemName = extractNameFromKey(stack.item.translationKey)
-            add(stack.item.translationKey, itemName)
+            val itemName = extractNameFromKey(stack.item.descriptionId)
+            add(stack.item.descriptionId, itemName)
         }
     }
 
@@ -205,7 +209,7 @@ class TranslationGenerator(
     }
     private fun chainTranslationBuilder() {
         BlockRegistry.registeredChains.forEach { chain ->
-            add(chain.asItem().translationKey, extractNameFromKey(chain.translationKey))
+            add(chain.asItem().descriptionId, extractNameFromKey(chain.descriptionId))
         }
     }
 
@@ -216,14 +220,14 @@ class TranslationGenerator(
         val nounMaterials = setOf("Gold", "Iron", "Copper", "Diamond", "Emerald", "Netherite")
 
         blockList.forEachIndexed { index, block ->
-            val parentName = extractNameFromKey(parentBlockList[index].translationKey)
-            val oxidationPrefix = extractOxidationPrefix(block.asItem().translationKey)
+            val parentName = extractNameFromKey(parentBlockList[index].descriptionId)
+            val oxidationPrefix = extractOxidationPrefix(block.asItem().descriptionId)
 
             val blockType =
                 when (block) {
-                    is StairsBlock -> "Stairs"
+                    is StairBlock -> "Stairs"
                     is SlabBlock -> "Slab"
-                    is TrapdoorBlock -> "Trapdoor"
+                    is TrapDoorBlock -> "Trapdoor"
                     is LanternBlock -> "Lantern"
                     else -> "Block"
                 }
@@ -247,7 +251,7 @@ class TranslationGenerator(
                 "$oxidationPrefix$prefix$parentName $type$blockType"
             }
 
-            add(block.asItem().translationKey, name)
+            add(block.asItem().descriptionId, name)
         }
     }
 }
