@@ -78,7 +78,7 @@ dependencies {
     implementation  "net.fabricmc:fabric-language-kotlin:${project.fabric_kotlin_version}"
 
     // Required Library
-    implementation  "maven.modrinth:midnightlib:${project.midnightlib}+${project.minecraft_version}-fabric"
+    implementation  "maven.modrinth:midnightlib:${project.midnightlib}-fabric"
 
     // Optional Runtime Mods
     runtimeOnly     "com.terraformersmc:modmenu:${project.modmenu_version}"
