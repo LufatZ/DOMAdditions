@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    id 'fabric-loom'              // version managed in settings.gradle via pluginManagement
+    id 'net.fabricmc.fabric-loom'              // version managed in settings.gradle via pluginManagement
     id 'maven-publish'
     id 'org.jetbrains.kotlin.jvm' // version managed in settings.gradle via pluginManagement
 }
@@ -71,23 +71,22 @@ fabricApi {
 dependencies {
     // Core Minecraft & Fabric
     minecraft          "com.mojang:minecraft:${project.minecraft_version}"
-    mappings           loom.officialMojangMappings()
-    modImplementation  "net.fabricmc:fabric-loader:${project.loader_version}"
+    implementation  "net.fabricmc:fabric-loader:${project.loader_version}"
 
     // Fabric API + Kotlin Language Adapter
-    modImplementation  "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
-    modImplementation  "net.fabricmc:fabric-language-kotlin:${project.fabric_kotlin_version}"
+    implementation  "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+    implementation  "net.fabricmc:fabric-language-kotlin:${project.fabric_kotlin_version}"
 
     // Required Library
-    modImplementation  "maven.modrinth:midnightlib:${project.midnightlib}-fabric"
+    implementation  "maven.modrinth:midnightlib:${project.midnightlib}+${project.minecraft_version}-fabric"
 
     // Optional Runtime Mods
-    modRuntimeOnly     "com.terraformersmc:modmenu:${project.modmenu_version}"
-    modRuntimeOnly     "maven.modrinth:jade:${project.jade}+fabric"
+    runtimeOnly     "com.terraformersmc:modmenu:${project.modmenu_version}"
+    runtimeOnly     "maven.modrinth:jade:${project.jade}+fabric"
 
     // Optional REI Integration
-    modCompileOnly     "me.shedaniel:RoughlyEnoughItems-api-fabric:${project.rei}"
-    modRuntimeOnly     "me.shedaniel:RoughlyEnoughItems-fabric:${project.rei}"
+    // compileOnly     "me.shedaniel:RoughlyEnoughItems-api-fabric:${project.rei}"
+    // runtimeOnly     "me.shedaniel:RoughlyEnoughItems-fabric:${project.rei}"
 }
 
 // ==========================================================================================
@@ -105,18 +104,18 @@ processResources {
 // Java / Kotlin Compilation
 // ==========================================================================================
 tasks.withType(JavaCompile).configureEach {
-    options.release.set(21)
+    options.release.set(25)
 }
 
 tasks.withType(KotlinCompile).configureEach {
     kotlinOptions {
-        jvmTarget = "21"
+        jvmTarget = "25"
     }
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_21
-    targetCompatibility = JavaVersion.VERSION_21
+    sourceCompatibility = JavaVersion.VERSION_25
+    targetCompatibility = JavaVersion.VERSION_25
     // withSourcesJar() // uncomment to include sources in JARs
 }
 

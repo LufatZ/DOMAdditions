@@ -5,20 +5,20 @@ import de.additions.Additions.logger
 import de.additions.blocks.BlockRegistry
 import de.additions.config.AdditionsConfig
 import de.additions.items.ItemRegistry
-import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup
-import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroupEntries
-import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents
+import net.fabricmc.fabric.api.creativetab.v1.CreativeModeTabEvents
+import net.fabricmc.fabric.api.creativetab.v1.FabricCreativeModeTab
+import net.fabricmc.fabric.api.creativetab.v1.FabricCreativeModeTabOutput
 import net.fabricmc.loader.api.FabricLoader
-import net.minecraft.world.level.block.Block
-import net.minecraft.world.item.Item
-import net.minecraft.world.item.CreativeModeTabs
-import net.minecraft.world.item.ItemStack
-import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.core.Registry
-import net.minecraft.resources.ResourceKey
+import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.core.registries.Registries
 import net.minecraft.network.chat.Component
 import net.minecraft.resources.Identifier
+import net.minecraft.resources.ResourceKey
+import net.minecraft.world.item.CreativeModeTabs
+import net.minecraft.world.item.Item
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.level.block.Block
 
 /**
  * ItemGroupRegistry manages the creation and registration of custom item groups (creative tabs)
@@ -37,20 +37,20 @@ object ItemGroupRegistry {
      */
     fun registerItemGroup(
         name: String,
-        icon: ItemStack,
-        items: List<ItemStack>,
+        icon: () -> ItemStack,
+        items: List<Item>,
     ) {
         val groupKey = ResourceKey.create(Registries.CREATIVE_MODE_TAB, Identifier.fromNamespaceAndPath(MODID, name))
 
         Registry.register(
             BuiltInRegistries.CREATIVE_MODE_TAB,
             groupKey,
-            FabricItemGroup
+            FabricCreativeModeTab
                 .builder()
                 .title(Component.translatable("itemGroup.$MODID.$name"))
-                .icon { icon }
+                .icon { icon() }
                 .displayItems { _, entries ->
-                    entries.acceptAll(items)
+                    items.forEach {entries.accept(it)}
                 }.build(),
         )
     }
@@ -66,14 +66,14 @@ object ItemGroupRegistry {
     fun registerItemGroups() {
         registerItemGroup( // all Blocks from DayOfMind
             name = "blocks",
-            icon = ItemStack(BlockRegistry.registeredBlocks[0].item),
-            items = BlockRegistry.registeredBlocks.toList(),
+            icon = { ItemStack(BlockRegistry.registeredBlocks[0]) },
+            items = BlockRegistry.registeredBlocks,
         )
 
         registerItemGroup( // all items from DayOfMind
             name = "items",
-            icon = ItemStack(ItemRegistry.registeredItems[0].item),
-            items = ItemRegistry.registeredItems.toList(),
+            icon = { ItemStack(ItemRegistry.registeredItems[0]) },
+            items = ItemRegistry.registeredItems,
         )
     }
 
@@ -92,53 +92,53 @@ object ItemGroupRegistry {
         parentItems: List<Item>,
     ) {
         // Add to Building Blocks group
-        ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.BUILDING_BLOCKS).register { itemGroup ->
+        CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.BUILDING_BLOCKS).register { itemGroup ->
             addToGroupAfterParent(itemGroup, items, parentItems)
         }
 
         // Add to Natural Blocks group
-        ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.NATURAL_BLOCKS).register { itemGroup ->
+        CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.NATURAL_BLOCKS).register { itemGroup ->
             addToGroupAfterParent(itemGroup, items, parentItems)
         }
 
         // Add to Redstone group
-        ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.REDSTONE_BLOCKS).register { itemGroup ->
+        CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.REDSTONE_BLOCKS).register { itemGroup ->
             addToGroupAfterParent(itemGroup, items, parentItems)
         }
 
         // Add to Tools group
-        ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.TOOLS_AND_UTILITIES).register { itemGroup ->
+        CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.TOOLS_AND_UTILITIES).register { itemGroup ->
             addToGroupAfterParent(itemGroup, items, parentItems)
         }
 
         // Add to Combat group
-        ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.COMBAT).register { itemGroup ->
+        CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.COMBAT).register { itemGroup ->
             addToGroupAfterParent(itemGroup, items, parentItems)
         }
 
         // Add to Colored Blocks group
-        ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.COLORED_BLOCKS).register { itemGroup ->
+        CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.COLORED_BLOCKS).register { itemGroup ->
             addToGroupAfterParent(itemGroup, items, parentItems)
         }
 
         // Add to Food and drink group
-        ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.FOOD_AND_DRINKS).register { itemGroup ->
+        CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.FOOD_AND_DRINKS).register { itemGroup ->
             addToGroupAfterParent(itemGroup, items, parentItems)
         }
 
-        ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.FUNCTIONAL_BLOCKS).register { itemGroup ->
+        CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.FUNCTIONAL_BLOCKS).register { itemGroup ->
             addToGroupAfterParent(itemGroup, items, parentItems)
         }
 
-        ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.INGREDIENTS).register { itemGroup ->
+        CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.INGREDIENTS).register { itemGroup ->
             addToGroupAfterParent(itemGroup, items, parentItems)
         }
 
-        ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.OP_BLOCKS).register { itemGroup ->
+        CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.OP_BLOCKS).register { itemGroup ->
             addToGroupAfterParent(itemGroup, items, parentItems)
         }
 
-        ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.SPAWN_EGGS).register { itemGroup ->
+        CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.SPAWN_EGGS).register { itemGroup ->
             addToGroupAfterParent(itemGroup, items, parentItems)
         }
     }
@@ -186,12 +186,10 @@ object ItemGroupRegistry {
     }
 
     fun registerItemsAfterCommonParent(
-        stacks: List<ItemStack>,
+        items: List<Item>,
         parentItem: Item,
     ) {
         val parentList = mutableListOf<Item>()
-        val items = mutableListOf<Item>()
-        stacks.forEach { items.add(it.item) }
         items.forEach { _ -> parentList.add(parentItem) }
         registerItemsInDefaultGroups(items, parentList)
     }
@@ -209,20 +207,16 @@ object ItemGroupRegistry {
      * @param parents List of parent blocks to place the new items after
      */
     private fun addToGroupAfterParent(
-        itemGroup: FabricItemGroupEntries,
+        itemGroup: FabricCreativeModeTabOutput,
         items: List<Item>,
         parents: List<Item>,
     ) {
         parents.forEachIndexed { index, parent ->
             val item = items[index]
-            val parentItem = parent
-
-            // Check if parent item exists in the current group
-            if (itemGroup.displayStacks.any { it.item == parentItem }) {
-                // Add the new item right after the parent item
-                itemGroup.addAfter(parentItem, item)
+            if (itemGroup.displayStacks.any { it.item == parent }) {
+                itemGroup.insertAfter(parent, item)  // addAfter → insertAfter
                 if (AdditionsConfig.DetailedLogging || FabricLoader.getInstance().isDevelopmentEnvironment) {
-                    logger.info("Added $item to $itemGroup after $parentItem")
+                    logger.info("Added $item after $parent")
                 }
             }
         }

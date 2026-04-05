@@ -1,8 +1,8 @@
 package de.additions.datagen
 
 import de.additions.blocks.BlockRegistry
-import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
-import net.fabricmc.fabric.api.datagen.v1.provider.FabricBlockLootTableProvider
+import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput
+import net.fabricmc.fabric.api.datagen.v1.provider.FabricBlockLootSubProvider
 import net.minecraft.core.HolderLookup
 import java.util.concurrent.CompletableFuture
 
@@ -18,9 +18,9 @@ import java.util.concurrent.CompletableFuture
  * necessary for accessing registry data during generation.
  */
 class LootGenerator(
-    generator: FabricDataOutput,
+    generator: FabricPackOutput,
     registryLookup: CompletableFuture<HolderLookup.Provider>,
-) : FabricBlockLootTableProvider(generator, registryLookup) {
+) : FabricBlockLootSubProvider(generator, registryLookup) {
     /**
      * Called by the data generation process to generate all loot tables.
      * This method defines the loot drops for various block types registered in [BlockRegistry].

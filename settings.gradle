@@ -3,7 +3,7 @@ pluginManagement {
 	file("gradle.properties").withInputStream { props.load(it) }
 
 	plugins {
-		id 'fabric-loom'               version props.loom_version
+		id 'net.fabricmc.fabric-loom'               version props.loom_version
 		id 'org.jetbrains.kotlin.jvm'  version props.kotlin_version
 	}
 

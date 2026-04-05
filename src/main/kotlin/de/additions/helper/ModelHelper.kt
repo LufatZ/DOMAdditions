@@ -1,15 +1,17 @@
 package de.additions.helper
 
 import de.additions.datagen.ModelGenerator
+import net.minecraft.client.color.item.ItemTintSource
+import net.minecraft.client.data.models.BlockModelGenerators
+import net.minecraft.client.data.models.model.ItemModelUtils
+import net.minecraft.client.data.models.model.TextureMapping
+import net.minecraft.client.data.models.model.TextureSlot
+import net.minecraft.client.resources.model.sprite.Material
+import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.resources.Identifier
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.GrassBlock
 import net.minecraft.world.level.block.SnowLayerBlock
-import net.minecraft.client.data.models.BlockModelGenerators
-import net.minecraft.client.data.models.model.ItemModelUtils
-import net.minecraft.client.data.models.model.TextureSlot
-import net.minecraft.client.data.models.model.TextureMapping
-import net.minecraft.client.color.item.ItemTintSource
-import net.minecraft.resources.Identifier
 
 object ModelHelper {
     /**
@@ -22,10 +24,8 @@ object ModelHelper {
      * @return Cleaned block identifier
      */
     fun extractCleanBlockIdentifier(block: Block, removeBlock: Boolean = false): String =
-        block.defaultBlockState().blockHolder.registeredName
-            .replace("minecraft:", "")
+        BuiltInRegistries.BLOCK.getKey(block).path
             .let { if (removeBlock) it.replace("_block", "") else it }
-
 
     /**
      * Builds a full texture identifier for a block.
@@ -56,6 +56,7 @@ object ModelHelper {
         if (overlay) append("_overlay")
         if (snow) append("_snow")
     }.let { Identifier.parse(it) }
+
     /**
      * Creates a TextureMap for a block with flexible texture configuration.
      *
@@ -111,20 +112,20 @@ object ModelHelper {
 
         when (textureKey) {
             "texture" -> {
-                put(TextureSlot.TEXTURE, topIdentifier)
+                put(TextureSlot.TEXTURE, Material(topIdentifier))
             }
 
             "overlay" -> {
-                put(TextureSlot.TOP, topIdentifier)
-                put(TextureSlot.SIDE, sideIdentifier)
-                put(TextureSlot.BOTTOM, bottomIdentifier)
-                put(TextureSlot.LAYER0, overlayIdentifier)
+                put(TextureSlot.TOP, Material(topIdentifier))
+                put(TextureSlot.SIDE, Material(sideIdentifier))
+                put(TextureSlot.BOTTOM, Material(bottomIdentifier))
+                put(TextureSlot.LAYER0, Material(overlayIdentifier))
             }
 
             else -> {
-                put(TextureSlot.TOP, topIdentifier)
-                put(TextureSlot.SIDE, sideIdentifier)
-                put(TextureSlot.BOTTOM, bottomIdentifier)
+                put(TextureSlot.TOP, Material(topIdentifier))
+                put(TextureSlot.SIDE, Material(sideIdentifier))
+                put(TextureSlot.BOTTOM, Material(bottomIdentifier))
             }
         }
     }

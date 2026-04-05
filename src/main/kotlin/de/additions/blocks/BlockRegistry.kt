@@ -14,25 +14,14 @@ import de.additions.blocks.BlockRegistry.trapdoorVariantsParents
 import de.additions.blocks.lanterns.*
 import de.additions.config.AdditionsConfig
 import de.additions.itemGroups.ItemGroupRegistry
-import net.minecraft.world.item.BlockItem
-import net.minecraft.world.item.Item
-import net.minecraft.world.item.ItemStack
-import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.core.Registry
-import net.minecraft.resources.ResourceKey
+import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.core.registries.Registries
 import net.minecraft.resources.Identifier
-import net.minecraft.world.level.block.Block
-import net.minecraft.world.level.block.Blocks
-import net.minecraft.world.level.block.CryingObsidianBlock
-import net.minecraft.world.level.block.DirtPathBlock
-import net.minecraft.world.level.block.GrassBlock
-import net.minecraft.world.level.block.LanternBlock
-import net.minecraft.world.level.block.MagmaBlock
-import net.minecraft.world.level.block.SlabBlock
-import net.minecraft.world.level.block.StairBlock
-import net.minecraft.world.level.block.TrapDoorBlock
-import net.minecraft.world.level.block.WeatheringCopperBlocks
+import net.minecraft.resources.ResourceKey
+import net.minecraft.world.item.BlockItem
+import net.minecraft.world.item.Item
+import net.minecraft.world.level.block.*
 import net.minecraft.world.level.block.state.BlockBehaviour
 import net.minecraft.world.level.block.state.properties.BlockSetType
 
@@ -43,7 +32,7 @@ import net.minecraft.world.level.block.state.properties.BlockSetType
  */
 object BlockRegistry {
     /** Stores all registered blocks as ItemStacks for later use, e.g., in item groups. */
-    val registeredBlocks: MutableList<ItemStack> = mutableListOf()
+    val registeredBlocks: MutableList<Item> = mutableListOf()
 
     /** List of all registered stair blocks. */
     @JvmStatic
@@ -301,7 +290,7 @@ object BlockRegistry {
         Registry.register(BuiltInRegistries.ITEM, itemKey, blockItem)
 
         // Add the ItemStack to the list for item groups
-        registeredBlocks.add(ItemStack(blockItem))
+        registeredBlocks.add(blockItem)
 
         logger.debug("Successfully registered block and block item: $id")
         return block
@@ -335,7 +324,7 @@ object BlockRegistry {
                             register(
                                 "${baseName}_slab",
                                 SnowySlabBlock(
-                                    settings.setId(keyOf("${baseName}_slab")),
+                                    settings.noOcclusion().setId(keyOf("${baseName}_slab")),
                                 ),
                             ).also { registeredGrassBlocks.add(it) }
                         }
@@ -405,7 +394,7 @@ object BlockRegistry {
                                 "${baseName}_stairs",
                                 SnowyStairsBlock(
                                     parent.defaultBlockState(),
-                                    settings.setId(keyOf("${baseName}_stairs")),
+                                    settings.noOcclusion().setId(keyOf("${baseName}_stairs")),
                                 ),
                             ).also { registeredGrassBlocks.add(it) }
 
@@ -497,7 +486,7 @@ object BlockRegistry {
                     .getKey(baseBlock)
                     .path
                     .replace("_block", "")
-            val lanternSettings = BlockBehaviour.Properties.ofFullCopy(Blocks.LANTERN)
+            val lanternSettings = BlockBehaviour.Properties.ofFullCopy(Blocks.LANTERN).noOcclusion()
 
             logger.debug("Creating lantern variants for base block: $baseName")
             if (baseBlock != Blocks.COPPER_BLOCK) {
@@ -553,7 +542,7 @@ object BlockRegistry {
             }
             // Register redstone variants if enabled
             if (AdditionsConfig.EnabledRedstoneLantern) {
-                logger.warn("Redstone Lanterns are enabled. Variant registration for: $baseName")
+                logger.info("Redstone Lanterns are enabled. Variant registration for: $baseName")
                 if (baseBlock != Blocks.COPPER_BLOCK) {
                     redstoneLantern =
                         register(
@@ -703,7 +692,7 @@ object BlockRegistry {
      */
     private fun registerChains() {
         logger.info("Starting chain registration")
-        val chainSettings = BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_CHAIN)
+        val chainSettings = BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_CHAIN).noOcclusion()
         val chain = register("redstone_chain", RedstoneChainBlock(chainSettings.setId(keyOf("redstone_chain"))))
         val copperChain = WeatheringCopperBlocks.create(
             "copper_redstone_chain",

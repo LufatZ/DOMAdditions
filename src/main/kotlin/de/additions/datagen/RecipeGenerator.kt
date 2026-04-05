@@ -15,7 +15,7 @@ import de.additions.items.ToolItem.Companion.C_NETHERITE
 import de.additions.items.ToolItem.Companion.C_STONE
 import de.additions.items.ToolItem.Companion.C_WOOD
 import de.additions.items.VeinMineItem
-import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
+import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider
 import net.minecraft.advancements.criterion.InventoryChangeTrigger
 import net.minecraft.advancements.criterion.ItemPredicate
@@ -52,7 +52,7 @@ import java.util.concurrent.CompletableFuture
  * @property registriesFuture Provides access to game registries during recipe generation
  */
 class RecipeGenerator(
-    output: FabricDataOutput,
+    output: FabricPackOutput,
     registriesFuture: CompletableFuture<HolderLookup.Provider>,
 ) : FabricRecipeProvider(output, registriesFuture) {
     // Registry lookup and exporter instances
@@ -134,8 +134,8 @@ class RecipeGenerator(
         }
 
         // Generate recipes for mod items
-        items.forEach { stack ->
-            createItemRecipe(stack.item)
+        items.forEach { item ->
+            createItemRecipe(item)
         }
 
         // Generate vanilla override recipes

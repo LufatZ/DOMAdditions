@@ -12,17 +12,17 @@ import de.additions.items.ToolItem.Companion.C_IRON
 import de.additions.items.ToolItem.Companion.C_NETHERITE
 import de.additions.items.ToolItem.Companion.C_STONE
 import de.additions.items.ToolItem.Companion.C_WOOD
-import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
-import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider
-import net.minecraft.world.level.block.Block
-import net.minecraft.world.level.block.Blocks
-import net.minecraft.world.item.Item
-import net.minecraft.core.registries.Registries
+import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput
+import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagsProvider
 import net.minecraft.core.HolderLookup
+import net.minecraft.core.registries.Registries
+import net.minecraft.resources.Identifier
 import net.minecraft.tags.BlockTags
 import net.minecraft.tags.ItemTags
 import net.minecraft.tags.TagKey
-import net.minecraft.resources.Identifier
+import net.minecraft.world.item.Item
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.Blocks
 import java.util.concurrent.CompletableFuture
 
 /**
@@ -32,9 +32,9 @@ import java.util.concurrent.CompletableFuture
  * @property registryLookup Asynchronous registry wrapper for block lookups
  */
 class ItemTagGenerator(
-    generator: FabricDataOutput,
+    generator: FabricPackOutput,
     registryLookup: CompletableFuture<HolderLookup.Provider>
-) : FabricTagProvider<Item>(generator, Registries.ITEM, registryLookup) {
+) : FabricTagsProvider<Item>(generator, Registries.ITEM, registryLookup) {
 
     companion object {
         val stonesTag = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(MODID, "stones"))
@@ -51,8 +51,7 @@ class ItemTagGenerator(
         BlockRegistry.registeredStairs.forEach{ stair -> addToTag(stair, ItemTags.STAIRS) }
         BlockRegistry.registeredTrapdoors.forEach{ trapdoor -> addToTag( trapdoor, ItemTags.TRAPDOORS) }
 
-        ItemRegistry.registeredItems.forEach{ stack ->
-            val item = stack.item
+        ItemRegistry.registeredItems.forEach{ item ->
             if (item is ToolItem) {
                 // Check mineable type
                 when (item.effectiveBlocks) {

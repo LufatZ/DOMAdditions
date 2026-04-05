@@ -13,15 +13,15 @@ import de.additions.items.ToolItem.Companion.C_NETHERITE
 import de.additions.items.ToolItem.Companion.C_STONE
 import de.additions.items.ToolItem.Companion.C_WOOD
 import de.additions.items.ToolItem.Companion.UNKNOWN_MATERIAL_MSG
-import net.minecraft.world.level.block.Blocks
-import net.minecraft.client.data.*
 import net.minecraft.client.data.models.ItemModelGenerators
 import net.minecraft.client.data.models.model.ItemModelUtils
 import net.minecraft.client.data.models.model.ModelTemplate
 import net.minecraft.client.data.models.model.TextureMapping
 import net.minecraft.client.data.models.model.TextureSlot
-import net.minecraft.tags.BlockTags
+import net.minecraft.client.resources.model.sprite.Material
 import net.minecraft.resources.Identifier
+import net.minecraft.tags.BlockTags
+import net.minecraft.world.level.block.Blocks
 import java.util.*
 
 object ItemModelGenerator {
@@ -35,8 +35,8 @@ object ItemModelGenerator {
      * Generates all item models from registered items.
      */
     fun ItemModelGenerators.generateItemsModels() {
-        registeredItems.forEach { stack ->
-            when (val item = stack.item) {
+        registeredItems.forEach { item ->
+            when (item) {
                 is ToolItem -> generateMineToolModel(this, item)
                 else -> logger.warn("Unknown item type: $item")
             }
@@ -50,7 +50,7 @@ object ItemModelGenerator {
      * @param type The [TextureType] specifying which part of the tool the texture is for (e.g., handle, blade).
      * @return An [Identifier] pointing to the resolved block texture resource path.
      */
-    fun getMaterialTextureIdentifier(item: ToolItem, type: TextureType): Identifier {
+    fun getMaterialTextureIdentifier(item: ToolItem, type: TextureType): Material {
         var replace = listOf("", "")
         val blockForTexture = when (type) {
             TextureType.HANDLE -> when (item.material) {
@@ -92,8 +92,8 @@ object ItemModelGenerator {
             "block/${ModelHelper.extractCleanBlockIdentifier(blockForTexture)
                 .replace(replace[0], replace[1])}"
         )
-        logger.info("Using material texture: $id for item: ${item.name}")
-        return id
+        logger.info("Using material texture: $id for item: $item")
+        return Material(id)
     }
 
     /**

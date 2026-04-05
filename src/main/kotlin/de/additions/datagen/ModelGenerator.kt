@@ -3,11 +3,11 @@ package de.additions.datagen
 import de.additions.datagen.models.BlockModelGenerator.init
 import de.additions.datagen.models.ItemModelGenerator.generateItemsModels
 import net.fabricmc.fabric.api.client.datagen.v1.provider.FabricModelProvider
-import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
-import net.minecraft.world.level.block.Block
-import net.minecraft.world.level.block.Blocks
+import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput
 import net.minecraft.client.data.models.BlockModelGenerators
 import net.minecraft.client.data.models.ItemModelGenerators
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.Blocks
 
 /**
  * Comprehensive Model Generation Class
@@ -24,7 +24,7 @@ import net.minecraft.client.data.models.ItemModelGenerators
  * @param generator The FabricDataOutput used for generating mod resources
  */
 class ModelGenerator(
-    generator: FabricDataOutput,
+    generator: FabricPackOutput,
 ) : FabricModelProvider(generator) {
     companion object {
         /**

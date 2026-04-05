@@ -21,11 +21,6 @@ import de.additions.datagen.models.CustomStates.createStairsModelMap
 import de.additions.helper.ModelHelper.configureBlockTextureMapping
 import de.additions.helper.ModelHelper.extractCleanBlockIdentifier
 import de.additions.helper.ModelHelper.generateBlockItemModel
-import net.minecraft.world.level.block.Block
-import net.minecraft.world.level.block.Blocks
-import net.minecraft.world.level.block.DirtPathBlock
-import net.minecraft.world.level.block.GrassBlock
-import net.minecraft.client.data.*
 import net.minecraft.client.data.models.BlockModelGenerators
 import net.minecraft.client.data.models.BlockModelGenerators.*
 import net.minecraft.client.data.models.blockstates.MultiVariantGenerator
@@ -33,14 +28,32 @@ import net.minecraft.client.data.models.model.ModelTemplate
 import net.minecraft.client.data.models.model.ModelTemplates
 import net.minecraft.client.data.models.model.TextureMapping
 import net.minecraft.client.data.models.model.TextureSlot
+import net.minecraft.client.resources.model.sprite.Material
 import net.minecraft.core.registries.BuiltInRegistries
-import net.minecraft.world.level.block.state.properties.BlockStateProperties
 import net.minecraft.resources.Identifier
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.level.block.DirtPathBlock
+import net.minecraft.world.level.block.GrassBlock
+import net.minecraft.world.level.block.state.properties.BlockStateProperties
 import java.util.*
 
+/**
+ * Object responsible for generating Minecraft block models for registered blocks within a mod context.
+ * Initializes the model generation state and dispatches specific creation tasks for various block types
+ * including stairs, slabs, lanterns, trapdoors, and chains based on their parent variants and textures.
+ */
 object BlockModelGenerator {
+    /**
+     * The instance responsible for generating block model definitions within the system.
+     */
     lateinit var generator: BlockModelGenerators
 
+    /**
+     * Initializes the block model generation process by setting the generator instance.
+     * Triggers the creation of custom models for registered blocks including stairs, slabs, lanterns, trapdoors, and chains.
+     * Handles specific variant behaviors such as bottom material adjustments and copper oxidation states.
+     */
     fun BlockModelGenerators.init() {
         generator = this
 
@@ -52,10 +65,9 @@ object BlockModelGenerator {
     }
 
     /**
-     * Processes and generates models for all registered stairs.
-     *
-     * Handles special cases for certain parent blocks like Podzol and Mycelium,
-     * which require custom bottom texture handling.
+     * Generates stair models for all registered stairs based on their associated parent blocks.
+     * For specific ground types such as podzol, mycelium, dirt path, and grass block, the generated model explicitly sets the bottom component to dirt; otherwise, it uses the default
+     *  configuration.
      */
     private fun generateStairModels() {
         registeredStairs.forEachIndexed { index, stair ->
@@ -70,10 +82,10 @@ object BlockModelGenerator {
     }
 
     /**
-     * Processes and generates models for all registered slabs.
-     *
-     * Similar to stair generation, handles special cases for parent blocks
-     * that require custom texture mapping.
+     * Generates block models for all registered slab variants based on their associated parent blocks.
+     * Iterates through the registered slabs and retrieves the corresponding parent block configuration.
+     * Invokes generateSlabModel with specific bottom texture parameters for podzol, mycelium, dirt path, and grass blocks to ensure correct visual representation.
+     * Uses default model generation logic for other parent block types.
      */
     private fun generateSlabModels() {
         registeredSlabs.forEachIndexed { index, slab ->
@@ -88,20 +100,18 @@ object BlockModelGenerator {
     }
 
     /**
-     * Processes and generates models for all registered lanterns.
-     *
-     * Creates standing and hanging variants for each registered lantern,
-     * using the parent block's texture as a base.
+     * Generates model data for all registered lantern types by iterating through the collection of registered entries.
+     * Delegates to generateLanternModel for each entry to handle specific material variations, template selection based on
+     * lantern size and parent block properties, as well as registration of standing and hanging variants with appropriate textures.
      */
     private fun generateLanternModels() {
         registeredLanterns.forEach { (lantern, baseBlock) -> generateLanternModel(lantern, baseBlock) }
     }
 
     /**
-     * Processes and generates models for all registered trapdoors.
-     *
-     * Creates bottom, top, and open variants for each registered trapdoor,
-     * using the parent block's texture.
+     * Generates model files for all registered trapdoor blocks.
+     * Iterates through the list of registered trapdoors and retrieves corresponding parent block definitions.
+     * For each pair, it delegates the creation of specific models including bottom, top, and open variants along with associated state configurations to a helper function.
      */
     private fun generateTrapdoorModels() {
         registeredTrapdoors.forEachIndexed { index, trapdoor ->
@@ -112,10 +122,11 @@ object BlockModelGenerator {
     }
 
     /**
-     * Generates models for all chain variants.
+     * Generates custom models for all registered chain blocks based on their material composition and oxidation state.
+     * Determines specific model identifiers for copper chains depending on whether they are oxidized, weathered, or exposed,
+     * while assigning a distinct identifier for iron chains. Creates axis-aligned pillar block custom models and registers corresponding item models via the generator instance.
      */
     private fun generateChainModels() {
-
         registeredChains.forEach { chain ->
             val id = BuiltInRegistries.BLOCK.getKey(chain).path
             val chainModelId =
@@ -125,7 +136,8 @@ object BlockModelGenerator {
                         id.contains("weathered_") -> Identifier.withDefaultNamespace("block/weathered_copper_chain")
                         id.contains("exposed_") -> Identifier.withDefaultNamespace("block/exposed_copper_chain")
                         else -> Identifier.withDefaultNamespace("block/copper_chain")
-                    } else {
+                    }
+                else {
                     Identifier.withDefaultNamespace("block/iron_chain")
                 }
             val chainItemModelId =
@@ -135,10 +147,10 @@ object BlockModelGenerator {
                         id.contains("weathered_") -> Identifier.withDefaultNamespace("item/weathered_copper_chain")
                         id.contains("exposed_") -> Identifier.withDefaultNamespace("item/exposed_copper_chain")
                         else -> Identifier.withDefaultNamespace("item/copper_chain")
-                    } else {
+                    }
+                else {
                     Identifier.withDefaultNamespace("item/iron_chain")
                 }
-
 
             generator.createAxisAlignedPillarBlockCustomModel(chain, plainVariant(chainModelId))
             generator.registerSimpleItemModel(chain, chainItemModelId)
@@ -146,7 +158,15 @@ object BlockModelGenerator {
     }
 
     /**
-     * Generates all necessary models and blockstates for a stair variant.
+     * Generates stair model variants for a given block parent. This method configures texture mappings and generates multiple model types including regular, rotated, outer, and inner
+     *  stairs based on the parent block type. It handles specific logic for grass blocks, dirt path blocks, and snowy overgrown blocks to determine appropriate textures for top, side
+     *  and bottom faces.
+     *
+     * @param stair The stair block variant being processed.
+     * @param parent The base block determining texture mapping rules and model templates.
+     * @param top Optional override for the top face texture or block definition. Defaults to the parent.
+     * @param side Optional override for the side face texture or block definition. Defaults to the parent.
+     * @param bottom Optional override for the bottom face texture or block definition. Defaults to the parent.
      */
     private fun generateStairModel(
         stair: Block,
@@ -179,7 +199,6 @@ object BlockModelGenerator {
                 textureKey = "",
             )
 
-        // Regular models
         val regularModel =
             when (parent) {
                 is GrassBlock ->
@@ -378,7 +397,6 @@ object BlockModelGenerator {
                 else -> ModelTemplates.STAIRS_INNER.createWithSuffix(stair, "_rotated", textureMap, generator.modelOutput)
             }
 
-        // Snowy models for grass blocks
         val regularSnowyModel =
             when (parent) {
                 in snowyOvergrownBlocks ->
@@ -512,7 +530,14 @@ object BlockModelGenerator {
     }
 
     /**
-     * Generates all necessary models and blockstates for a trapdoor variant.
+     * Generates the block state and model variants for a trapdoor block.
+     *
+     * Configures texture mapping based on the parent block properties, creates separate models
+     * for the closed top, closed bottom, and open states, and registers the corresponding item model.
+     *
+     * @param trapdoor The trapdoor block instance being modeled.
+     * @param parent The parent block used to determine texture configuration rules
+     *               such as side/top texture presence and removal logic.
      */
     private fun generateTrapdoorModel(
         trapdoor: Block,
@@ -564,13 +589,20 @@ object BlockModelGenerator {
     }
 
     /**
-     * Generates all necessary models and blockstates for a lantern variant.
+     * Generates model data and registers block states for lantern blocks based on their type and parent material.
+     *
+     * Determines texture mappings considering copper oxidation states if the parent is a copper block, selecting specific textures for oxidized, weathered, or exposed variants.
+     * Selects appropriate model templates (standing or hanging) depending on whether the lantern is small, big, or standard.
+     * Registers specific item models and block states for redstone lanterns placed on iron or copper blocks using simple variant logic.
+     * Otherwise, registers generated standing and hanging variants with state-based dispatching for the hanging property.
+     *
+     * @param lantern The lantern block instance to generate models for, determining template selection logic and oxidation checks.
+     * @param parent The parent block type used to determine texture variants and special case handling conditions for redstone lanterns.
      */
     private fun generateLanternModel(
         lantern: Block,
         parent: Block,
     ) {
-        // Bestimme die richtige Textur basierend auf Oxidationsstufe
         val textureBlock = when {
             parent == Blocks.COPPER_BLOCK -> {
                 val lanternId = BuiltInRegistries.BLOCK.getKey(lantern).path
@@ -584,23 +616,23 @@ object BlockModelGenerator {
             else -> parent
         }
 
-        val textureMap =
-            TextureMapping().apply {
-                put(TextureSlot.TEXTURE, Identifier.parse("block/${extractCleanBlockIdentifier(textureBlock)}"))
-                put(
-                    TextureSlot.PARTICLE, Identifier.parse(
-                    if (parent != Blocks.COPPER_BLOCK) "block/lantern"
-                    else {
-                        val lanternId = BuiltInRegistries.BLOCK.getKey(lantern).path
-                        when {
-                            lanternId.contains("oxidized_") -> "block/oxidized_copper_lantern"
-                            lanternId.contains("weathered_") -> "block/weathered_copper_lantern"
-                            lanternId.contains("exposed_") -> "block/exposed_copper_lantern"
-                            else -> "block/copper_lantern"
-                        }
-                    }
-                ))
+        val particleMaterial = when {
+            parent == Blocks.COPPER_BLOCK -> {
+                val lanternId = BuiltInRegistries.BLOCK.getKey(lantern).path
+                val texturePath = when {
+                    lanternId.contains("oxidized_")  -> "block/oxidized_copper_lantern"
+                    lanternId.contains("weathered_") -> "block/weathered_copper_lantern"
+                    lanternId.contains("exposed_")   -> "block/exposed_copper_lantern"
+                    else                             -> "block/copper_lantern"
+                }
+                Material(Identifier.withDefaultNamespace(texturePath))
             }
+            else -> TextureMapping.getBlockTexture(Blocks.LANTERN)
+        }
+
+        val textureMap = TextureMapping()
+            .put(TextureSlot.TEXTURE, TextureMapping.getBlockTexture(textureBlock))
+            .put(TextureSlot.PARTICLE, particleMaterial)
         val standingTemplateModelId =
             when (lantern) {
                 is SmallLantern, is SmallRedstoneLantern -> "$MODID:block/template_small_lantern_standing"
@@ -627,7 +659,7 @@ object BlockModelGenerator {
                 generator.modelOutput,
             )
 
-        val lanternModelhanging =
+        val lanternModelHanging =
             plainVariant(
                 ModelTemplate(
                     Optional.of(Identifier.parse(hangingTemplateModelId)),
@@ -642,46 +674,60 @@ object BlockModelGenerator {
                 ),
             )
 
-        if (parent == Blocks.IRON_BLOCK &&
-            lantern is RedstoneLantern &&
-            lantern !is BigRedstoneLantern &&
-            lantern !is SmallRedstoneLantern
-        ) {
-            val lanternStandingModel = plainVariant(Identifier.withDefaultNamespace("block/lantern"))
-            val lanternHangingModel = plainVariant(Identifier.withDefaultNamespace("block/lantern_hanging"))
-            val lanternItemModelId = Identifier.withDefaultNamespace("item/lantern")
-            generator.registerSimpleItemModel(lantern, lanternItemModelId)
-            generator.blockStateOutput.accept(
-                MultiVariantGenerator.dispatch(lantern).with(
-                    createBooleanModelDispatch(BlockStateProperties.HANGING, lanternHangingModel, lanternStandingModel),
-                ),
-            )
-        } else if (parent == Blocks.COPPER_BLOCK &&
-            lantern is RedstoneLantern &&
-            lantern !is BigRedstoneLantern &&
-            lantern !is SmallRedstoneLantern
-        ) {
-            val lanternStandingModel = plainVariant(Identifier.withDefaultNamespace("block/copper_lantern"))
-            val lanternHangingModel = plainVariant(Identifier.withDefaultNamespace("block/copper_lantern_hanging"))
-            val lanternItemModelId = Identifier.withDefaultNamespace("item/copper_lantern")
-            generator.registerSimpleItemModel(lantern, lanternItemModelId)
-            generator.blockStateOutput.accept(
-                MultiVariantGenerator.dispatch(lantern).with(
-                    createBooleanModelDispatch(BlockStateProperties.HANGING, lanternHangingModel, lanternStandingModel),
-                ),
-            )
-        } else {
-            generator.blockStateOutput.accept(
-                MultiVariantGenerator.dispatch(lantern).with(
-                    createBooleanModelDispatch(BlockStateProperties.HANGING, lanternModelhanging, plainVariant(lanternModelStanding)),
-                ),
-            )
-            generateBlockItemModel(lantern, parent, lanternModelStanding, generator)
+        when (parent) {
+            Blocks.IRON_BLOCK if lantern is RedstoneLantern &&
+                    lantern !is BigRedstoneLantern &&
+                    lantern !is SmallRedstoneLantern
+                -> {
+                val lanternStandingModel = plainVariant(Identifier.withDefaultNamespace("block/lantern"))
+                val lanternHangingModel = plainVariant(Identifier.withDefaultNamespace("block/lantern_hanging"))
+                generator.registerSimpleItemModel(lantern, Identifier.withDefaultNamespace("item/lantern"))
+                generator.blockStateOutput.accept(
+                    MultiVariantGenerator.dispatch(lantern).with(
+                        createBooleanModelDispatch(BlockStateProperties.HANGING, lanternHangingModel, lanternStandingModel),
+                    ),
+                )
+            }
+
+            Blocks.COPPER_BLOCK if lantern is RedstoneLantern &&
+                    lantern !is BigRedstoneLantern &&
+                    lantern !is SmallRedstoneLantern
+                -> {
+                val lanternStandingModel = plainVariant(Identifier.withDefaultNamespace("block/copper_lantern"))
+                val lanternHangingModel = plainVariant(Identifier.withDefaultNamespace("block/copper_lantern_hanging"))
+                generator.registerSimpleItemModel(lantern, Identifier.withDefaultNamespace("item/copper_lantern"))
+                generator.blockStateOutput.accept(
+                    MultiVariantGenerator.dispatch(lantern).with(
+                        createBooleanModelDispatch(BlockStateProperties.HANGING, lanternHangingModel, lanternStandingModel),
+                    ),
+                )
+            }
+
+            else -> {
+                generator.blockStateOutput.accept(
+                    MultiVariantGenerator.dispatch(lantern).with(
+                        createBooleanModelDispatch(
+                            BlockStateProperties.HANGING,
+                            lanternModelHanging,
+                            plainVariant(lanternModelStanding)
+                        ),
+                    ),
+                )
+                generateBlockItemModel(lantern, parent, lanternModelStanding, generator)
+            }
         }
     }
 
     /**
-     * Generates all necessary models and blockstates for a slab variant.
+     * Generates model definitions and block states for a slab block variant based on its parent material type.
+     * This method configures texture mappings for both standard and snowy conditions, selecting appropriate
+     * template models depending on the parent block class such as GrassBlock or DirtPathBlock. It handles
+     * specific variations including overgrown blocks and snow cover states before outputting the results.
+     * @param slab The specific slab block instance being configured with model definitions.
+     * @param parent The base material or block class determining the model template selection logic.
+     * @param top The source block for top face textures, defaulting to the parent if not specified.
+     * @param side The source block for side face textures, defaulting to the parent if not specified.
+     * @param bottom The source block for bottom face textures, defaulting to the parent if not specified.
      */
     private fun generateSlabModel(
         slab: Block,
@@ -729,12 +775,7 @@ object BlockModelGenerator {
                         TextureSlot.SIDE,
                         TextureSlot.BOTTOM,
                         TextureSlot.LAYER0,
-                    ).createWithSuffix(
-                        slab,
-                        "",
-                        textureMap,
-                        generator.modelOutput,
-                    )
+                    ).createWithSuffix(slab, "", textureMap, generator.modelOutput)
 
                 is DirtPathBlock ->
                     ModelTemplate(
@@ -743,12 +784,7 @@ object BlockModelGenerator {
                         TextureSlot.TOP,
                         TextureSlot.SIDE,
                         TextureSlot.BOTTOM,
-                    ).createWithSuffix(
-                        slab,
-                        "",
-                        textureMap,
-                        generator.modelOutput,
-                    )
+                    ).createWithSuffix(slab, "", textureMap, generator.modelOutput)
 
                 in snowyOvergrownBlocks ->
                     ModelTemplate(
@@ -757,20 +793,10 @@ object BlockModelGenerator {
                         TextureSlot.TOP,
                         TextureSlot.SIDE,
                         TextureSlot.BOTTOM,
-                    ).createWithSuffix(
-                        slab,
-                        "",
-                        textureMap,
-                        generator.modelOutput,
-                    )
+                    ).createWithSuffix(slab, "", textureMap, generator.modelOutput)
 
                 else ->
-                    ModelTemplates.SLAB_BOTTOM.createWithSuffix(
-                        slab,
-                        "",
-                        textureMap,
-                        generator.modelOutput,
-                    )
+                    ModelTemplates.SLAB_BOTTOM.createWithSuffix(slab, "", textureMap, generator.modelOutput)
             }
 
         val snowyBottomModel =
@@ -782,12 +808,7 @@ object BlockModelGenerator {
                         TextureSlot.TOP,
                         TextureSlot.SIDE,
                         TextureSlot.BOTTOM,
-                    ).createWithSuffix(
-                        slab,
-                        "_snow",
-                        snowyTextureMap,
-                        generator.modelOutput,
-                    )
+                    ).createWithSuffix(slab, "_snow", snowyTextureMap, generator.modelOutput)
 
                 else -> null
             }
@@ -802,12 +823,7 @@ object BlockModelGenerator {
                         TextureSlot.SIDE,
                         TextureSlot.BOTTOM,
                         TextureSlot.LAYER0,
-                    ).createWithSuffix(
-                        slab,
-                        "_top",
-                        textureMap,
-                        generator.modelOutput,
-                    )
+                    ).createWithSuffix(slab, "_top", textureMap, generator.modelOutput)
 
                 is DirtPathBlock ->
                     ModelTemplate(
@@ -816,12 +832,7 @@ object BlockModelGenerator {
                         TextureSlot.TOP,
                         TextureSlot.SIDE,
                         TextureSlot.BOTTOM,
-                    ).createWithSuffix(
-                        slab,
-                        "_top",
-                        textureMap,
-                        generator.modelOutput,
-                    )
+                    ).createWithSuffix(slab, "_top", textureMap, generator.modelOutput)
 
                 in snowyOvergrownBlocks ->
                     ModelTemplate(
@@ -830,31 +841,16 @@ object BlockModelGenerator {
                         TextureSlot.TOP,
                         TextureSlot.SIDE,
                         TextureSlot.BOTTOM,
-                    ).createWithSuffix(
-                        slab,
-                        "_top",
-                        textureMap,
-                        generator.modelOutput,
-                    )
+                    ).createWithSuffix(slab, "_top", textureMap, generator.modelOutput)
 
                 else ->
-                    ModelTemplates.SLAB_TOP.createWithSuffix(
-                        slab,
-                        "",
-                        textureMap,
-                        generator.modelOutput,
-                    )
+                    ModelTemplates.SLAB_TOP.createWithSuffix(slab, "", textureMap, generator.modelOutput)
             }
 
         val snowyTopModel =
             when (parent) {
                 in snowyOvergrownBlocks ->
-                    ModelTemplates.SLAB_TOP.createWithSuffix(
-                        slab,
-                        "_snow_top",
-                        snowyTextureMap,
-                        generator.modelOutput,
-                    )
+                    ModelTemplates.SLAB_TOP.createWithSuffix(slab, "_snow_top", snowyTextureMap, generator.modelOutput)
 
                 else -> null
             }
@@ -863,7 +859,8 @@ object BlockModelGenerator {
 
         val snowyFullBlockModel =
             when (parent) {
-                in snowyOvergrownBlocks -> Identifier.parse("block/${extractCleanBlockIdentifier(Blocks.GRASS_BLOCK)}_snow") else -> null
+                in snowyOvergrownBlocks -> Identifier.parse("block/${extractCleanBlockIdentifier(Blocks.GRASS_BLOCK)}_snow")
+                else -> null
             }
 
         generateBlockItemModel(slab, parent, bottomModel, generator)

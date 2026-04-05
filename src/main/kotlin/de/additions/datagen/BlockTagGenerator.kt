@@ -6,17 +6,16 @@ import de.additions.Additions.MODID
 import de.additions.Additions.logger
 import de.additions.blocks.BlockRegistry
 import de.additions.helper.IdentifierHelper
-import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
-import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider
-import net.minecraft.world.level.block.Block
-import net.minecraft.world.level.block.Blocks
-import net.minecraft.core.registries.Registries
+import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput
+import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagsProvider
 import net.minecraft.core.HolderLookup
+import net.minecraft.core.registries.Registries
+import net.minecraft.resources.Identifier
 import net.minecraft.tags.BlockTags
 import net.minecraft.tags.TagKey
-import net.minecraft.world.level.block.SoundType
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.SoundType.*
-import net.minecraft.resources.Identifier
 import java.util.concurrent.CompletableFuture
 
 /**
@@ -38,9 +37,9 @@ import java.util.concurrent.CompletableFuture
  * @property registriesFuture A future providing asynchronous access to the registry wrapper lookup.
  */
 class BlockTagGenerator(
-    output: FabricDataOutput,
+    output: FabricPackOutput,
     registriesFuture: CompletableFuture<HolderLookup.Provider>,
-) : FabricTagProvider<Block>(output, Registries.BLOCK, registriesFuture) {
+) : FabricTagsProvider<Block>(output, Registries.BLOCK, registriesFuture) {
     companion object {
         // Groups typically mined fastest with a Pickaxe
         private val PICKAXE_SOUND_GROUPS =
@@ -216,6 +215,11 @@ class BlockTagGenerator(
 
         // 4. Add blocks to custom tags
         addToTag(Blocks.DIRT_PATH, DirtPathVariantTag)
+
+        // Magma-Varianten für Bubble Columns registrieren
+        BlockRegistry.getRegisteredMagmaBlocks().forEach { block ->
+            addToTag(block, BlockTags.ENABLES_BUBBLE_COLUMN_DRAG_DOWN)
+        }
     }
 
     /**

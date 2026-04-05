@@ -6,19 +6,15 @@ import de.additions.Additions.logger
 import de.additions.blocks.BlockRegistry
 import de.additions.blocks.lanterns.*
 import de.additions.items.ItemRegistry
-import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
+import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricLanguageProvider
-import net.minecraft.world.item.ItemStack
 import net.minecraft.core.HolderLookup
-import net.minecraft.world.level.block.Block
-import net.minecraft.world.level.block.LanternBlock
-import net.minecraft.world.level.block.SlabBlock
-import net.minecraft.world.level.block.StairBlock
-import net.minecraft.world.level.block.TrapDoorBlock
+import net.minecraft.world.item.Item
+import net.minecraft.world.level.block.*
 import java.util.concurrent.CompletableFuture
 
 class TranslationGenerator(
-    generator: FabricDataOutput,
+    generator: FabricPackOutput,
     registryLookup: CompletableFuture<HolderLookup.Provider>,
 ) : FabricLanguageProvider(generator, registryLookup) {
     private val processedKey = mutableListOf<String>()
@@ -107,10 +103,10 @@ class TranslationGenerator(
         add("tag.item.additions.stones.tooltip", "All stone variants")
     }
 
-    private fun itemsTranslationBuilder(stacks: MutableList<ItemStack>) {
-        stacks.forEach { stack ->
-            val itemName = extractNameFromKey(stack.item.descriptionId)
-            add(stack.item.descriptionId, itemName)
+    private fun itemsTranslationBuilder(items: MutableList<Item>) {
+        items.forEach { item ->
+            val itemName = extractNameFromKey(item.descriptionId)
+            add(item.descriptionId, itemName)
         }
     }
 

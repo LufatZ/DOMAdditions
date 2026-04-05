@@ -1,18 +1,18 @@
 package de.additions.blocks
 
-import net.minecraft.world.level.block.state.BlockState
-import net.minecraft.world.level.block.Blocks
-import net.minecraft.world.level.block.BubbleColumnBlock
-import net.minecraft.world.level.block.StairBlock
-import net.minecraft.world.entity.Entity
-import net.minecraft.world.entity.LivingEntity
-import net.minecraft.server.level.ServerLevel
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
+import net.minecraft.server.level.ServerLevel
 import net.minecraft.util.RandomSource
+import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.LevelReader
 import net.minecraft.world.level.ScheduledTickAccess
+import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.level.block.BubbleColumnBlock
+import net.minecraft.world.level.block.StairBlock
+import net.minecraft.world.level.block.state.BlockState
 
 /**
  * Represents a stair block made of magma.
@@ -55,7 +55,7 @@ class MagmaStair(
         pos: BlockPos,
         random: RandomSource,
     ) {
-        BubbleColumnBlock.updateColumn(world, pos.above(), state)
+        BubbleColumnBlock.updateColumn(Blocks.BUBBLE_COLUMN,world, pos.above(), state)
     }
 
     /**

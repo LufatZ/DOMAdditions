@@ -8,19 +8,19 @@ import de.additions.items.ToolItem.Companion.MiningTypes
 import de.additions.items.ToolItem.Companion.RADIUS
 import de.additions.items.ToolItem.Companion.ToolTypes
 import de.additions.items.ToolItem.Companion.materials
+import net.minecraft.ChatFormatting
+import net.minecraft.core.Registry
 import net.minecraft.core.component.DataComponents
-import net.minecraft.world.item.component.ItemLore
+import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.core.registries.Registries
+import net.minecraft.network.chat.Component
+import net.minecraft.resources.Identifier
+import net.minecraft.resources.ResourceKey
+import net.minecraft.tags.BlockTags
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
-import net.minecraft.core.registries.BuiltInRegistries
-import net.minecraft.core.Registry
-import net.minecraft.resources.ResourceKey
-import net.minecraft.core.registries.Registries
-import net.minecraft.tags.BlockTags
-import net.minecraft.network.chat.Component
-import net.minecraft.ChatFormatting
-import net.minecraft.resources.Identifier
+import net.minecraft.world.item.component.ItemLore
 
 /**
  * A singleton registry responsible for registering custom tool items with material variants.
@@ -46,7 +46,7 @@ object ItemRegistry {
      * The list is populated during item registration and represents the complete
      * set of tools added by this mod.
      */
-    val registeredItems: MutableList<ItemStack> = mutableListOf()
+    val registeredItems: MutableList<Item> = mutableListOf()
 
     /**
      * Registers all custom tool items and adds them to the appropriate item groups.
@@ -125,7 +125,7 @@ object ItemRegistry {
                     tool
                 )
 
-                registeredItems.add(ItemStack(tool))
+                registeredItems.add(tool)
 
                 if (logging) {
                     logger.info("registered tool item: $id")
