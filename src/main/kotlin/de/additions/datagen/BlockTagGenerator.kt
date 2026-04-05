@@ -5,12 +5,14 @@ package de.additions.datagen
 import de.additions.Additions.MODID
 import de.additions.Additions.logger
 import de.additions.blocks.BlockRegistry
-import de.additions.helper.IdentifierHelper
+import de.additions.datagen.BlockTagGenerator.Companion.DirtLikeBlockTag
 import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagsProvider
 import net.minecraft.core.HolderLookup
+import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.core.registries.Registries
 import net.minecraft.resources.Identifier
+import net.minecraft.resources.ResourceKey
 import net.minecraft.tags.BlockTags
 import net.minecraft.tags.TagKey
 import net.minecraft.world.level.block.Block
@@ -21,8 +23,8 @@ import java.util.concurrent.CompletableFuture
 /**
  * Generates Minecraft block tags for custom blocks based on their characteristics and parent blocks.
  *
- * This provider automatically assigns appropriate mining tool tags (`PICKAXE_WITH_MINEABLE`, `AXE_WITH_MINEABLE`,
- * `SHOVEL_WITH_MINEABLE`, `HOE_WITH_MINEABLE`) by inspecting the [BlockSoundGroup] of the parent blocks.
+ * This provider automatically assigns appropriate mining tool tags (`MINEABLE_WITH_PICKAXE`, `MINEABLE_WITH_AXE`,
+ * `MINEABLE_WITH_SHOVEL`, `MINEABLE_WITH_HOE`) by inspecting the [SoundType] of the parent blocks.
  * It also assigns standard block type tags like `SLABS`, `STAIRS`, `TRAPDOORS`, and specific
  * material tags like `DIRT` based on parent properties.
  *
@@ -40,6 +42,10 @@ class BlockTagGenerator(
     output: FabricPackOutput,
     registriesFuture: CompletableFuture<HolderLookup.Provider>,
 ) : FabricTagsProvider<Block>(output, Registries.BLOCK, registriesFuture) {
+
+    /** Shorthand to resolve a [Block] instance to its [ResourceKey] for use with [builder]. */
+    private fun Block.key(): ResourceKey<Block> = BuiltInRegistries.BLOCK.getResourceKey(this).orElseThrow()
+
     companion object {
         // Groups typically mined fastest with a Pickaxe
         private val PICKAXE_SOUND_GROUPS =
@@ -180,9 +186,17 @@ class BlockTagGenerator(
                 GRAVEL,
             )
 
-        // Custom BlockTag for DirtlLike Blocks
+        // Custom BlockTags
         val DirtLikeBlockTag: TagKey<Block> = TagKey.create(Registries.BLOCK, Identifier.fromNamespaceAndPath(MODID, "dirt_like"))
         val DirtPathVariantTag: TagKey<Block> = TagKey.create(Registries.BLOCK, Identifier.fromNamespaceAndPath(MODID, "dirt_path_variant"))
+
+        /**
+         * Custom BlockTag bundling all vanilla ore tags and serving as the primary ore detection
+         * mechanism for vein mining. Other mods can extend this tag to add their own ores by
+         * including `additions:ores` in their own tag files.
+         * Used in [VeinMineItem] as the first check before falling back to naming convention.
+         */
+        val OresTag: TagKey<Block> = TagKey.create(Registries.BLOCK, Identifier.fromNamespaceAndPath(MODID, "ores"))
     }
 
     /**
@@ -194,65 +208,89 @@ class BlockTagGenerator(
      * @param wrapper The registry wrapper lookup provided by Fabric, used for accessing registry data.
      */
     override fun addTags(wrapper: HolderLookup.Provider) {
-        // 1. Handle specific block types first
+        // 1. Handle specific block types first.
         // Lanterns are always mineable by pickaxe, regardless of parent material sound.
-        // This ensures consistency even if the parent sound group might suggest otherwise.
         BlockRegistry.registeredLanterns.keys.forEach { lantern ->
-            mineableByPickaxe(lantern)
+            builder(BlockTags.MINEABLE_WITH_PICKAXE).add(lantern.key())
         }
 
-        // 2. Assign mining tool tags and specific material tags based on parent blocks
-        // Process trapdoors using their specific parent list
+        // 2. Assign mining tool tags and specific material tags based on parent blocks.
         assignTagsBasedOnParent(BlockRegistry.registeredTrapdoors, BlockRegistry.trapdoorVariantsParents)
-        // Process stairs and slabs using the common block variant parent list
         assignTagsBasedOnParent(BlockRegistry.registeredStairs, BlockRegistry.blockVariantsParents)
         assignTagsBasedOnParent(BlockRegistry.registeredSlabs, BlockRegistry.blockVariantsParents)
 
-        // 3. Add blocks to standard type tags
-        BlockRegistry.registeredSlabs.forEach { slab -> addToTag(slab, BlockTags.SLABS) }
-        BlockRegistry.registeredStairs.forEach { stair -> addToTag(stair, BlockTags.STAIRS) }
-        BlockRegistry.registeredTrapdoors.forEach { trapdoor -> addToTag(trapdoor, BlockTags.TRAPDOORS) }
+        // 3. Add blocks to standard type tags.
+        builder(BlockTags.SLABS).addAll(BlockRegistry.registeredSlabs.map { it.key() })
+        builder(BlockTags.STAIRS).addAll(BlockRegistry.registeredStairs.map { it.key() })
+        builder(BlockTags.TRAPDOORS).addAll(BlockRegistry.registeredTrapdoors.map { it.key() })
 
-        // 4. Add blocks to custom tags
-        addToTag(Blocks.DIRT_PATH, DirtPathVariantTag)
+        // 4. Add blocks to custom tags.
+        builder(DirtPathVariantTag).add(Blocks.DIRT_PATH.key())
+        builder(BlockTags.ENABLES_BUBBLE_COLUMN_DRAG_DOWN).addAll(BlockRegistry.getRegisteredMagmaBlocks().map { it.key() })
 
-        // Magma-Varianten für Bubble Columns registrieren
-        BlockRegistry.getRegisteredMagmaBlocks().forEach { block ->
-            addToTag(block, BlockTags.ENABLES_BUBBLE_COLUMN_DRAG_DOWN)
-        }
+        // 5. Build the additions:ores tag from all vanilla ore tags.
+        // Vanilla tags are always present, added directly via addTag.
+        // Mod-provided ore tags (e.g. from Create, Thermal etc.) are included as optional tags
+        // so the build does not fail if those mods are not present.
+        // Other mods can extend additions:ores by adding it as a parent in their own tag files.
+        builder(OresTag)
+            .addOptionalTag(BlockTags.COAL_ORES)
+            .addOptionalTag(BlockTags.COPPER_ORES)
+            .addOptionalTag(BlockTags.DIAMOND_ORES)
+            .addOptionalTag(BlockTags.EMERALD_ORES)
+            .addOptionalTag(BlockTags.GOLD_ORES)
+            .addOptionalTag(BlockTags.IRON_ORES)
+            .addOptionalTag(BlockTags.LAPIS_ORES)
+            .addOptionalTag(BlockTags.REDSTONE_ORES)
+            // Common cross-mod ore convention tags (c: namespace, used by many Fabric mods).
+            // Added as optional so the build does not fail when the mod is absent.
+            .addOptionalTag(TagKey.create(Registries.BLOCK, Identifier.parse("c:ores")))
+            .addOptionalTag(TagKey.create(Registries.BLOCK, Identifier.parse("c:ores/zinc")))
+            .addOptionalTag(TagKey.create(Registries.BLOCK, Identifier.parse("c:ores/silver")))
+            .addOptionalTag(TagKey.create(Registries.BLOCK, Identifier.parse("c:ores/lead")))
+            .addOptionalTag(TagKey.create(Registries.BLOCK, Identifier.parse("c:ores/tin")))
+            .addOptionalTag(TagKey.create(Registries.BLOCK, Identifier.parse("c:ores/nickel")))
+            .addOptionalTag(TagKey.create(Registries.BLOCK, Identifier.parse("c:ores/uranium")))
+            .addOptionalTag(TagKey.create(Registries.BLOCK, Identifier.parse("c:ores/aluminum")))
+            .addOptionalTag(TagKey.create(Registries.BLOCK, Identifier.parse("c:ores/osmium")))
+            .addOptionalTag(TagKey.create(Registries.BLOCK, Identifier.parse("c:ores/fluorite")))
+            .addOptionalTag(TagKey.create(Registries.BLOCK, Identifier.parse("c:ores/apatite")))
+            .addOptionalTag(TagKey.create(Registries.BLOCK, Identifier.parse("c:ores/sulfur")))
     }
 
     /**
      * Assigns mining tool tags and specific material tags to blocks based on their parent block's sound group.
      *
      * Iterates through the provided block list and assigns:
-     * 1. A primary mining tool tag ([BlockTags.MINEABLE_WITH_AXE], [BlockTags.MINEABLE_WITH_SHOVEL], [BlockTags.MINEABLE_WITH_HOE], [BlockTags.MINEABLE_WITH_PICKAXE])
-     * based on the sound group of the corresponding parent block.
-     * 2. Additional material-specific tags (e.g., [BlockTags.DIRT]) if the parent's sound group matches predefined sets.
+     * 1. A primary mining tool tag ([BlockTags.MINEABLE_WITH_PICKAXE], [BlockTags.MINEABLE_WITH_AXE],
+     * [BlockTags.MINEABLE_WITH_SHOVEL], [BlockTags.MINEABLE_WITH_HOE]) based on the sound group
+     * of the corresponding parent block.
+     * 2. Additional material-specific tags (e.g., [DirtLikeBlockTag]) if the parent's sound group
+     * matches predefined sets.
      *
-     * If a sound group is [EMPTY] or not recognized for tool tagging,
-     * a warning is logged, and it defaults to pickaxe-mineable (except for INTENTIONALLY_EMPTY).
+     * If a sound group is [EMPTY], the block is skipped with an info log.
+     * Unrecognized sound groups default to [defaultTag] with a warning.
      *
      * @param blocks The list of blocks to be tagged (e.g., slabs, stairs).
-     * @param parentBlocks The corresponding list of parent blocks. Must be the same size as `blocks`.
-     * @param defaultTagAssigner A function reference to assign a default mining tag if the sound group is unhandled. Defaults to [mineableByPickaxe].
+     * @param parentBlocks The corresponding list of parent blocks. Must be the same size as [blocks].
+     * @param defaultTag The mining tool tag to fall back to if the sound group is unrecognized.
+     * Defaults to [BlockTags.MINEABLE_WITH_PICKAXE].
      */
     private fun assignTagsBasedOnParent(
         blocks: List<Block>,
         parentBlocks: List<Block>,
-        defaultTagAssigner: (Block) -> Unit = ::mineableByPickaxe,
+        defaultTag: TagKey<Block> = BlockTags.MINEABLE_WITH_PICKAXE,
     ) {
-        // Basic check to prevent potential IndexOutOfBoundsException
         if (blocks.size != parentBlocks.size) {
             logger.error(
-                "[BlockTagGenerator] Block list size (${blocks.size}) and parent block list size (${parentBlocks.size}) mismatch! Skipping tag generation for these lists.",
+                "[BlockTagGenerator] Block list size (${blocks.size}) and parent block list size " +
+                "(${parentBlocks.size}) mismatch! Skipping tag generation for these lists.",
                 IllegalArgumentException("Block and parent list sizes do not match."),
             )
             return
         }
 
         blocks.forEachIndexed { index, block ->
-            // Avoid tagging blocks derived from parents with INTENTIONALLY_EMPTY sound group, log info.
             val parentBlock = parentBlocks[index]
             val parentSoundGroup = parentBlock.defaultBlockState().soundType
 
@@ -261,77 +299,43 @@ class BlockTagGenerator(
                     "[BlockTagGenerator] Skipping tool tag assignment for block [${block.descriptionId}] " +
                         "because its parent [${parentBlock.descriptionId}] has INTENTIONALLY_EMPTY sound group.",
                 )
-            } else {
-                // Determine and assign the primary mining tool tag
-                val toolTagAssigner: ((Block) -> Unit)? =
-                    when (parentSoundGroup) {
-                        in PICKAXE_SOUND_GROUPS -> ::mineableByPickaxe
-                        in AXE_SOUND_GROUPS -> ::mineableByAxe
-                        in SHOVEL_SOUND_GROUPS -> ::mineableByShovel
-                        in HOE_SOUND_GROUPS -> ::mineableByHoe
-                        else -> {
-                            logger.warn(
-                                """
-                                [BlockTagGenerator] Unhandled Sound Group for Mining Tool Tagging:
-                                  Block         : ${block.descriptionId}
-                                  Parent Block  : ${parentBlock.descriptionId}
-                                  Sound Group   : $parentSoundGroup
-                                  Action        : Defaulting to Pickaxe mineable. Consider updating sound group sets or adding specific handling.
-                                """.trimIndent(),
-                            )
-                            defaultTagAssigner // Use the provided default
-                        }
-                    }
-                toolTagAssigner?.invoke(block) // Apply the determined tool tag if one was found/defaulted
-
-                // Assign additional specific material tags based on parent sound group
-                if (parentSoundGroup in DIRT_LIKE_SOUND_GROUPS) {
-                    val tag = if (parentBlock == Blocks.DIRT_PATH) DirtPathVariantTag else DirtLikeBlockTag
-                    addToTag(block, tag)
-                    logger.debug(
-                        "Added tag [{}] to block [{}] based on parent [{}]'s sound group [{}].",
-                        tag.location,
-                        block.descriptionId,
-                        parentBlock.descriptionId,
-                        parentSoundGroup,
-                    )
-                }
-                // TODO: Add more checks here for other material tags (e.g., PLANKS, LOGS) if needed
+                return@forEachIndexed
             }
+
+            // Determine the primary mining tool tag from the parent's sound group.
+            val toolTag: TagKey<Block> = when (parentSoundGroup) {
+                in PICKAXE_SOUND_GROUPS -> BlockTags.MINEABLE_WITH_PICKAXE
+                in AXE_SOUND_GROUPS -> BlockTags.MINEABLE_WITH_AXE
+                in SHOVEL_SOUND_GROUPS -> BlockTags.MINEABLE_WITH_SHOVEL
+                in HOE_SOUND_GROUPS -> BlockTags.MINEABLE_WITH_HOE
+                else -> {
+                    logger.warn(
+                        """
+                        [BlockTagGenerator] Unhandled Sound Group for Mining Tool Tagging:
+                          Block         : ${block.descriptionId}
+                          Parent Block  : ${parentBlock.descriptionId}
+                          Sound Group   : $parentSoundGroup
+                          Action        : Defaulting to ${defaultTag.location()}. Consider updating sound group sets or adding specific handling.
+                        """.trimIndent(),
+                    )
+                    defaultTag
+                }
+            }
+            builder(toolTag).add(block.key())
+
+            // Assign additional dirt-like material tag if applicable.
+            if (parentSoundGroup in DIRT_LIKE_SOUND_GROUPS) {
+                val tag = if (parentBlock == Blocks.DIRT_PATH) DirtPathVariantTag else DirtLikeBlockTag
+                builder(tag).add(block.key())
+                logger.debug(
+                    "Added tag [{}] to block [{}] based on parent [{}]'s sound group [{}].",
+                    tag.location,
+                    block.descriptionId,
+                    parentBlock.descriptionId,
+                    parentSoundGroup,
+                )
+            }
+            // TODO: Add more checks here for other material tags (e.g., PLANKS, LOGS) if needed
         }
-    }
-
-    /** Adds the given block to the [BlockTags.MINEABLE_WITH_AXE] tag. */
-    private fun mineableByPickaxe(block: Block) {
-        addToTag(block, BlockTags.MINEABLE_WITH_PICKAXE)
-    }
-
-    /** Adds the given block to the [BlockTags.MINEABLE_WITH_AXE] tag. */
-    private fun mineableByAxe(block: Block) {
-        addToTag(block, BlockTags.MINEABLE_WITH_AXE)
-    }
-
-    /** Adds the given block to the [BlockTags.MINEABLE_WITH_SHOVEL] tag. */
-    private fun mineableByShovel(block: Block) {
-        addToTag(block, BlockTags.MINEABLE_WITH_SHOVEL)
-    }
-
-    /** Adds the given block to the [BlockTags.MINEABLE_WITH_HOE] tag. */
-    private fun mineableByHoe(block: Block) {
-        addToTag(block, BlockTags.MINEABLE_WITH_HOE)
-    }
-
-    /**
-     * Helper method to add a block to a specific tag.
-     * Gets or creates the tag builder for the given key and adds the block.
-     *
-     * @param block The block to add to the tag.
-     * @param key The [TagKey] representing the tag to add the block to.
-     */
-    private fun addToTag(
-        block: Block,
-        key: TagKey<Block>,
-    ) {
-        getOrCreateRawBuilder(key).addElement(IdentifierHelper.getId(block))
     }
 }
