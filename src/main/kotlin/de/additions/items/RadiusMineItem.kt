@@ -4,6 +4,7 @@ import de.additions.blocks.BlockRegistry
 import de.additions.blocks.BlockRegistry.DIRT_PATH_SLAB
 import de.additions.blocks.BlockRegistry.DIRT_PATH_STAIR
 import de.additions.datagen.BlockTagGenerator
+import de.additions.items.RadiusMineItem.Companion.PATH_CREATION_COOLDOWN
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.core.component.DataComponents
@@ -27,240 +28,175 @@ import net.minecraft.world.level.gameevent.GameEvent
 import java.util.*
 
 /**
- * Represents a custom mining tool that breaks blocks in a defined radius (AoE) around the initially mined block.
- * It also includes AoE functionality similar to a shovel for creating paths.
+ * A custom mining tool that breaks blocks in a square (2*RADIUS+1)² area around the initially
+ * mined block, in a plane relative to the miner's look direction (AoE mining).
+ * Also provides AoE shovel functionality for creating and reverting dirt paths.
  *
- * Inherits from [Item] and relies on the [ToolComponent] (and potentially others like AttributeModifiers)
- * being correctly configured via [Item.Settings] during item registration (e.g., using `.pickaxe()`, `.shovel()`, or `.tool()` helpers).
+ * Inherits from [ToolItem]. The [Item.Properties] passed at registration must already carry the
+ * appropriate [DataComponents.TOOL] and [DataComponents.ATTRIBUTE_MODIFIERS] components
+ * (use the `.pickaxe()`, `.shovel()`, etc. helpers on [Item.Properties]).
  *
- * @property material The [ToolMaterial] defining base properties. Used here for helpers and potentially passed to Settings during registration.
- * @property effectiveBlocks A [TagKey]<[Block]> specifying which blocks the AoE mining effect applies to.
- * Should generally match the tag used when configuring the [ToolComponent] (e.g., [BlockTags.PICKAXE_MINEABLE]).
- * @param settings The base [Item.Settings] for this item. MUST be pre-configured with appropriate components
- * (like [DataComponentTypes.TOOL], [DataComponentTypes.ATTRIBUTE_MODIFIERS]) for base tool functionality.
+ * @property material   The [ToolMaterial] used for helper lookups (crafting ingredient, name, …).
+ * @property effectiveBlocks  The block tag whose members receive the AoE mining treatment.
+ *                            Should match the tag baked into the [DataComponents.TOOL] component.
+ * @param settings  Pre-configured [Item.Properties]; must include TOOL + ATTRIBUTE_MODIFIERS.
  */
-class RadiusMineItem(material: ToolMaterial,
-                     effectiveBlocks: TagKey<Block>,
-                     settings: Properties,
+class RadiusMineItem(
+    material: ToolMaterial,
+    effectiveBlocks: TagKey<Block>,
+    settings: Properties,
 ) : ToolItem(material, effectiveBlocks, settings) {
-companion object {
 
-    /** Cooldown in Ticks (20 Ticks = 1 Second) for the path creation ability. */
-    private const val PATH_CREATION_COOLDOWN = 2
+    companion object {
+        /** Cooldown in ticks before the path-creation ability can fire again (20 ticks = 1 s). */
+        private const val PATH_CREATION_COOLDOWN = 2
 
-    /** Map to store the last usage time of the path creation ability per player UUID. */
-    private val lastPathCreationTime = mutableMapOf<UUID, Long>()
-}
+        /** Per-player timestamp of the last successful path-creation use. */
+        private val lastPathCreationTime = mutableMapOf<UUID, Long>()
+    }
+
     /**
-     * Called after a block is successfully mined. Implements the radius mining logic.
-     * Breaks additional blocks within the defined [RADIUS] around the original block, in a plane relative to the miner's facing direction.
+     * Called after a block is successfully mined.
+     * Breaks every block in a square (2*RADIUS+1)² plane around [pos], oriented perpendicular
+     * to the miner's look direction. The center block (already broken by vanilla) is skipped.
      *
-     * @param stack The [ItemStack] used for mining.
-     * @param world The [World] where mining occurred.
-     * @param state The [BlockState] of the initially mined block.
-     * @param pos The [BlockPos] of the initially mined block.
-     * @param miner The [LivingEntity] who mined the block.
-     * @return Boolean indicating if the mining action should proceed (super call handles initial damage).
+     * Only runs server-side and only for blocks with a positive destroy speed (skips insta-break
+     * blocks like air/grass to avoid wasting durability).
      */
     override fun mineBlock(
         stack: ItemStack,
         world: Level,
         state: BlockState,
-        pos: BlockPos, // Position of the *first* block broken
+        pos: BlockPos,
         miner: LivingEntity,
     ): Boolean {
-        // super.postMine() handles damage for the *initial* block based on ToolComponent.damagePerBlock
-        // It returns true if the block was successfully mined and damage was applied (or would be in survival).
         val initialResult = super.mineBlock(stack, world, state, pos, miner)
 
         val toolData = stack.get(DataComponents.TOOL)
 
-        // Execute AoE only on the server, if the item has tool data, and the initial block wasn't instantly breakable.
         if (world.isClientSide || state.getDestroySpeed(world, pos) <= 0.0f || toolData == null) {
-            return initialResult // Don't process AoE on client or for trivial blocks
+            return initialResult
         }
 
-        // Determine the AoE plane based on the direction the player is facing.
         when (miner.nearestViewDirection) {
-            // Looking Up/Down: Mine in a horizontal (XZ) plane around the target block.
+            // Looking up/down → square in the XZ plane
             Direction.UP, Direction.DOWN -> {
                 for (dx in -RADIUS..RADIUS) {
                     for (dz in -RADIUS..RADIUS) {
-                        // Skip the center block (dx=0, dz=0) - already mined
-                        // Check if within the circular radius in the XZ plane
-                        if ((dx != 0 || dz != 0) && dx * dx + dz * dz <= RADIUS * RADIUS) {
-                            tryBreakBlock(pos.offset(dx, 0, dz), world, miner, stack, toolData)
-                        }
+                        if (dx == 0 && dz == 0) continue // centre already broken
+                        tryBreakBlock(pos.offset(dx, 0, dz), world, miner, stack, toolData)
                     }
                 }
             }
-            // Looking North/South: Mine in a vertical (XY) plane around the target block.
+            // Looking north/south → square in the XY plane
             Direction.NORTH, Direction.SOUTH -> {
                 for (dx in -RADIUS..RADIUS) {
                     for (dy in -RADIUS..RADIUS) {
-                        // Skip the center block (dx=0, dy=0)
-                        // Check if within the circular radius in the XY plane
-                        if ((dx != 0 || dy != 0) && dx * dx + dy * dy <= RADIUS * RADIUS) {
-                            tryBreakBlock(pos.offset(dx, dy, 0), world, miner, stack, toolData)
-                        }
+                        if (dx == 0 && dy == 0) continue
+                        tryBreakBlock(pos.offset(dx, dy, 0), world, miner, stack, toolData)
                     }
                 }
             }
-            // Looking East/West: Mine in a vertical (YZ) plane around the target block.
+            // Looking east/west → square in the YZ plane
             Direction.EAST, Direction.WEST -> {
                 for (dz in -RADIUS..RADIUS) {
                     for (dy in -RADIUS..RADIUS) {
-                        // Skip the center block (dz=0, dy=0)
-                        // Check if within the circular radius in the YZ plane
-                        if ((dz != 0 || dy != 0) && dz * dz + dy * dy <= RADIUS * RADIUS) {
-                            tryBreakBlock(pos.offset(0, dy, dz), world, miner, stack, toolData)
-                        }
+                        if (dz == 0 && dy == 0) continue
+                        tryBreakBlock(pos.offset(0, dy, dz), world, miner, stack, toolData)
                     }
                 }
             }
-            // Should not happen with standard facing directions
-            else -> Unit
         }
 
-        // Return true because the item was used for mining (even if only the initial block was affected by super.postMine)
-        // This ensures vanilla mechanics like stat tracking might count the usage.
         return true
     }
 
     /**
-     * Called when the item is used on a block (right-click). Implements the radius path creation logic.
-     * Turns suitable blocks (like dirt, grass) into dirt paths within the defined [RADIUS].
+     * Right-click handler. Converts suitable blocks within a square (2*RADIUS+1)² XZ area around
+     * the clicked position into dirt paths (normal use) or reverts path variants back to dirt
+     * (sneak-use). The area is always horizontal regardless of look direction.
      *
-     * @param context Provides context about the usage action (world, position, player, etc.).
-     * @return [ActionResult] indicating whether the action was successful.
+     * Respects a short [PATH_CREATION_COOLDOWN] to prevent sound/event spam on rapid clicks.
      */
     override fun useOn(context: UseOnContext): InteractionResult {
         val world = context.level
         val initialPos = context.clickedPos
         val player = context.player ?: return InteractionResult.PASS
-        val stack = context.itemInHand ?: return InteractionResult.PASS // Need stack for damage
+        val stack = context.itemInHand ?: return InteractionResult.PASS
 
-        // --- Cooldown Check ---
+        // --- Cooldown check ---
         val playerUuid = player.uuid
         val currentTime = world.gameTime
-        val lastUsage = lastPathCreationTime[playerUuid] ?: 0L
-        if (currentTime - lastUsage < PATH_CREATION_COOLDOWN) {
-            return InteractionResult.PASS // Still in cooldown
+        if (currentTime - (lastPathCreationTime[playerUuid] ?: 0L) < PATH_CREATION_COOLDOWN) {
+            return InteractionResult.PASS
         }
 
-        // Define which blocks can be turned into paths
-        val pathableFullBlocks = BlockTags.DIRT // Using the DIRT tag (includes grass, dirt, podzol, etc.)
+        val pathableFullBlocks = BlockTags.DIRT
         val pathableCustomBlocks = BlockTagGenerator.DirtLikeBlockTag
-        val dirtCovertableBlocks = BlockTagGenerator.DirtPathVariantTag
+        val dirtConvertableBlocks = BlockTagGenerator.DirtPathVariantTag
         var changedSomething = false
 
-        fun isInPathable(state: BlockState): Boolean = state.`is`(pathableFullBlocks) || state.`is`(pathableCustomBlocks)
+        fun isPathable(state: BlockState) =
+            state.`is`(pathableFullBlocks) || state.`is`(pathableCustomBlocks)
 
-        fun isInDirtCovertable(state: BlockState): Boolean = state.`is`(dirtCovertableBlocks)
+        fun isDirtConvertable(state: BlockState) =
+            state.`is`(dirtConvertableBlocks)
 
-        // Iterate through the horizontal plane defined by the RADIUS around the clicked block
         for (dx in -RADIUS..RADIUS) {
             for (dz in -RADIUS..RADIUS) {
-                // Check if the position is within the circular radius in the XZ plane
-                if (dx * dx + dz * dz <= RADIUS * RADIUS) {
-                    val currentPos = initialPos.offset(dx, 0, dz)
-                    val targetState = world.getBlockState(currentPos)
-                    val blockAboveState = world.getBlockState(currentPos.above())
+                val currentPos = initialPos.offset(dx, 0, dz)
+                val targetState = world.getBlockState(currentPos)
+                val blockAboveState = world.getBlockState(currentPos.above())
 
-                    // Conditions for creating a path:
-                    // 1. Target block is pathable (e.g., in DIRT tag).
-                    // 2. Space above is air.
-                    if (isInPathable(targetState) && blockAboveState.isAir && !player.isShiftKeyDown) {
-                        val targetBlock = targetState.block
+                if (isPathable(targetState) && blockAboveState.isAir && !player.isShiftKeyDown) {
+                    // --- Normal use: convert to dirt path ---
+                    val pathState: BlockState? = when (targetState.block) {
+                        Blocks.DIRT_PATH -> null   // already a path
+                        DIRT_PATH_STAIR  -> null
+                        DIRT_PATH_SLAB   -> null
+                        is StairBlock    -> DIRT_PATH_STAIR.withPropertiesOf(targetState)
+                        is SlabBlock     -> DIRT_PATH_SLAB.withPropertiesOf(targetState)
+                        else             -> Blocks.DIRT_PATH.defaultBlockState()
+                    }
 
-                        // Determine the desired path state
-                        val pathState: BlockState? =
-                            when (targetBlock) {
-                                // Check if target is already a custom path stair/slab
-                                // this should not be necessary, but just in case
-                                Blocks.DIRT_PATH -> null
-                                DIRT_PATH_STAIR -> null
-                                DIRT_PATH_SLAB -> null
-                                // copy states from the target block
-                                is StairBlock -> DIRT_PATH_STAIR.withPropertiesOf(targetState)
-                                is SlabBlock -> DIRT_PATH_SLAB.withPropertiesOf(targetState)
-                                else -> Blocks.DIRT_PATH.defaultBlockState() // Default to full path block
-                            }
+                    if (pathState != null) {
+                        world.playSound(player, currentPos, SoundEvents.SHOVEL_FLATTEN, SoundSource.BLOCKS)
 
-                        // If a valid path state was determined and it's different
-                        if (pathState != null) {
-                            // Play sound before changing state
-                            world.playSound(
-                                player, // Play sound near the player triggering it
-                                currentPos,
-                                SoundEvents.SHOVEL_FLATTEN,
-                                SoundSource.BLOCKS,
-                            )
-
-                            // Perform changes only on the server
-                            if (!world.isClientSide) {
-                                // Set the block state
-                                world.setBlock(currentPos, pathState, Block.UPDATE_CLIENTS or Block.UPDATE_KNOWN_SHAPE)
-
-                                // Emit game event for observers (like sculk)
-                                world.gameEvent(
-                                    GameEvent.BLOCK_CHANGE,
-                                    currentPos,
-                                    GameEvent.Context.of(player, pathState), // Use player context
-                                )
-
-                                // Apply durability damage
-                                stack.hurtWithoutBreaking(1, player)
-                                changedSomething = true
-                            }
-                        }
-                    } else if (isInDirtCovertable(targetState) && player.isShiftKeyDown) {
-                        // Check if the target block is a dirt-like block that can be converted
-                        val newState =
-                            when (targetState.block) {
-                                is StairBlock -> BlockRegistry.DIRT_STAIR.withPropertiesOf(targetState)
-                                is SlabBlock -> BlockRegistry.DIRT_SLAB.withPropertiesOf(targetState)
-                                else -> Blocks.DIRT.withPropertiesOf(targetState)
-                            }
-
-                        // Play sound before changing state
-                        world.playSound(
-                            player,
-                            currentPos,
-                            SoundEvents.SHOVEL_FLATTEN,
-                            SoundSource.BLOCKS,
-                        )
-
-                        // Perform changes only on the server
                         if (!world.isClientSide) {
-                            if (currentPos == player.blockPosition()) {
-                                // push up the player if the replaced block is below them
-                                player.randomTeleport(player.x, player.y + 0.5, player.z, false)
-                            }
-                            // Set the block state
-                            world.setBlock(currentPos, newState, Block.UPDATE_CLIENTS or Block.UPDATE_KNOWN_SHAPE)
-
-                            // Emit game event for observers (like sculk)
-                            world.gameEvent(
-                                GameEvent.BLOCK_CHANGE,
-                                currentPos,
-                                GameEvent.Context.of(player, newState), // Use player context
-                            )
-
-                            // Apply durability damage
+                            world.setBlock(currentPos, pathState, Block.UPDATE_CLIENTS or Block.UPDATE_KNOWN_SHAPE)
+                            world.gameEvent(GameEvent.BLOCK_CHANGE, currentPos, GameEvent.Context.of(player, pathState))
                             stack.hurtWithoutBreaking(1, player)
                             changedSomething = true
                         }
+                    }
+
+                } else if (isDirtConvertable(targetState) && player.isShiftKeyDown) {
+                    // --- Sneak-use: revert path variants back to dirt ---
+                    val newState = when (targetState.block) {
+                        is StairBlock -> BlockRegistry.DIRT_STAIR.withPropertiesOf(targetState)
+                        is SlabBlock  -> BlockRegistry.DIRT_SLAB.withPropertiesOf(targetState)
+                        else          -> Blocks.DIRT.withPropertiesOf(targetState)
+                    }
+
+                    world.playSound(player, currentPos, SoundEvents.SHOVEL_FLATTEN, SoundSource.BLOCKS)
+
+                    if (!world.isClientSide) {
+                        // Push the player up slightly when the block directly below them is replaced
+                        if (currentPos == player.blockPosition()) {
+                            player.randomTeleport(player.x, player.y + 0.5, player.z, false)
+                        }
+
+                        world.setBlock(currentPos, newState, Block.UPDATE_CLIENTS or Block.UPDATE_KNOWN_SHAPE)
+                        world.gameEvent(GameEvent.BLOCK_CHANGE, currentPos, GameEvent.Context.of(player, newState))
+                        stack.hurtWithoutBreaking(1, player)
+                        changedSomething = true
                     }
                 }
             }
         }
 
-        // If any block was changed server-side, update cooldown and return SUCCESS
         return if (changedSomething) {
-            if (!world.isClientSide) { // Only update cooldown on server
-                lastPathCreationTime[playerUuid] = currentTime
-            }
+            if (!world.isClientSide) lastPathCreationTime[playerUuid] = currentTime
             InteractionResult.SUCCESS
         } else {
             InteractionResult.PASS

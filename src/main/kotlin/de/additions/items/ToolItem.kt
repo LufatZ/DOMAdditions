@@ -4,24 +4,23 @@ import de.additions.Additions.logger
 import de.additions.datagen.ItemTagGenerator
 import de.additions.items.ToolItem.Companion.materials
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback
-import net.minecraft.world.level.block.Block
-import net.minecraft.world.level.block.state.BlockState
-import net.minecraft.core.component.DataComponents
-import net.minecraft.world.item.component.Tool
+import net.minecraft.core.BlockPos
+import net.minecraft.core.HolderGetter
+import net.minecraft.tags.BlockTags
+import net.minecraft.tags.ItemTags
+import net.minecraft.tags.TagKey
+import net.minecraft.world.InteractionResult
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 import net.minecraft.world.item.ToolMaterial
+import net.minecraft.world.item.component.Tool
 import net.minecraft.world.item.crafting.Ingredient
-import net.minecraft.core.HolderGetter
-import net.minecraft.tags.BlockTags
-import net.minecraft.tags.ItemTags
-import net.minecraft.tags.TagKey
-import net.minecraft.world.InteractionResult
-import net.minecraft.core.BlockPos
 import net.minecraft.world.level.Level
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.state.BlockState
 
 /**
  * Represents a custom mining tool that breaks blocks in a defined radius (AoE) around the initially mined block.
@@ -69,7 +68,7 @@ open class ToolItem(
         }
 
         /** The radius for the Area of Effect (AoE) mining and path creation (0=1x1, 1=3x3, 2=5x5 -> 5x5 area). */
-        const val RADIUS = 2
+        const val RADIUS = 1
 
         internal enum class ToolTypes {
             PICKAXE,AXE,SHOVEL,HOE
@@ -225,7 +224,7 @@ open class ToolItem(
         val targetState = world.getBlockState(targetPos)
 
         val isCreative = miner is Player && miner.isCreative
-        val canMine = isCreative || isSuitableForMining(targetState, world, targetPos, toolData)
+        val canMine = isSuitableForMining(targetState, world, targetPos, toolData)
 
         if (canMine) {
             val blockBroken = world.destroyBlock(targetPos, !isCreative, miner)
@@ -250,7 +249,6 @@ open class ToolItem(
         state: BlockState,
         world: Level,
         targetPos: BlockPos,
-        // Keep miner parameter
         toolData: Tool,
     ): Boolean {
         // 1. Check if the tool is configured to mine this block type via the effectiveBlocks tag.
@@ -280,7 +278,6 @@ open class ToolItem(
         return !state.isAir &&
                 state.getDestroySpeed(world, targetPos) > 0.0f &&
                 toolData.damagePerBlock() > 0 &&
-                // Ensure the tool component defines damage
                 sufficientMiningLevel
     }
 }

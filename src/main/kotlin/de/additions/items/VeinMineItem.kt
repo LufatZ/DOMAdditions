@@ -386,7 +386,7 @@ class VeinMineItem(
         val blockState = world.getBlockState(pos)
 
         if (blockState.block != targetBlock) return false
-        if (miner is Player && miner.isCreative) return true
+        //if (miner is Player && miner.isCreative) return true
 
         return isSuitableForMining(blockState, world, pos, toolData)
     }
