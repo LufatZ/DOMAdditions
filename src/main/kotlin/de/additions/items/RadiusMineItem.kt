@@ -12,6 +12,7 @@ import net.minecraft.tags.TagKey
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.InteractionResult
 import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.ToolMaterial
 import net.minecraft.world.item.component.Tool
@@ -39,31 +40,33 @@ class RadiusMineItem(
 ) : ToolItem(material, effectiveBlocks, settings) {
 
     /**
-     * Performs block mining with an area-of-effect (AoE) expansion based on the direction the miner is facing.
-     * This method triggers a secondary breaking process in a specified radius around the target block,
-     * depending on whether the miner is looking up/down, north/south, or east/west.
+     * Handles the mining of a block by potentially expanding the breakage area based on the direction of impact.
+     * If the item stack contains valid tool data, this method determines the mining direction from the
+     * miner's view or last hit face and triggers an expanded breakage within a specified radius.
      *
-     * @param stack The [ItemStack] being used to mine the block.
-     * @param world The [Level] where the mining occurs.
-     * @param state The [BlockState] of the block being mined.
-     * @param pos The [BlockPos] of the block being mined.
-     * @param miner The [LivingEntity] performing the mining action.
-     * @return True if the mining operation was successful, regardless of whether an expansion occurred.
+     * @param stack The item stack being used for the mining action.
+     * @param world The level where the mining is occurring.
+     * @param state The state of the block being mined.
+     * @param pos The position of the block being mined.
+     * @param miner The entity performing the mining action.
+     * @return True if the expansion logic was applied, or the result from the super method if tool data is missing.
      */
     override fun mineBlock(stack: ItemStack, world: Level, state: BlockState, pos: BlockPos, miner: LivingEntity): Boolean {
         val initialResult = super.mineBlock(stack, world, state, pos, miner)
-
         val toolData = stack.get(DataComponents.TOOL) ?: return initialResult
-        when (miner.nearestViewDirection) {
+
+        val face = (miner as? Player)?.let { lastHitFace[it.uuid] }
+            ?: miner.nearestViewDirection
+
+        when (face) {
             Direction.UP, Direction.DOWN ->
                 expandAndBreak(pos, world, miner, stack, toolData, dx = -RADIUS..RADIUS, dy = 0..0, dz = -RADIUS..RADIUS)
-
             Direction.NORTH, Direction.SOUTH ->
                 expandAndBreak(pos, world, miner, stack, toolData, dx = -RADIUS..RADIUS, dy = -RADIUS..RADIUS, dz = 0..0)
-
             else ->
                 expandAndBreak(pos, world, miner, stack, toolData, dx = 0..0, dy = -RADIUS..RADIUS, dz = -RADIUS..RADIUS)
         }
+
         return true
     }
 

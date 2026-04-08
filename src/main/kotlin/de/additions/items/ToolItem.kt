@@ -2,6 +2,7 @@ package de.additions.items
 
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback
 import net.minecraft.core.BlockPos
+import net.minecraft.core.Direction
 import net.minecraft.tags.BlockTags
 import net.minecraft.tags.TagKey
 import net.minecraft.world.InteractionResult
@@ -14,6 +15,7 @@ import net.minecraft.world.item.component.Tool
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.state.BlockState
+import java.util.*
 
 /**
  * Base implementation of an item that functions as a tool, supporting specialized mining mechanics and durability management.
@@ -32,21 +34,24 @@ open class ToolItem(
      * [ToolMaterial] instances with increased durability.
      */
     companion object {
+        val lastHitFace = mutableMapOf<UUID, Direction>()
         init {
             /**
              * Registers a callback to handle block mining in Creative mode.
              * This ensures that custom AoE/Vein mining effects trigger even when
              * vanilla durability constraints are bypassed.
              */
-            AttackBlockCallback.EVENT.register { player, world, _, pos, _ ->
-                if (world.isClientSide || !player.isCreative) {
-                    return@register InteractionResult.PASS
-                }
+            AttackBlockCallback.EVENT.register { player, world, _, pos, direction ->
+                if (world.isClientSide) return@register InteractionResult.PASS
 
-                val stack = player.mainHandItem
-                if (stack.item is ToolItem) {
-                    val state = world.getBlockState(pos)
-                    (stack.item as ToolItem).mineBlock(stack, world, state, pos, player)
+                lastHitFace[player.uuid] = direction
+
+                if (player.isCreative) {
+                    val stack = player.mainHandItem
+                    if (stack.item is ToolItem) {
+                        val state = world.getBlockState(pos)
+                        (stack.item as ToolItem).mineBlock(stack, world, state, pos, player)
+                    }
                 }
 
                 InteractionResult.PASS
