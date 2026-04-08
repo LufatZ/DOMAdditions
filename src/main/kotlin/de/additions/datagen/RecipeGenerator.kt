@@ -6,15 +6,13 @@ import de.additions.Additions.MODID
 import de.additions.Additions.logger
 import de.additions.blocks.*
 import de.additions.blocks.lanterns.*
-import de.additions.items.ItemRegistry
-import de.additions.items.ToolItem
+import de.additions.items.*
 import de.additions.items.ToolItem.Companion.C_DIAMOND
 import de.additions.items.ToolItem.Companion.C_GOLD
 import de.additions.items.ToolItem.Companion.C_IRON
 import de.additions.items.ToolItem.Companion.C_NETHERITE
 import de.additions.items.ToolItem.Companion.C_STONE
 import de.additions.items.ToolItem.Companion.C_WOOD
-import de.additions.items.VeinMineItem
 import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider
 import net.minecraft.advancements.criterion.InventoryChangeTrigger

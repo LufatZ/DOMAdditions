@@ -4,9 +4,7 @@ import de.additions.Additions.MODID
 import de.additions.Additions.logger
 import de.additions.Additions.logging
 import de.additions.itemGroups.ItemGroupRegistry
-import de.additions.items.ToolItem.Companion.MiningTypes
 import de.additions.items.ToolItem.Companion.RADIUS
-import de.additions.items.ToolItem.Companion.ToolTypes
 import de.additions.items.ToolItem.Companion.materials
 import net.minecraft.ChatFormatting
 import net.minecraft.core.Registry
@@ -36,6 +34,8 @@ import net.minecraft.world.item.component.ItemLore
  */
 object ItemRegistry {
 
+    internal enum class ToolTypes { PICKAXE, AXE, SHOVEL, HOE }
+    internal enum class MiningTypes { RADIUS_MINING, VEIN_MINING }
     /**
      * A mutable list containing [ItemStack] instances of all successfully registered tools.
      *
