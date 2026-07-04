@@ -1,6 +1,15 @@
 ![DayOfMind](https://cdn.modrinth.com/data/o0NSWXiU/images/30dd4442f5da1001f240de08fb3e7130a56c8a87.jpeg)
 
 ---
+## ⚠️ **This repository has moved!**
+
+Development of DayOfMind Additions no longer happens here. All future work, issues, and pull requests now live on Codeberg:
+
+👉 **[https://codeberg.org/OxFaTech/DayOfMind-Additions](https://codeberg.org/OxFaTech/DayOfMind-Additions)**
+
+This GitHub repository is kept for archival purposes only and will not receive further updates. Please open new issues and contribute over on Codeberg.
+
+---
 ## 🔨 **Join the Tools Rework Beta Testing!**
 
 We're excited to announce that **DayOfMind Additions is getting a complete tools overhaul**, and we need YOUR help to make it amazing! 🚀
@@ -28,7 +37,8 @@ Welcome to **DayOfMind**, a sophisticated Minecraft mod project developed by Oxf
 ![fabric](https://img.shields.io/badge/fabric-1.19.x-707070?style=flat-square)
 [![ko-fi](https://img.shields.io/badge/Ko--fi-FF5E5B?logo=ko-fi&logoColor=white)](https://ko-fi.com/R6R818TUQY)
 [![Crowdin](https://badges.crowdin.net/dayofmind-additions/localized.svg)](https://crowdin.com/project/dayofmind-additions)
-[![GitHub](https://img.shields.io/badge/GitHub-%23121011.svg?logo=github&logoColor=white)](https://github.com/LufatZ/DOMAdditions)
+[![Codeberg](https://img.shields.io/badge/Codeberg-2185D0?logo=codeberg&logoColor=white)](https://codeberg.org/OxFaTech/DayOfMind-Additions)
+[![GitHub (archived)](https://img.shields.io/badge/GitHub-archived-8B0000?logo=github&logoColor=white)](https://github.com/LufatZ/DOMAdditions)
 [![Discord](https://img.shields.io/badge/Discord-%237289DA.svg?logo=discord&logoColor=white)](https://discord.gg/juxu5Jrrdk)
 [![Modrinth](https://img.shields.io/badge/Modrinth-0077DD?logo=modrinth&logoColor=white)](https://modrinth.com/mod/dayofmind-additions)
 [![CurseForge](https://img.shields.io/badge/CurseForge-551A8B?logo=curseforge&logoColor=white)](https://www.curseforge.com/minecraft/mc-mods/dayofmind-additions)
@@ -36,7 +46,8 @@ Welcome to **DayOfMind**, a sophisticated Minecraft mod project developed by Oxf
 ---
 
 ## 📚 Quick Links
-- [**GitHub Repository**](https://github.com/LufatZ/DOMAdditions): Explore the code, report bugs, or contribute! ✍️
+- [**Codeberg Repository**](https://codeberg.org/OxFaTech/DayOfMind-Additions): Explore the code, report bugs, or contribute! ✍️
+- [**GitHub Repository (archived)**](https://github.com/LufatZ/DOMAdditions): Old code history only, no longer maintained.
 - [**Discord Community**](https://discord.gg/yRkqCvFcmz): Share your ideas and give feedback! 🫶
 - [**Translation Project on Crowdin**](https://crowdin.com/project/dayofmind-additions): Help translate the mod!
 - [**Modpack on Modrinth**](https://modrinth.com/modpack/dayofmind) | [**CurseForge**](https://www.curseforge.com/minecraft/modpacks/day-of-mind): Try out the official modpack! 🎮
